@@ -1,0 +1,473 @@
+// ====================> Some HRM test globals <=======================
+#define		HRM_AVG_SAMPLES		4
+// HRM_SAMPLE_TIME = 6667 * 150 uSec = 50 mSec = 20Hz
+#define 	HRM_SAMPLE_TIME		6667
+#define		HRM_STITCH_TRESH	300
+uint16_t 	accel_x;
+uint16_t 	accel_y;
+uint16_t 	accel_z;
+uint8_t 	uart_rev_buffer[1] = {0};
+uint8_t 	uart_rx_ubyte;
+T_PKT_TYPES tx_type;			//T_PKT_TYPES type;
+uint8_t 	tx_payload[ MAX_PKT_PAYLOAD ];
+int8_t 		tx_pay_len = -1;	//default no response
+uint8_t 	current_hrm = 69, hrm_step = 0;
+uint16_t	hrm_tx_rdy_cntr = 0;
+uint16_t 	run_get_hrms = 0;
+int16_t 	hrm_chan1_raw[156], hrm_chan2_raw[156], hrm_raw_index = 0, hrm_raw_index_old;
+int16_t		hrm_chan_1_raw, hrm_chan_2_raw;
+uint8_t		hrm_running_avg_indx = 0;
+int16_t		hrm_chan1_running_avg[HRM_AVG_SAMPLES], hrm_chan2_running_avg[HRM_AVG_SAMPLES];
+int32_t		hrm_chan1_running_avg_accm, hrm_chan2_running_avg_accm;
+int16_t 	hrm_ch1_avg, hrm_ch2_avg;
+int16_t 	hrm_chan1_fbs = 0, hrm_chan2_fbs = 0;
+bool		hrm_stitch_flag = 0;
+/// note default index = 8 = 0x12 = 50mA
+uint8_t hrm_agc_led_current_idx = 8;
+uint8_t hrm_agc_led_current[30] = {0x00, 0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38, 0x12, 0x21, 0x29, 0x31, 0x22, 0x39, 0x2A, 
+									0x23, 0x32, 0x3A, 0x24, 0x33, 0x2C, 0x3B, 0x34, 0x2D, 0x3C, 0x35, 0x3D, 0x36, 0x3E, 0x3F};
+									
+/*                      Proto 1153 HRM code                                 
+	uint8_t		hrm_running_avg_indx = 0;
+	int16_t	hrm_chan1_running_avg[5], hrm_chan2_running_avg[5];
+	int32_t	hrm_chan1_running_avg_accm, hrm_chan2_running_avg_accm;
+	int16_t hrm_chan1_fbs = 0, hrm_chan2_fbs = 0;	
+*/
+// HRM_SAMPLE_TIME = 6667 * 150 uSec = 50 mSec = 20Hz
+//#define		HRM_AVG_SAMPLES		6
+//#define 	HRM_SAMPLE_TIME		6667
+//#define		HRM_STITCH_TRESH	100
+		
+/// note default index = 8 = 0x12 = 50mA
+///uint8_t hrm_agc_led_current_idx = 8;
+///uint8_t hrm_agc_led_current[30] = {0x00, 0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38, 0x12, 0x21, 0x29, 0x31, 0x22, 0x39, 0x2A, 
+///									0x23, 0x32, 0x3A, 0x24, 0x33, 0x2C, 0x3B, 0x34, 0x2D, 0x3C, 0x35, 0x3D, 0x36, 0x3E, 0x3F};	
+
+	if (m_conn_handle != BLE_CONN_HANDLE_INVALID)
+	{		
+		if(hrm_tx_rdy_cntr == HRM_SAMPLE_TIME) 
+		{		
+			/// Get a hrm sample every 0.05 seconds = 20 Hz.
+			hrm_chan_1_raw = ((uint16_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT1) << 8) + (uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT2);
+			hrm_chan_2_raw = ((uint16_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT4) << 8) + (uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT5);
+			Si115xWriteToRegister(SI115x_REG_COMMAND, 0x11); // Force cmd
+			hrm_chan_1_raw -= hrm_chan1_fbs;
+			hrm_chan_2_raw -= hrm_chan2_fbs;
+			
+			/// Running Average.
+#if 0
+			hrm_chan1_running_avg[hrm_running_avg_indx] = hrm_chan_1_raw;
+			hrm_chan2_running_avg[hrm_running_avg_indx] = hrm_chan_2_raw;
+			hrm_chan1_running_avg_accm = 0;
+			hrm_chan2_running_avg_accm = 0;
+			for(i=0; i<HRM_AVG_SAMPLES; i++)
+			{
+				hrm_chan1_running_avg_accm += (int32_t)hrm_chan1_running_avg[i] * 100;
+				hrm_chan2_running_avg_accm += (int32_t)hrm_chan2_running_avg[i] * 100;
+			}
+			hrm_chan_1_raw = (int16_t)(hrm_chan1_running_avg_accm / HRM_AVG_SAMPLES / 100);
+			hrm_chan_2_raw = (int16_t)(hrm_chan2_running_avg_accm / HRM_AVG_SAMPLES / 100);
+#endif	
+			
+			/// Done, throw it in the pile.
+			hrm_chan1_raw[hrm_raw_index] = hrm_chan_1_raw;
+			hrm_chan2_raw[hrm_raw_index] = hrm_chan_2_raw;
+			
+#if 0
+			/// LED Current Control (AGC).
+			if( ((uint16_t)hrm_chan_1_raw + hrm_chan1_fbs > 12000) && (hrm_agc_led_current_idx > 0))
+			{
+				hrm_agc_led_current_idx--;
+				Si115xParamSet(PARAM_LED1_A, hrm_agc_led_current[hrm_agc_led_current_idx]);
+				Si115xParamSet(PARAM_LED1_B, hrm_agc_led_current[hrm_agc_led_current_idx]);
+			}
+			
+			if( ((uint16_t)hrm_chan_1_raw + hrm_chan1_fbs < 12000) && (hrm_agc_led_current_idx < 29))
+			{
+				hrm_agc_led_current_idx++;
+				Si115xParamSet(PARAM_LED1_A, hrm_agc_led_current[hrm_agc_led_current_idx]);
+				Si115xParamSet(PARAM_LED1_B, hrm_agc_led_current[hrm_agc_led_current_idx]);
+			}
+#endif
+			
+#if 0			
+			/// Seeking Zero the Bias.
+			if(hrm_raw_index == 0)
+			{
+				hrm_chan1_fbs = hrm_chan_1_raw + hrm_chan1_fbs;
+				hrm_chan2_fbs = hrm_chan_2_raw + hrm_chan2_fbs;
+			}
+			if(hrm_raw_index > 5)
+			{		
+				if( (hrm_chan_1_raw > (hrm_chan1_raw[hrm_raw_index - 5] + HRM_STITCH_TRESH)) || 
+				  (hrm_chan_1_raw < (hrm_chan1_raw[hrm_raw_index - 5] - HRM_STITCH_TRESH)) )
+				{
+					hrm_chan1_fbs = hrm_chan1_fbs + ((hrm_chan_1_raw) / 2);
+				}
+				else
+					hrm_chan1_fbs = hrm_chan1_fbs + ((hrm_chan_1_raw) / 10);
+				
+				if( (hrm_chan_2_raw > (hrm_chan2_raw[hrm_raw_index - 5] + HRM_STITCH_TRESH)) || 
+				  (hrm_chan_2_raw < (hrm_chan2_raw[hrm_raw_index - 5] - HRM_STITCH_TRESH)) )
+				{
+					hrm_chan2_fbs = hrm_chan2_fbs + ((hrm_chan_2_raw) / 2);
+				}
+				else
+					hrm_chan2_fbs = hrm_chan2_fbs + ((hrm_chan_2_raw) / 10);
+			}
+#endif		
+#if 0
+			/// LED Current Control (AGC).
+			if( ((uint16_t)hrm_chan1_fbs > 12000) && (hrm_agc_led_current_idx > 0))
+			{
+				hrm_agc_led_current_idx--;
+				Si115xParamSet(PARAM_LED1_A, hrm_agc_led_current[hrm_agc_led_current_idx]);
+				Si115xParamSet(PARAM_LED1_B, hrm_agc_led_current[hrm_agc_led_current_idx]);
+			}
+			
+			if( ((uint16_t)hrm_chan1_fbs < 12000) && (hrm_agc_led_current_idx < 29))
+			{
+				hrm_agc_led_current_idx++;
+				Si115xParamSet(PARAM_LED1_A, hrm_agc_led_current[hrm_agc_led_current_idx]);
+				Si115xParamSet(PARAM_LED1_B, hrm_agc_led_current[hrm_agc_led_current_idx]);
+			}
+#endif			
+/// ==>
+#if 1			
+			/// Stitcher.
+			/* 	Break this into two pices. Calc the new bias while timing a threshold rejection. 
+				Throw away the new bias if we recover in xx seconds or adopt the new hrm_chanX_fbs 
+				if the event lasts it was a level change. A problem will occur if the event happens 
+				in the last xx seconds of the frame. */
+
+			if( (hrm_chan_1_raw > HRM_STITCH_TRESH) || (hrm_chan_1_raw < -HRM_STITCH_TRESH) || 
+				(hrm_chan_2_raw > HRM_STITCH_TRESH) || (hrm_chan_2_raw < -HRM_STITCH_TRESH) )
+			{
+				if(!hrm_stitch_flag)
+					hrm_raw_index_old = hrm_raw_index;
+				hrm_stitch_flag = 1;
+				hrm_chan1_fbs = hrm_chan1_fbs + ((hrm_chan_1_raw) / 2);
+				hrm_chan2_fbs = hrm_chan2_fbs + ((hrm_chan_2_raw) / 2);
+			}
+			else if(hrm_stitch_flag)
+			{
+				hrm_stitch_flag = 0;
+				if(hrm_raw_index_old >= 2)
+					hrm_raw_index = hrm_raw_index_old - 2;
+				else
+					hrm_raw_index = hrm_raw_index_old; /// make rolling!!!
+				
+				for(i=0; i<HRM_AVG_SAMPLES; i++)
+				{
+					hrm_chan1_running_avg[i] = hrm_chan_1_raw; 
+					hrm_chan2_running_avg[i] = hrm_chan_2_raw; 
+				}	
+			}				
+#endif			
+			/// Pump it out. Pass queued messages to the radio.
+			if(!hrm_stitch_flag)
+			{
+				tx_type = HRM_PKT;
+				tx_pay_len = 11;
+				tx_payload[0] = hrm_ch1_avg >> 8;
+				tx_payload[1] = hrm_ch1_avg & 0xFF;
+				tx_payload[2] = (uint16_t)(hrm_chan_1_raw + hrm_chan1_fbs) >> 8;
+				tx_payload[3] = (uint16_t)(hrm_chan_1_raw + hrm_chan1_fbs) & 0xFF;
+				tx_payload[4] = current_hrm;
+				tx_payload[5] = hrm_agc_led_current_idx;
+				tx_payload[6] = hrm_chan1_raw[hrm_raw_index] >> 8;
+				tx_payload[7] = hrm_chan1_raw[hrm_raw_index] & 0xFF;
+				tx_payload[8] = hrm_chan2_raw[hrm_raw_index] >> 8;
+				tx_payload[9] = hrm_chan2_raw[hrm_raw_index] & 0xFF;
+				queue_packet_wrapper( tx_type, tx_payload, tx_pay_len );
+				ble_transfer_packets_wrapper();		
+				run_get_hrms++;
+				if(run_get_hrms == 6 * 20)
+				{
+					Get_HRMs();
+					hrm_raw_index = 0;
+					run_get_hrms = 0;
+				}
+				hrm_tx_rdy_cntr = 0;
+				hrm_raw_index++;
+			}
+			//hrm_raw_index++;
+			if(hrm_running_avg_indx == HRM_AVG_SAMPLES)
+				hrm_running_avg_indx = 0;
+			
+			/// See if the host wants anything.
+			hrm_read_cmd(); 
+		}
+		///else    if(!hrm_stitch_flag)
+			hrm_tx_rdy_cntr++;	
+	}
+	nrf_drv_wdt_channel_feed( m_wdt_channel_id );
+
+//==========================================================================
+//==========================================================================
+
+void 	hrm_read_cmd(void);
+
+void Get_HRMs(void);
+
+int8_t detect_peak(
+        const int16_t*   	data, /* the data */ 
+        int8_t             	data_count, /* row count of data */  
+        int16_t          	delta, /* delta used for distinguishing peaks */
+        int8_t             	emi_first /* should we search emission peak first of
+                                     absorption peak first? */
+        );
+
+//========================================================================
+
+//========================================================================================================//
+/*==============================================*/
+/* 				 HRM Post Processing 				
+	unix_time = 1 sec
+second_counter = uint32_t app_timer_cnt_get()   30.5us/tick
+
+uint32_t app_timer_cnt_diff_compute	(	uint32_t 	ticks_to,
+uint32_t 	ticks_from,
+uint32_t * 	p_ticks_diff 
+)		
+Function for computing the difference between two RTC1 counter values.
+
+Parameters
+[in]	ticks_to	Value returned by app_timer_cnt_get().
+[in]	ticks_from	Value returned by app_timer_cnt_get().
+[out]	p_ticks_diff	Number of ticks from ticks_from to ticks_to.
+uint32_t hrm_timer_start, hrm_add_time, hrm_run_time;
+
+// This code can be applied to both front and rear channels.
+// bellCurveOfSameLength is a [Float], with length = 20, storing a Gaussian function with maxima at the center of the array, sum of the function = 1.  This is reusable.
+// last20Points is a [Float] array with the last 20 data points of the heart rate data, casted to floating point values for a given channel.
+// last data point is the floating representation of the last heart rate data point.
+// This is the convolution, which will return a single Float value.
+func fgn(n: Int, f: [Float], g: [Float]) -> Float {
+        var sum : Double = 0
+        let M = g.count/2
+        for m in -M..<M {
+            let gm = g.data[m+M]
+            guard n+m > 0, n+m < f.count else {
+                continue
+            }
+            let fnm = f.data[n+m]
+            sum += gm*fnm
+        }
+        return sum
+    }
+
+let n = bellCurveOfSameLength.count/2
+let lowPass  = fgn(n, last20Points, bellCurveOfSameLength)
+let newValue = lastDataPoint - lowPass
+Add CommentCollapse 
+*/
+/*==============================================*/
+//========================================================================================================//
+
+void Get_HRMs(void)
+{
+	/// CZ + MM => avg 4, delta 5, no width skip, stitching on, forward filter off. 
+	int8_t 		i, j;
+	int32_t		hrm_chan1_running_avg_accm, hrm_chan2_running_avg_accm;
+
+#if 0
+	/// Bias subtraction. ///
+	for(i = 0; i < hrm_raw_index; i++)
+	{
+		hrm_chan1_raw[i] -= hrm_chan2_raw[i];
+	}
+#endif
+	
+	/// Average.
+#if 1
+	for(i = 0; i < (hrm_raw_index - HRM_AVG_SAMPLES); i++)
+	{
+		hrm_chan1_running_avg_accm = hrm_chan2_running_avg_accm = 0;
+		for(j = 0; j < HRM_AVG_SAMPLES; j++)
+		{
+			hrm_chan1_running_avg_accm += hrm_chan1_raw[i+j];
+			hrm_chan2_running_avg_accm += hrm_chan2_raw[i+j];
+		}
+		hrm_chan1_raw[i] = (int16_t)(hrm_chan1_running_avg_accm / HRM_AVG_SAMPLES);
+		hrm_chan2_raw[i] = (int16_t)(hrm_chan2_running_avg_accm / HRM_AVG_SAMPLES);
+	}
+	
+	/// Add nomalization here. ///
+#endif
+				
+	
+#if 0
+	/// Bias subtraction. ///
+	for(i = 0; i < hrm_raw_index; i++)
+	{
+		hrm_chan1_raw[i] -= hrm_chan2_raw[i];
+	}
+#endif
+	
+
+#if 1	
+	/// Eliminate bounce by increaseing delta (dh).
+	pd_emi_delta = 3;
+	do
+	{	
+		detect_peak(hrm_chan1_raw, hrm_raw_index, pd_emi_delta, 1);
+		dh = 0;
+		pd_reduction_loop = num_emi_peaks;
+		if(pd_reduction_loop > num_absop_peaks)
+			pd_reduction_loop = num_absop_peaks;
+		for(i=0; i<(pd_reduction_loop - 1); i++)
+		{
+			if( ((emi_peaks_xpos[i+1] - emi_peaks_xpos[i]) < PD_DEBOUNCE_WIDTH) 
+				|| ((absop_peaks_xpos[i+1] - absop_peaks_xpos[i]) < PD_DEBOUNCE_WIDTH) )
+			{
+				dh++;
+			}
+		}
+		
+		if(dh > 0)
+		{
+			pd_emi_delta++;	
+		}
+		
+		if(dh == 25)
+			dh = 0;
+	}while(dh > 0);
+#else
+	detect_peak(hrm_chan1_raw, hrm_raw_index, 8, 1);
+#endif	
+
+#if 1		
+	/// Missing pulse correction:
+	// run thru the absop_peaks_xpos[num_absop_peaks[0]]. find delta x for each. avg delta x. if 1 is double the rest add 1 to num_absop_peaks[0].
+	
+	old_num_of_emi_peaks = num_emi_peaks;
+	old_num_of_absop_peaks = num_absop_peaks;
+	for(k=0; k<2; k++)
+	{
+		avg_x_diff = 0;
+		for(i=0; i<(old_num_of_emi_peaks - 1); i++)
+		{
+			avg_x_diff += (emi_peaks_xpos[i + 1] - emi_peaks_xpos[i]);	
+		}
+		avg_x_diff = avg_x_diff / old_num_of_emi_peaks;
+		avg_x_rng = avg_x_diff + (avg_x_diff / 2) + (avg_x_diff / 4);
+	
+		for(i=0; i<(old_num_of_emi_peaks - 1); i++)
+		{
+			if((emi_peaks_xpos[i + 1] - emi_peaks_xpos[i]) > avg_x_rng) 
+			{
+				num_emi_peaks++;
+				for(j=old_num_of_emi_peaks; j<=(i+1); j--)
+				{
+					emi_peaks_xpos[j] = emi_peaks_xpos[j-1];
+				}
+				emi_peaks_xpos[i] = emi_peaks_xpos[i] + avg_x_diff;
+			}
+		}
+	
+		avg_x_diff = 0;
+		for(i=0; i<(old_num_of_absop_peaks - 1); i++)
+		{
+			avg_x_diff += (absop_peaks_xpos[i + 1] - absop_peaks_xpos[i]);	
+		}
+		avg_x_diff = avg_x_diff / old_num_of_absop_peaks;
+		avg_x_rng = avg_x_diff + (avg_x_diff / 2) + (avg_x_diff / 4);
+	
+		for(i=0; i<(old_num_of_absop_peaks - 1); i++)
+		{
+			if((absop_peaks_xpos[i + 1] - absop_peaks_xpos[i]) > avg_x_rng)
+			{
+				num_absop_peaks++;
+				for(j=old_num_of_absop_peaks; j<=(i+1); j--)
+				{
+					absop_peaks_xpos[j] = absop_peaks_xpos[j-1];
+				}
+				absop_peaks_xpos[i] = absop_peaks_xpos[i] + avg_x_diff;
+			}
+		}
+	}
+#endif
+	
+    /// Average the hrm output.
+	current_hrm = ((num_emi_peaks * 10) + (current_hrm * 10) + (num_absop_peaks * 10)) / 12;
+///	current_hrm = ((num_emi_peaks * 10) + (current_hrm * 4) + (num_absop_peaks * 10)) / 6;
+	//current_hrm = ((num_emi_peaks * 10) + (current_hrm * 3) + (num_absop_peaks * 0)) / 4;
+}
+/// ========================================================================================== ///
+
+int8_t detect_peak(
+					const int16_t*   	data, 		/* the data */ 
+					int8_t             	data_count, /* row count of data */  
+					int16_t          	delta, 		/* delta used for distinguishing peaks */
+					int8_t             	emi_first 	/* should we search emission peak first of
+														absorption peak first? */
+					)
+{
+    int     i;
+    double  mx;
+    double  mn;
+    int     mx_pos = 0;
+    int     mn_pos = 0;
+    int     is_detecting_emi = emi_first;
+
+
+    mx = data[0];
+    mn = data[0];
+
+    num_emi_peaks = 0;
+    num_absop_peaks = 0;
+
+    for(i = 1; i < data_count; ++i)
+    {
+        if(data[i] > mx)
+        {
+            mx_pos = i;
+            mx = data[i];
+        }
+        if(data[i] < mn)
+        {
+            mn_pos = i;
+            mn = data[i];
+        }
+
+        if(is_detecting_emi &&
+                data[i] < mx - delta)
+        {
+            if(num_emi_peaks >= HRM_DP_DATA_SIZE) /* not enough spaces */
+                return 1;
+
+            emi_peaks[num_emi_peaks] = mx; //mx_pos
+			emi_peaks_xpos[num_emi_peaks] = mx_pos;
+			num_emi_peaks++;
+			
+            is_detecting_emi = 0;
+
+            i = mx_pos - 1;
+
+            mn = data[mx_pos];
+            mn_pos = mx_pos;
+        }
+        else if((!is_detecting_emi) &&
+                data[i] > mn + delta)
+        {
+            if(num_absop_peaks >= HRM_DP_DATA_SIZE)
+                return 2;
+			
+			absop_peaks_xpos[num_absop_peaks] = mn_pos;
+            absop_peaks[num_absop_peaks] = mn;
+            num_absop_peaks++;
+
+            is_detecting_emi = 1;
+            
+            i = mn_pos - 1;
+
+            mx = data[mn_pos];
+            mx_pos = mn_pos;
+        }
+    }
+
+    return 0;
+}
+
+vs rev 1

@@ -1,0 +1,12 @@
+[Apply_Histogram_Mag]
+Class="Function"
+Prototype="void Apply_Histogram_Mag();"
+
+[Apply_Histogram_Acc]
+Class="Function"
+Prototype="void Apply_Histogram_Acc();"
+
+[Apply_Histogram_Gyro]
+Class="Function"
+Prototype="void Apply_Histogram_Gyro();"
+

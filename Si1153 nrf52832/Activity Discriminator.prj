@@ -1,0 +1,770 @@
+[Project Header]
+Version = 1302
+Pathname = "/c/Users/Laser/Desktop/Si1153 nrf52832/Activity Discriminator.prj"
+Project Label = "Activity Discriminator"
+CVI Dir = "/c/program files (x86)/national instruments/cvi2013"
+CVI Shared Dir = "/C/Program Files (x86)/National Instruments/Shared/CVI"
+CVI Pub Local Dir = "/C/ProgramData/National Instruments/CVI2013"
+CVI Pub Global Dir = "/C/ProgramData/National Instruments/CVI"
+IVI Standard Root Dir = "/C/Program Files (x86)/IVI Foundation/IVI"
+VXIplug&play Framework Dir = "/C/Program Files (x86)/IVI Foundation/VISA/winnt"
+IVI Standard Root 64-bit Dir = "/C/Program Files/IVI Foundation/IVI"
+VXIplug&play Framework 64-bit Dir = "/C/Program Files/IVI Foundation/VISA/win64"
+Number of Files = 23
+Target Type = "Executable"
+Flags = 16
+Copied From Locked InstrDrv Directory = False
+Copied from VXIPNP Directory = False
+Locked InstrDrv Name = ""
+Don't Display Deploy InstrDrv Dialog = False
+
+[Folders]
+Folder 0 = "Source Files"
+FolderEx 0 = "Source Files"
+Folder 1 = "Include Files"
+FolderEx 1 = "Include Files"
+Folder 2 = "User Interface Files"
+FolderEx 2 = "User Interface Files"
+Folder 3 = "Instrument Files"
+FolderEx 3 = "Instrument Files"
+Folder 4 = "Library Files"
+FolderEx 4 = "Library Files"
+
+[File 0001]
+File Type = "CSource"
+Res Id = 1
+Path Is Rel = True
+Path Rel To = "Project"
+Path Rel Path = "Activity Discriminator Main.c"
+Path = "/c/Users/Laser/Desktop/Si1153 nrf52832/Activity Discriminator Main.c"
+Exclude = False
+Compile Into Object File = False
+Project Flags = 0
+Folder = "Source Files"
+Folder Id = 0
+
+[File 0002]
+File Type = "CSource"
+Res Id = 2
+Path Is Rel = True
+Path Rel To = "Project"
+Path Rel Path = "Activity_Procedural.c"
+Path = "/c/Users/Laser/Desktop/Si1153 nrf52832/Activity_Procedural.c"
+Exclude = False
+Compile Into Object File = False
+Project Flags = 0
+Folder = "Source Files"
+Folder Id = 0
+
+[File 0003]
+File Type = "CSource"
+Res Id = 3
+Path Is Rel = True
+Path Rel To = "Project"
+Path Rel Path = "AX3dPlot.c"
+Path = "/c/Users/Laser/Desktop/Si1153 nrf52832/AX3dPlot.c"
+Exclude = False
+Compile Into Object File = False
+Project Flags = 0
+Folder = "Source Files"
+Folder Id = 0
+
+[File 0004]
+File Type = "CSource"
+Res Id = 4
+Path Is Rel = True
+Path Rel To = "Project"
+Path Rel Path = "Blood Hart.c"
+Path = "/c/Users/Laser/Desktop/Si1153 nrf52832/Blood Hart.c"
+Exclude = False
+Compile Into Object File = False
+Project Flags = 0
+Folder = "Source Files"
+Folder Id = 0
+
+[File 0005]
+File Type = "CSource"
+Res Id = 5
+Path Is Rel = True
+Path Rel To = "Project"
+Path Rel Path = "Gravity Vector OGL.c"
+Path = "/c/Users/Laser/Desktop/Si1153 nrf52832/Gravity Vector OGL.c"
+Exclude = False
+Compile Into Object File = False
+Project Flags = 0
+Folder = "Source Files"
+Folder Id = 0
+
+[File 0006]
+File Type = "CSource"
+Res Id = 6
+Path Is Rel = True
+Path Rel To = "Project"
+Path Rel Path = "Gravity Vector.c"
+Path = "/c/Users/Laser/Desktop/Si1153 nrf52832/Gravity Vector.c"
+Exclude = False
+Compile Into Object File = False
+Project Flags = 0
+Folder = "Source Files"
+Folder Id = 0
+
+[File 0007]
+File Type = "CSource"
+Res Id = 7
+Path Is Rel = True
+Path Rel To = "Project"
+Path Rel Path = "Histogram.c"
+Path = "/c/Users/Laser/Desktop/Si1153 nrf52832/Histogram.c"
+Exclude = False
+Compile Into Object File = False
+Project Flags = 0
+Folder = "Source Files"
+Folder Id = 0
+
+[File 0008]
+File Type = "CSource"
+Res Id = 8
+Path Is Rel = True
+Path Rel To = "Project"
+Path Rel Path = "Load Store Data.c"
+Path = "/c/Users/Laser/Desktop/Si1153 nrf52832/Load Store Data.c"
+Exclude = False
+Compile Into Object File = False
+Project Flags = 0
+Folder = "Source Files"
+Folder Id = 0
+
+[File 0009]
+File Type = "CSource"
+Res Id = 9
+Path Is Rel = True
+Path Rel To = "Project"
+Path Rel Path = "Magnitude.c"
+Path = "/c/Users/Laser/Desktop/Si1153 nrf52832/Magnitude.c"
+Exclude = False
+Compile Into Object File = False
+Project Flags = 0
+Folder = "Source Files"
+Folder Id = 0
+
+[File 0010]
+File Type = "CSource"
+Res Id = 10
+Path Is Rel = True
+Path Rel To = "Project"
+Path Rel Path = "Peak Detector 3.c"
+Path = "/c/Users/Laser/Desktop/Si1153 nrf52832/Peak Detector 3.c"
+Exclude = False
+Compile Into Object File = False
+Project Flags = 0
+Folder = "Source Files"
+Folder Id = 0
+
+[File 0011]
+File Type = "CSource"
+Res Id = 11
+Path Is Rel = True
+Path Rel To = "Project"
+Path Rel Path = "Position Integrator.c"
+Path = "/c/Users/Laser/Desktop/Si1153 nrf52832/Position Integrator.c"
+Exclude = False
+Compile Into Object File = False
+Project Flags = 0
+Folder = "Source Files"
+Folder Id = 0
+
+[File 0012]
+File Type = "CSource"
+Res Id = 12
+Path Is Rel = True
+Path Rel To = "Project"
+Path Rel Path = "Raw Data Filters.c"
+Path = "/c/Users/Laser/Desktop/Si1153 nrf52832/Raw Data Filters.c"
+Exclude = False
+Compile Into Object File = False
+Project Flags = 0
+Folder = "Source Files"
+Folder Id = 0
+
+[File 0013]
+File Type = "CSource"
+Res Id = 13
+Path Is Rel = True
+Path Rel To = "Project"
+Path Rel Path = "RT Serial Sensor Aqu.c"
+Path = "/c/Users/Laser/Desktop/Si1153 nrf52832/RT Serial Sensor Aqu.c"
+Exclude = False
+Compile Into Object File = False
+Project Flags = 0
+Folder = "Source Files"
+Folder Id = 0
+
+[File 0014]
+File Type = "CSource"
+Res Id = 14
+Path Is Rel = True
+Path Rel To = "Project"
+Path Rel Path = "Si1153 Cntrl.c"
+Path = "/c/Users/Laser/Desktop/Si1153 nrf52832/Si1153 Cntrl.c"
+Exclude = False
+Compile Into Object File = False
+Project Flags = 0
+Folder = "Source Files"
+Folder Id = 0
+
+[File 0015]
+File Type = "CSource"
+Res Id = 15
+Path Is Rel = True
+Path Rel To = "Project"
+Path Rel Path = "Sig Graph.c"
+Path = "/c/Users/Laser/Desktop/Si1153 nrf52832/Sig Graph.c"
+Exclude = False
+Compile Into Object File = False
+Project Flags = 0
+Folder = "Source Files"
+Folder Id = 0
+
+[File 0016]
+File Type = "Include"
+Res Id = 16
+Path Is Rel = True
+Path Rel To = "Project"
+Path Rel Path = "Activity Discriminator vars.h"
+Path = "/c/Users/Laser/Desktop/Si1153 nrf52832/Activity Discriminator vars.h"
+Exclude = False
+Project Flags = 0
+Folder = "Include Files"
+Folder Id = 1
+
+[File 0017]
+File Type = "Include"
+Res Id = 17
+Path Is Rel = True
+Path Rel To = "Project"
+Path Rel Path = "Activity Discriminator.h"
+Path = "/c/Users/Laser/Desktop/Si1153 nrf52832/Activity Discriminator.h"
+Exclude = False
+Project Flags = 0
+Folder = "Include Files"
+Folder Id = 1
+
+[File 0018]
+File Type = "Include"
+Res Id = 18
+Path Is Rel = True
+Path Rel To = "Project"
+Path Rel Path = "../../../675da3299148/mbed.h"
+Path = "/c/Users/675da3299148/mbed.h"
+Exclude = False
+Project Flags = 0
+Folder = "Include Files"
+Folder Id = 1
+
+[File 0019]
+File Type = "User Interface Resource"
+Res Id = 19
+Path Is Rel = True
+Path Rel To = "Project"
+Path Rel Path = "Activity Discriminator.uir"
+Path = "/c/Users/Laser/Desktop/Si1153 nrf52832/Activity Discriminator.uir"
+Exclude = False
+Project Flags = 0
+Folder = "User Interface Files"
+Folder Id = 2
+
+[File 0020]
+File Type = "Function Panel"
+Res Id = 20
+Path Is Rel = True
+Path Rel To = "CVI"
+Path Rel To Override = "CVI"
+Path Rel Path = "toolslib/custctrl/3DGraphCtrl.fp"
+Path Line0001 = "/c/Program Files (x86)/National Instruments/CVI2013/toolslib/custctrl/3DGraphCtr"
+Path Line0002 = "l.fp"
+Exclude = False
+Project Flags = 0
+Folder = "Instrument Files"
+Folder Id = 3
+
+[File 0021]
+File Type = "Function Panel"
+Res Id = 21
+Path Is Rel = True
+Path Rel To = "CVI"
+Path Rel To Override = "CVI"
+Path Rel Path = "toolslib/custctrl/cviogl.fp"
+Path = "/c/Program Files (x86)/National Instruments/CVI2013/toolslib/custctrl/cviogl.fp"
+Exclude = False
+Project Flags = 0
+Folder = "Instrument Files"
+Folder Id = 3
+
+[File 0022]
+File Type = "Library"
+Res Id = 22
+Path Is Rel = True
+Path Rel To = "CVI"
+Path Rel To Override = "CVI"
+Path Rel Path = "sdk/lib/msvc/GlU32.lib"
+Path = "/c/Program Files (x86)/National Instruments/CVI2013/sdk/lib/msvc/GlU32.lib"
+Exclude = False
+Project Flags = 0
+Folder = "Library Files"
+Folder Id = 4
+
+[File 0023]
+File Type = "Library"
+Res Id = 23
+Path Is Rel = True
+Path Rel To = "CVI"
+Path Rel To Override = "CVI"
+Path Rel Path = "sdk/lib/msvc/OpenGL32.lib"
+Path = "/c/Program Files (x86)/National Instruments/CVI2013/sdk/lib/msvc/OpenGL32.lib"
+Exclude = False
+Project Flags = 0
+Folder = "Library Files"
+Folder Id = 4
+
+[Custom Build Configs]
+Num Custom Build Configs = 0
+
+[Default Build Config Debug]
+Config Name = "Debug"
+Is 64-Bit = False
+Is Release = False
+Default Calling Convention = "cdecl"
+Optimization Level = "No optimizations"
+Require Prototypes = True
+Show Warning IDs in Build Output = False
+Selected Warning Level = "Common"
+Warning List None = ""
+Warning List Common = ""
+Warning List Extended = ""
+Warning List All = ""
+Warning Mode = 0
+Enable Unreferenced Identifiers Warning = True
+Enable Pointer Mismatch Warning = True
+Enable Unreachable Code Warning = True
+Enable Assignment In Conditional Warning = True
+Uninitialized Locals Compile Warning = "Aggressive"
+Require Return Values = True
+Enable C99 Extensions = False
+Enable OpenMP Extensions = False
+Stack Size = 100000
+Stack Reserve = 131072
+Stack Commit = 4096
+Image Base Address = 4194304
+Image Base Address x64 = 4194304
+Compiler Defines = ""
+Sign = False
+Sign Store = ""
+Sign Certificate = ""
+Sign Timestamp URL = ""
+Sign URL = ""
+Manifest Embed = False
+Icon File Is Rel = False
+Icon File = ""
+Application Title = ""
+Use IVI Subdirectories for Import Libraries = False
+Use VXIPNP Subdirectories for Import Libraries = False
+Use Dflt Import Lib Base Name = True
+Where to Copy DLL = "Do not copy"
+Custom Directory to Copy DLL Is Rel = False
+Custom Directory to Copy DLL = ""
+Generate Source Documentation = "None"
+Runtime Support = "Full Runtime Support"
+Runtime Binding = "Shared"
+Embed Project .UIRs = False
+Generate Map File = False
+Embed Timestamp = True
+Create Console Application = False
+Using LoadExternalModule = True
+DLL Exports = "Include File Symbols"
+Register ActiveX Server = False
+Numeric File Version = "1,0,0,0"
+Numeric Prod Version = "1,0,0,0"
+Comments = ""
+Comments Ex = ""
+Company Name = "HP"
+Company Name Ex = "%company"
+File Description = "Activity Discriminator (Debug x86)"
+File Description Ex = "%application (%rel_dbg %arch)"
+File Version = "1.0"
+File Version Ex = "%f1.%f2"
+Internal Name = "Activity Discriminator"
+Internal Name Ex = "%basename"
+Legal Copyright = "Copyright © HP 2018"
+Legal Copyright Ex = "Copyright © %company %Y"
+Legal Trademarks = ""
+Legal Trademarks Ex = ""
+Original Filename = "Activity Discriminator.exe"
+Original Filename Ex = "%filename"
+Private Build = ""
+Private Build Ex = ""
+Product Name = "HP Activity Discriminator"
+Product Name Ex = "%company %application"
+Product Version = "1.0"
+Product Version Ex = "%p1.%p2"
+Special Build = ""
+Special Build Ex = ""
+Add Type Lib To DLL = False
+Include Type Lib Help Links = False
+TLB Help Style = "HLP"
+Type Lib FP File Is Rel = False
+Type Lib FP File = ""
+
+[Default Build Config Release]
+Config Name = "Release"
+Is 64-Bit = False
+Is Release = True
+Default Calling Convention = "cdecl"
+Optimization Level = "No optimizations"
+Require Prototypes = True
+Show Warning IDs in Build Output = False
+Selected Warning Level = "Common"
+Warning List None = ""
+Warning List Common = ""
+Warning List Extended = ""
+Warning List All = ""
+Warning Mode = 0
+Enable Unreferenced Identifiers Warning = True
+Enable Pointer Mismatch Warning = True
+Enable Unreachable Code Warning = True
+Enable Assignment In Conditional Warning = True
+Uninitialized Locals Compile Warning = "Aggressive"
+Require Return Values = True
+Enable C99 Extensions = False
+Enable OpenMP Extensions = False
+Stack Size = 100000
+Stack Reserve = 131072
+Stack Commit = 4096
+Image Base Address = 4194304
+Image Base Address x64 = 4194304
+Compiler Defines = ""
+Sign = False
+Sign Store = ""
+Sign Certificate = ""
+Sign Timestamp URL = ""
+Sign URL = ""
+Manifest Embed = False
+Icon File Is Rel = False
+Icon File = ""
+Application Title = ""
+Use IVI Subdirectories for Import Libraries = False
+Use VXIPNP Subdirectories for Import Libraries = False
+Use Dflt Import Lib Base Name = True
+Where to Copy DLL = "Do not copy"
+Custom Directory to Copy DLL Is Rel = False
+Custom Directory to Copy DLL = ""
+Generate Source Documentation = "None"
+Runtime Support = "Full Runtime Support"
+Runtime Binding = "Shared"
+Embed Project .UIRs = False
+Generate Map File = False
+Embed Timestamp = True
+Create Console Application = False
+Using LoadExternalModule = True
+DLL Exports = "Include File Symbols"
+Register ActiveX Server = False
+Numeric File Version = "1,0,0,0"
+Numeric Prod Version = "1,0,0,0"
+Comments = ""
+Comments Ex = ""
+Company Name = "HP"
+Company Name Ex = "%company"
+File Description = "convolve (Release x86)"
+File Description Ex = "%application (%rel_dbg %arch)"
+File Version = "1.0"
+File Version Ex = "%f1.%f2"
+Internal Name = "convolve"
+Internal Name Ex = "%basename"
+Legal Copyright = "Copyright © HP 2018"
+Legal Copyright Ex = "Copyright © %company %Y"
+Legal Trademarks = ""
+Legal Trademarks Ex = ""
+Original Filename = "convolve.exe"
+Original Filename Ex = "%filename"
+Private Build = ""
+Private Build Ex = ""
+Product Name = "HP convolve"
+Product Name Ex = "%company %application"
+Product Version = "1.0"
+Product Version Ex = "%p1.%p2"
+Special Build = ""
+Special Build Ex = ""
+Add Type Lib To DLL = False
+Include Type Lib Help Links = False
+TLB Help Style = "HLP"
+Type Lib FP File Is Rel = False
+Type Lib FP File = ""
+
+[Default Build Config Debug64]
+Config Name = "Debug64"
+Is 64-Bit = True
+Is Release = False
+Default Calling Convention = "cdecl"
+Optimization Level = "No optimizations"
+Require Prototypes = True
+Show Warning IDs in Build Output = False
+Selected Warning Level = "Common"
+Warning List None = ""
+Warning List Common = ""
+Warning List Extended = ""
+Warning List All = ""
+Warning Mode = 0
+Enable Unreferenced Identifiers Warning = True
+Enable Pointer Mismatch Warning = True
+Enable Unreachable Code Warning = True
+Enable Assignment In Conditional Warning = True
+Uninitialized Locals Compile Warning = "Aggressive"
+Require Return Values = True
+Enable C99 Extensions = False
+Enable OpenMP Extensions = False
+Stack Size = 100000
+Stack Reserve = 131072
+Stack Commit = 4096
+Image Base Address = 4194304
+Image Base Address x64 = 4194304
+Compiler Defines = ""
+Sign = False
+Sign Store = ""
+Sign Certificate = ""
+Sign Timestamp URL = ""
+Sign URL = ""
+Manifest Embed = False
+Icon File Is Rel = False
+Icon File = ""
+Application Title = ""
+Use IVI Subdirectories for Import Libraries = False
+Use VXIPNP Subdirectories for Import Libraries = False
+Use Dflt Import Lib Base Name = True
+Where to Copy DLL = "Do not copy"
+Custom Directory to Copy DLL Is Rel = False
+Custom Directory to Copy DLL = ""
+Generate Source Documentation = "None"
+Runtime Support = "Full Runtime Support"
+Runtime Binding = "Shared"
+Embed Project .UIRs = False
+Generate Map File = False
+Embed Timestamp = True
+Create Console Application = False
+Using LoadExternalModule = True
+DLL Exports = "Include File Symbols"
+Register ActiveX Server = False
+Add Type Lib To DLL = False
+Include Type Lib Help Links = False
+TLB Help Style = "HLP"
+Type Lib FP File Is Rel = False
+Type Lib FP File = ""
+
+[Default Build Config Release64]
+Config Name = "Release64"
+Is 64-Bit = True
+Is Release = True
+Default Calling Convention = "cdecl"
+Optimization Level = "No optimizations"
+Require Prototypes = True
+Show Warning IDs in Build Output = False
+Selected Warning Level = "Common"
+Warning List None = ""
+Warning List Common = ""
+Warning List Extended = ""
+Warning List All = ""
+Warning Mode = 0
+Enable Unreferenced Identifiers Warning = True
+Enable Pointer Mismatch Warning = True
+Enable Unreachable Code Warning = True
+Enable Assignment In Conditional Warning = True
+Uninitialized Locals Compile Warning = "Aggressive"
+Require Return Values = True
+Enable C99 Extensions = False
+Enable OpenMP Extensions = False
+Stack Size = 100000
+Stack Reserve = 131072
+Stack Commit = 4096
+Image Base Address = 4194304
+Image Base Address x64 = 4194304
+Compiler Defines = ""
+Sign = False
+Sign Store = ""
+Sign Certificate = ""
+Sign Timestamp URL = ""
+Sign URL = ""
+Manifest Embed = False
+Icon File Is Rel = False
+Icon File = ""
+Application Title = ""
+Use IVI Subdirectories for Import Libraries = False
+Use VXIPNP Subdirectories for Import Libraries = False
+Use Dflt Import Lib Base Name = True
+Where to Copy DLL = "Do not copy"
+Custom Directory to Copy DLL Is Rel = False
+Custom Directory to Copy DLL = ""
+Generate Source Documentation = "None"
+Runtime Support = "Full Runtime Support"
+Runtime Binding = "Shared"
+Embed Project .UIRs = False
+Generate Map File = False
+Embed Timestamp = True
+Create Console Application = False
+Using LoadExternalModule = True
+DLL Exports = "Include File Symbols"
+Register ActiveX Server = False
+Add Type Lib To DLL = False
+Include Type Lib Help Links = False
+TLB Help Style = "HLP"
+Type Lib FP File Is Rel = False
+Type Lib FP File = ""
+
+[Compiler Options]
+Default Calling Convention = "cdecl"
+Require Prototypes = True
+Require Return Values = True
+Enable Pointer Mismatch Warning = True
+Enable Unreachable Code Warning = True
+Enable Unreferenced Identifiers Warning = True
+Enable Assignment In Conditional Warning = True
+O Option Compatible With 5.0 = False
+Enable C99 Extensions = False
+Uninitialized Locals Compile Warning = "Aggressive"
+Precompile Prefix Header = False
+Prefix Header File = ""
+
+[Run Options]
+Stack Size = 100000
+Stack Commit = 4096
+Image Base Address = 4194304
+Image Base Address x64 = 4194304
+
+[Compiler Defines]
+Compiler Defines = ""
+
+[Include Paths]
+Include Path 1 Is Rel = True
+Include Path 1 Rel To = "Project"
+Include Path 1 Rel Path = "../../../675da3299148"
+Include Path 1 = "/c/Users/675da3299148"
+Include Path 2 Is Rel = True
+Include Path 2 Rel To = "Project"
+Include Path 2 Rel Path Line0001 = "../../../675da3299148/TARGET_LPC1768/TARGET_NXP/TARGET_LPC176X/TARGET_MBED_LPC17"
+Include Path 2 Rel Path Line0002 = "68"
+Include Path 2 Line0001 = "/c/Users/675da3299148/TARGET_LPC1768/TARGET_NXP/TARGET_LPC176X/TARGET_MBED_LPC17"
+Include Path 2 Line0002 = "68"
+Include Path 3 Is Rel = True
+Include Path 3 Rel To = "Project"
+Include Path 3 Rel Path = "../../../675da3299148/TARGET_LPC1768/TARGET_NXP/TARGET_LPC176X"
+Include Path 3 = "/c/Users/675da3299148/TARGET_LPC1768/TARGET_NXP/TARGET_LPC176X"
+Include Path 4 Is Rel = True
+Include Path 4 Rel To = "Project"
+Include Path 4 Rel Path = "../../../675da3299148/TARGET_LPC1768/TARGET_NXP/TARGET_LPC176X/device"
+Include Path 4 = "/c/Users/675da3299148/TARGET_LPC1768/TARGET_NXP/TARGET_LPC176X/device"
+Include Path 5 Is Rel = True
+Include Path 5 Rel To = "Project"
+Include Path 5 Rel Path = "../../../675da3299148/TARGET_LPC1768"
+Include Path 5 = "/c/Users/675da3299148/TARGET_LPC1768"
+
+[Create Executable]
+Executable File_Debug Is Rel = True
+Executable File_Debug Rel To = "Project"
+Executable File_Debug Rel Path = "Activity Discriminator.exe"
+Executable File_Debug = "/c/Users/Laser/Desktop/Si1153 nrf52832/Activity Discriminator.exe"
+Executable File_Release Is Rel = True
+Executable File_Release Rel To = "Project"
+Executable File_Release Rel Path = "convolve.exe"
+Executable File_Release = "/c/Users/Laser/Desktop/Si1153 nrf52832/convolve.exe"
+Executable File_Debug64 Is Rel = True
+Executable File_Debug64 Rel To = "Project"
+Executable File_Debug64 Rel Path = "convolve.exe"
+Executable File_Debug64 = "/c/Users/Laser/Desktop/Si1153 nrf52832/convolve.exe"
+Executable File_Release64 Is Rel = True
+Executable File_Release64 Rel To = "Project"
+Executable File_Release64 Rel Path = "convolve.exe"
+Executable File_Release64 = "/c/Users/Laser/Desktop/Si1153 nrf52832/convolve.exe"
+Icon File Is Rel = False
+Icon File = ""
+Application Title = ""
+Numeric File Version = "1,0,0,0"
+Numeric Prod Version = "1,0,0,0"
+Comments = ""
+Comments Ex = ""
+Company Name = "HP"
+Company Name Ex = "%company"
+File Description = "convolve (Release x86)"
+File Description Ex = "%application (%rel_dbg %arch)"
+File Version = "1.0"
+File Version Ex = "%f1.%f2"
+Internal Name = "convolve"
+Internal Name Ex = "%basename"
+Legal Copyright = "Copyright © HP 2018"
+Legal Copyright Ex = "Copyright © %company %Y"
+Legal Trademarks = ""
+Legal Trademarks Ex = ""
+Original Filename = "convolve.exe"
+Original Filename Ex = "%filename"
+Private Build = ""
+Private Build Ex = ""
+Product Name = "HP convolve"
+Product Name Ex = "%company %application"
+Product Version = "1.0"
+Product Version Ex = "%p1.%p2"
+Special Build = ""
+Special Build Ex = ""
+DLL Exports = "Include File Symbols"
+Use IVI Subdirectories for Import Libraries = False
+Use VXIPNP Subdirectories for Import Libraries = False
+Use Dflt Import Lib Base Name = True
+Where to Copy DLL = "Do not copy"
+Custom Directory to Copy DLL Is Rel = False
+Custom Directory to Copy DLL = ""
+Generate Source Documentation = "None"
+Add Type Lib To DLL = False
+Include Type Lib Help Links = False
+TLB Help Style = "HLP"
+Type Lib FP File Is Rel = False
+Type Lib FP File = ""
+Type Lib Guid = ""
+Runtime Support = "Full Runtime Support"
+Instrument Driver Support Only = False
+Embed Project .UIRs = False
+Generate Map File = False
+
+[External Compiler Support]
+UIR Callbacks File Option = 0
+Using LoadExternalModule = False
+Create Project Symbols File = True
+UIR Callbacks Obj File Is Rel = False
+UIR Callbacks Obj File = ""
+Project Symbols H File Is Rel = False
+Project Symbols H File = ""
+Project Symbols Obj File Is Rel = False
+Project Symbols Obj File = ""
+
+[ActiveX Server Options]
+Specification File Is Rel = False
+Specification File = ""
+Source File Is Rel = False
+Source File = ""
+Include File Is Rel = False
+Include File = ""
+IDL File Is Rel = False
+IDL File = ""
+Register ActiveX Server = False
+
+[Signing Info]
+Sign = False
+Sign Debug Build = False
+Store = ""
+Certificate = ""
+Timestamp URL = ""
+URL = ""
+
+[Manifest Info]
+Embed = False
+
+[tpcSection]
+tpcEnabled = 0
+tpcOverrideEnvironment = 0
+tpcEnabled x64 = 0
+tpcOverrideEnvironment x64 = 0
+

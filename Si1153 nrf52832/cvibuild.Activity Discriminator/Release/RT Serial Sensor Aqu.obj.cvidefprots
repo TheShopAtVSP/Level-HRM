@@ -1,0 +1,12 @@
+[RT_Scan_Loop_CB]
+Class="Function"
+Prototype="int RT_Scan_Loop_CB(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[RT_Scan_Loop]
+Class="Function"
+Prototype="void RT_Scan_Loop();"
+
+[RT_Timer_CB]
+Class="Function"
+Prototype="int RT_Timer_CB(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+

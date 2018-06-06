@@ -1,0 +1,16 @@
+[AX3dPlot]
+Class="Function"
+Prototype="void AX3dPlot();"
+
+[Plot_3D_CB]
+Class="Function"
+Prototype="int Plot_3D_CB(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[GYR_Plot_3D_CB]
+Class="Function"
+Prototype="int GYR_Plot_3D_CB(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[ACC_Plot_3D_CB]
+Class="Function"
+Prototype="int ACC_Plot_3D_CB(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+

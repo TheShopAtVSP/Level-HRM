@@ -1,0 +1,12 @@
+[Save_Data]
+Class="Function"
+Prototype="int Save_Data(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[Load_Data]
+Class="Function"
+Prototype="int Load_Data(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[Load_Last_Data]
+Class="Function"
+Prototype="int Load_Last_Data(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+

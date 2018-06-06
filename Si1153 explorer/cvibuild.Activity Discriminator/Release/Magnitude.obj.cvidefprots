@@ -1,0 +1,4 @@
+[Get_Manitude]
+Class="Function"
+Prototype="void Get_Manitude(int source_sel);"
+

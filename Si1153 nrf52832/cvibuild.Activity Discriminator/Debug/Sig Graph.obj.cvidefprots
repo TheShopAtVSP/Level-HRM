@@ -1,0 +1,48 @@
+[UpdateSG1_CB]
+Class="Function"
+Prototype="int UpdateSG1_CB(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[UpdateSG1]
+Class="Function"
+Prototype="void UpdateSG1();"
+
+[UpdateSG2_CB]
+Class="Function"
+Prototype="int UpdateSG2_CB(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[UpdateSG2]
+Class="Function"
+Prototype="void UpdateSG2();"
+
+[UpdateSG3_CB]
+Class="Function"
+Prototype="int UpdateSG3_CB(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[UpdateSG3]
+Class="Function"
+Prototype="void UpdateSG3();"
+
+[UpdateSG4_CB]
+Class="Function"
+Prototype="int UpdateSG4_CB(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[UpdateSG4]
+Class="Function"
+Prototype="void UpdateSG4();"
+
+[Update_PD_Plots]
+Class="Function"
+Prototype="void Update_PD_Plots();"
+
+[Update_Sig_Plots]
+Class="Function"
+Prototype="void Update_Sig_Plots();"
+
+[Accel_and_Gyro_Cursor_Update]
+Class="Function"
+Prototype="int Accel_and_Gyro_Cursor_Update(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[Update_Cursors]
+Class="Function"
+Prototype="void Update_Cursors();"
+

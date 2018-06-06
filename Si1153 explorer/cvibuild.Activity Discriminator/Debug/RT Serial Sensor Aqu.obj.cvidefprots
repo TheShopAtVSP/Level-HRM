@@ -1,0 +1,20 @@
+[RT_Scan_Loop]
+Class="Function"
+Prototype="void RT_Scan_Loop();"
+
+[Serial_Get_Byte]
+Class="Function"
+Prototype="unsigned char Serial_Get_Byte();"
+
+[RT_Timer_CB]
+Class="Function"
+Prototype="int RT_Timer_CB(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[SetAquisisionTime]
+Class="Function"
+Prototype="int SetAquisisionTime(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[ClearStripChartCB]
+Class="Function"
+Prototype="int ClearStripChartCB(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+

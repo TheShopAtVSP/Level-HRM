@@ -1,0 +1,16 @@
+[Peak_Detector_CB]
+Class="Function"
+Prototype="int Peak_Detector_CB(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[Apply_Peak_Detector]
+Class="Function"
+Prototype="void Apply_Peak_Detector();"
+
+[ReStart_FO]
+Class="Function"
+Prototype="int ReStart_FO(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[detect_peak]
+Class="Function"
+Prototype="int detect_peak(const double *data, int data_count, int *emi_peaks, int *num_emi_peaks, int max_emi_peaks, int *absop_peaks, int *num_absop_peaks, int max_absop_peaks, double delta, int emi_first);"
+

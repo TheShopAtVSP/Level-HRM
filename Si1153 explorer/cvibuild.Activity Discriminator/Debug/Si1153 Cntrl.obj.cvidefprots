@@ -1,0 +1,24 @@
+[Set_LED_Source]
+Class="Function"
+Prototype="int Set_LED_Source(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[Chan_1_LED_Enable]
+Class="Function"
+Prototype="int Chan_1_LED_Enable(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[Chan_2_LED_Enable]
+Class="Function"
+Prototype="int Chan_2_LED_Enable(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[LED_A_Current]
+Class="Function"
+Prototype="int LED_A_Current(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[LED_B_Current]
+Class="Function"
+Prototype="int LED_B_Current(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[LED_C_Current]
+Class="Function"
+Prototype="int LED_C_Current(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+

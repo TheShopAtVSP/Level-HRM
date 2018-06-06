@@ -1,0 +1,9 @@
+C354 B354 seems to produce good resting and step results.
+C354 A100 works better during step with subtraction off.
+A100 B354 sucks.
+
+
+C354 B354 2sec step worked better with x1 manual sub.
+
+C17 B354 gives about equal deflection and the HR is not =.
+

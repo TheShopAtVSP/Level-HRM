@@ -1,0 +1,8 @@
+[Self_Steady_CB]
+Class="Function"
+Prototype="int Self_Steady_CB(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[Self_Steady]
+Class="Function"
+Prototype="void Self_Steady();"
+

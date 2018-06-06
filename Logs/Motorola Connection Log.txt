@@ -1,0 +1,88 @@
+[BLE_EVT_DISPATCH] 0x10
+[DM]: dm_ble_evt_handler  p_ble_evt->header.evt_id 0x0010
+[DM]: Request to Allocation Conn Inst
+[DM]:[00]: Conn Inst Allocated.
+[DM]: dm_ble_evt_handler  BLE_GAP_EVT_CONNECTED INDEX 0x0000
+[DM]: Searching for Dev 0x78 0xFF 0x04 0x6E 0x96 0x41.
+[DM]:[DI 0x00]: Device type 0x00.
+[DM]: Device Addr 0xAD 0x1D 0x1D 0xE5 0x61 0xCC KRI 0xKR 0x[DM]:[DI 0x01]: Device type 0x00.
+[DM]: Device Addr 0xAD 0x1D 0x1D 0xE5 0x61 0xCC KRI 0xKR 0x[DM]:[DI 0x02]: Device type 0x00.
+[DM]: Device Addr 0xAD 0x1D 0x1D 0xE5 0x61 0xCC KRI 0xKR 0x[DM]:[DI 0x03]: Device type 0xFF.
+[DM]: Device Addr 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF KRI 0xKR 0x[DM]:[DI 0x04]: Device type 0xFF.
+[DM]: Device Addr 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF KRI 0xKR 0x[DM]:[DI 0x05]: Device type 0xFF.
+[DM]: Device Addr 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF KRI 0xKR 0x[DM]:[DI 0x06]: Device type 0xFF.
+[DM]: Device Addr 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF KRI 0xKR 0xdm_device_instance_find No bonded device found.
+[DM]: Notifying App of event 0x11
+[ON_BLE_EVT] Connected
+[BLE_EVT_DISPATCH] 0x13
+[DM]: dm_ble_evt_handler  p_ble_evt->header.evt_id 0x0013
+[DM]: >> BLE_GAP_EVT_SEC_PARAMS_REQUEST
+[DM]:[DI 0x03]: Device type 0xFF.
+[DM]: Device Addr 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF.
+[KR]: DIA: set_key_ring(0);  key_ring_index = device_index_ring = 0x03
+[DM]: Allocated Dev Inst 0x03
+#####[KR]: Freeing Dev Inst 0x04
+[DM]:[DI 0x04]: Freeing Instance.
+[DM]: Init Peer Inst 0x0004
+[KR] ==>set_key_ring(int) key_ring[key_ring_index] 0  key_ring_index 4 key 0
+[DM]:[CI 0x00]:[DI 0x03]: Bonded!
+[DM]: 0x01, 0x01, 0x01, 0x01
+[DM]: Notifying App of event 0x13
+[CFG_UPDATE] @ 64750
+[UPDATE_CFG] Wake @64750
+   [SPIM] Timer On @64750
+   [SPIM] Timer Off @64750
+   [SPI_CB] 0x00
+[UPDATE_CFG] Read @64750
+  [SPIRD] AD:0x7C000 LN:0xB9
+   [SPIM] Timer On @64750
+   [SPIM] Timer Off @64750
+   [SPI_CB] 0xBD
+[UPDATE_CFG] Sect Unlock @64750
+  [SPIPRT] Wr En
+   [SPIM] Timer On @64750
+   [SPIM] Timer Off @64750
+   [SPI_CB] 0x00
+  [SPIRDST]
+   [SPIM] Timer On @64750
+  [SPIPRT] Stat Issued
+   [SPIM] Timer Off @64750
+ [BLE_EVT_DISPATCH] 0x12
+[DM]: dm_ble_evt_handler  p_ble_evt->header.evt_id 0x0012
+[SYS_EVT_DISPATCH] 2: @65000
+[SYS_EVT_DISPATCH] 2: @65125
+[SYS_EVT_DISPATCH] 2: @65125
+[SYS_EVT_DISPATCH] 2: @65125
+[SYS_EVT_DISPATCH] 2: @65125
+[DM]: Notifying App of event 0x23
+PS: Consumed Command Element 0
+[BLE_EVT_DISPATCH] 0x1A
+[DM]: dm_ble_evt_handler  p_ble_evt->header.evt_id 0x001A
+[DM]: >> BLE_GAP_EVT_CONN_SEC_UPDATE, Mode 0x01, Level 0x02
+[DM]: --> gatts_context_apply
+[DM]:[CI 0x00]: State 0x86, Size 0x00000000
+[DM]: Notifying App of event 0x15
+[BLE_EVT_DISPATCH] 0x19
+[DM]: dm_ble_evt_handler  p_ble_evt->header.evt_id 0x0019
+[DM]: >> BLE_GAP_EVT_AUTH_STATUS, status 00000000
+
+0x00 0x04 0x03 0x00 0x03 0x02 
+
+0xAA 0xB7 0xF9 0x99 0x17 0x99 0x2C 0x71 0x59 0xA0 0x91 0x57 0xAA 0xAA 0x08 0x27 0x40 0x00 0xFC 0xFE 0xBD 0xA1 0x2B 0x85 0x16 0x5B 0xEE 0x40 
+[DM]:[CI 0x00]:[DI 0x03]: Bonded!
+[DM]: --> device_context_store
+[DM]:[DI 03]:[CI 00]: -> Storing bonding information.
+[DM]: --> gatts_context_store
+[DM]: --> m_connection_table[p_handle->connection_id].conn_handle 0
+[DM]: sd_ble_gatts_sys_attr_get FAILED. err_code = C (hex)
+[DM]: Notifying App of event 0x14
+[SYS_EVT_DISPATCH] 2: @65625
+PS: Consumed Command Element 1
+[SYS_EVT_DISPATCH] 2: @65625
+[DM]:[0x03]:[0xFF]: Bond context Event
+[DM]: Notifying App of event 0x22
+PS: Consumed Command Element 2
+[BLE_EVT_DISPATCH] 0x12
+[DM]: dm_ble_evt_handler  p_ble_evt->header.evt_id 0x0012
+[BLE_EVT_DISPATCH] 0x12
+[DM]: dm_ble_evt_handler  p_ble_evt->header.evt_id 0x0012

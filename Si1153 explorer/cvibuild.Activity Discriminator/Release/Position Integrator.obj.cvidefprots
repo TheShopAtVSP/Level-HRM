@@ -1,0 +1,16 @@
+[Position_Integrator_CB]
+Class="Function"
+Prototype="int Position_Integrator_CB(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[Apply_Position_Integrator]
+Class="Function"
+Prototype="void Apply_Position_Integrator();"
+
+[Basic_Integrate]
+Class="Function"
+Prototype="void Basic_Integrate(const double *x, int n, int dt, double xInit, double xFinal, double *y);"
+
+[Simpson_Integrate]
+Class="Function"
+Prototype="void Simpson_Integrate(const double *x, int n, int dt, double xInit, double xFinal, double *y);"
+

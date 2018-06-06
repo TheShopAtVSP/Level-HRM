@@ -1,0 +1,8 @@
+[Apply_Raw_Data_Filtering_CB]
+Class="Function"
+Prototype="int Apply_Raw_Data_Filtering_CB(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[Apply_Raw_Data_Filtering]
+Class="Function"
+Prototype="void Apply_Raw_Data_Filtering();"
+

@@ -1,0 +1,60 @@
+[Generatesig1]
+Class="Function"
+Prototype="int Generatesig1(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[GenerateGraphs]
+Class="Function"
+Prototype="void GenerateGraphs();"
+
+[Getsig1wavetype]
+Class="Function"
+Prototype="int Getsig1wavetype(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[Getsig1noise]
+Class="Function"
+Prototype="int Getsig1noise(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[Getsig1cycles]
+Class="Function"
+Prototype="int Getsig1cycles(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[Getsig1phase]
+Class="Function"
+Prototype="int Getsig1phase(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[Getsig1points]
+Class="Function"
+Prototype="int Getsig1points(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[Getsig1noiseamp]
+Class="Function"
+Prototype="int Getsig1noiseamp(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[Getsig2points]
+Class="Function"
+Prototype="int Getsig2points(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[Getsig2cycles]
+Class="Function"
+Prototype="int Getsig2cycles(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[Getsig2phase]
+Class="Function"
+Prototype="int Getsig2phase(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[Getsig2noise]
+Class="Function"
+Prototype="int Getsig2noise(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[Getsig2noiseamp]
+Class="Function"
+Prototype="int Getsig2noiseamp(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[Getsig2wavetype]
+Class="Function"
+Prototype="int Getsig2wavetype(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[SetAutoGenerate]
+Class="Function"
+Prototype="int SetAutoGenerate(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+

@@ -1,0 +1,8 @@
+[Peak_Detector_CB]
+Class="Function"
+Prototype="int Peak_Detector_CB(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[Apply_Peak_Detector]
+Class="Function"
+Prototype="void Apply_Peak_Detector();"
+

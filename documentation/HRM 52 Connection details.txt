@@ -1,0 +1,22 @@
+HRM Glasses:
+
+static const char m_target_periph_name1[] = "Level 19B1"; // small
+static const char m_target_periph_name2[] = "Level 6DA7"; // old wide
+static const char m_target_periph_name3[] = "Level CFA7"; // new wide
+
+Primary Service:
+0x180A
+Batt Service: 
+0x180F
+UART Service:
+6E400001-B5A3-F393-E0A9-E50E24DCCA9E
+
+FW:
+#define DEVICE_NAME                     	"Level"	/**< Name of device. Will be included in the advertising data. */
+#define MANUFACTURER_NAME    	"TheShop" /**< Manufacturer. Will be passed to Device Information Service. */
+#define MODEL_NUM                       	"678"	/**< Model number. Will be passed to Device Information Service. */
+#define FW_REV_MAJOR		3
+#define FW_REV_MINOR		45	/**< errata 20 implemented as possible fix for occassional sys_timer startup problems*/						 
+#define MANUFACTURER_ID                	 0x1122334455  /**< Manufacturer ID, part of System ID. Will be passed to Device Information Service. */
+#define ORG_UNIQUE_ID                   	0x667788  
+HRM_PKT			=	0x69

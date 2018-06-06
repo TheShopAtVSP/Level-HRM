@@ -1,0 +1,59 @@
+-nologo
+-out:g:\Work VSP\HRM\VCNL4020 explorer\cvibuild.Activity Discriminator\Release\convolve.exe
+-arch:x86
+-timestamp
+-loadextmod
+-res:g:\Work VSP\HRM\VCNL4020 explorer\cvibuild.Activity Discriminator\Release\resources.res
+-entry:_CVIWinMainStartupCode@0
+-base:0x400000
+-linked:g:\Work VSP\HRM\VCNL4020 explorer\cvibuild.Activity Discriminator\Release\linkersummary.txt
+-dlldeps:g:\Work VSP\HRM\VCNL4020 explorer\cvibuild.Activity Discriminator\Release\dlldependencies.txt
+-licensing:g:\Work VSP\HRM\VCNL4020 explorer\cvibuild.Activity Discriminator\Release\linkerlicensing.txt
+-browsedeps:g:\Work VSP\HRM\VCNL4020 explorer\cvibuild.Activity Discriminator\Release\moduledependencies.txt
+-stackreserve:131072
+-stackcommit:4096
+-in:g:\Work VSP\HRM\VCNL4020 explorer\cvibuild.Activity Discriminator\Release\Activity Discriminator Main.obj
+-in:g:\Work VSP\HRM\VCNL4020 explorer\cvibuild.Activity Discriminator\Release\Activity_Procedural.obj
+-in:g:\Work VSP\HRM\VCNL4020 explorer\cvibuild.Activity Discriminator\Release\AX3dPlot.obj
+-in:g:\Work VSP\HRM\VCNL4020 explorer\cvibuild.Activity Discriminator\Release\Blood Hart.obj
+-in:g:\Work VSP\HRM\VCNL4020 explorer\cvibuild.Activity Discriminator\Release\Gravity Vector OGL.obj
+-in:g:\Work VSP\HRM\VCNL4020 explorer\cvibuild.Activity Discriminator\Release\Gravity Vector.obj
+-in:g:\Work VSP\HRM\VCNL4020 explorer\cvibuild.Activity Discriminator\Release\Histogram.obj
+-in:g:\Work VSP\HRM\VCNL4020 explorer\cvibuild.Activity Discriminator\Release\Load Store Data.obj
+-in:g:\Work VSP\HRM\VCNL4020 explorer\cvibuild.Activity Discriminator\Release\Magnitude.obj
+-in:g:\Work VSP\HRM\VCNL4020 explorer\cvibuild.Activity Discriminator\Release\Motor Control.obj
+-in:g:\Work VSP\HRM\VCNL4020 explorer\cvibuild.Activity Discriminator\Release\Peak Detector.obj
+-in:g:\Work VSP\HRM\VCNL4020 explorer\cvibuild.Activity Discriminator\Release\Position Integrator.obj
+-in:g:\Work VSP\HRM\VCNL4020 explorer\cvibuild.Activity Discriminator\Release\Raw Data Filters.obj
+-in:g:\Work VSP\HRM\VCNL4020 explorer\cvibuild.Activity Discriminator\Release\RT Serial Sensor Aqu.obj
+-in:g:\Work VSP\HRM\VCNL4020 explorer\cvibuild.Activity Discriminator\Release\Self Steady.obj
+-in:g:\Work VSP\HRM\VCNL4020 explorer\cvibuild.Activity Discriminator\Release\Sig Generator.obj
+-in:g:\Work VSP\HRM\VCNL4020 explorer\cvibuild.Activity Discriminator\Release\Sig Graph.obj
+-in:g:\Work VSP\HRM\VCNL4020 explorer\cvibuild.Activity Discriminator\Release\Uno Serial Sensor Aqu.obj
+-in:g:\Work VSP\HRM\VCNL4020 explorer\cvibuild.Activity Discriminator\Release\VCNL4020 Cntrl.obj
+-more:g:\apps folder\national instruments\cvi2013\bin\msvc\cvistart.lib
+-more:g:\apps folder\national instruments\cvi2013\bin\msvc\cvi.lib
+-more:g:\Apps Folder\National Instruments\CVI2013\toolslib\custctrl\msvc\3DGraphCtrl.obj
+-more:g:\apps folder\national instruments\cvi2013\sdk\lib\msvc\advapi32.lib
+-more:c:\ProgramData\National Instruments\CVI2013\bin\msvc\analysis.lib
+-more:g:\Apps Folder\National Instruments\CVI2013\toolslib\custctrl\custsupp\msvc\ckcviogl.obj
+-more:g:\Apps Folder\National Instruments\CVI2013\bin\msvc\cviauto.lib
+-more:g:\Apps Folder\National Instruments\CVI2013\bin\msvc\cviddc.lib
+-more:g:\Apps Folder\National Instruments\CVI2013\bin\msvc\cvidotnet.lib
+-more:g:\Apps Folder\National Instruments\CVI2013\bin\msvc\cvinetstreams.lib
+-more:g:\Apps Folder\National Instruments\CVI2013\bin\msvc\cvinetv.lib
+-more:g:\Apps Folder\National Instruments\CVI2013\bin\msvc\cvintwrk.lib
+-more:g:\Apps Folder\National Instruments\CVI2013\toolslib\custctrl\msvc\cviogl.lib
+-more:g:\Apps Folder\National Instruments\CVI2013\bin\msvc\cvitdms.lib
+-more:g:\apps folder\national instruments\cvi2013\sdk\lib\msvc\gdi32.lib
+-more:g:\Apps Folder\National Instruments\CVI2013\sdk\lib\msvc\GlU32.lib
+-more:g:\Apps Folder\National Instruments\CVI2013\bin\msvc\gpib.lib
+-more:g:\apps folder\national instruments\cvi2013\sdk\lib\msvc\kernel32.lib
+-more:g:\Apps Folder\National Instruments\CVI2013\bin\msvc\nivxi.lib
+-more:g:\Apps Folder\National Instruments\CVI2013\bin\msvc\omp.lib
+-more:g:\Apps Folder\National Instruments\CVI2013\sdk\lib\msvc\OpenGL32.lib
+-more:g:\Apps Folder\National Instruments\CVI2013\toolslib\toolbox\msvc\toolbox.obj
+-more:g:\apps folder\national instruments\cvi2013\sdk\lib\msvc\user32.lib
+-more:g:\apps folder\national instruments\cvi2013\sdk\lib\msvc\uuid.lib
+-more:g:\Apps Folder\National Instruments\Shared\CVI\Bin\msvc\visa.lib
+-more:g:\apps folder\national instruments\cvi2013\sdk\lib\msvc\winmm.lib
