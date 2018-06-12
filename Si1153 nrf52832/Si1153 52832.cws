@@ -1,6 +1,7 @@
 [Workspace Header]
 Version = 1700
-Pathname = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Si1153 nrf52832/Si1153 52832.cws"
+Pathname Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/Si1153"
+Pathname Line0002 = " 52832.cws"
 CVI Dir = "/c/program files (x86)/national instruments/cvi2017"
 CVI Shared Dir = "/C/Program Files (x86)/National Instruments/Shared/CVI"
 CVI Pub Local Dir = "/C/ProgramData/National Instruments/CVI2017"
@@ -12,11 +13,11 @@ VXIplug&play Framework 64-bit Dir = "/C/Program Files/IVI Foundation/VISA/win64"
 Number of Projects = 1
 Active Project = 1
 Project 0001 = "Activity Discriminator.prj"
-Drag Bar Left = 175
-Window Top = 42
-Window Left = 1934
-Window Bottom = 1187
-Window Right = 3637
+Drag Bar Left = 309
+Window Top = 36
+Window Left = 47
+Window Bottom = 1181
+Window Right = 1825
 Maximized = False
 Maximized Children = True
 Max32 Number Of Errors = 20
@@ -30,9 +31,9 @@ Save Changes Before Compiling = "Always"
 Hide Windows = False
 Break At First Statement = False
 Sort Type = "File Name"
-Number of Opened Files = 8
+Number of Opened Files = 5
 Window Confinement Region Enabled = True
-MainColumnWidth = 158
+MainColumnWidth = 292
 FileDateColumnWidth = 70
 FileSizeColumnWidth = 70
 
@@ -46,242 +47,232 @@ Batch Build Release = False
 Batch Build Debug = False
 
 [File 0001]
-Path Line0001 = "/c/Program Files (x86)/National Instruments/CVI2017/toolslib/custctrl/3DGraphCtr"
+Path Line0001 = "/c/program files (x86)/national instruments/cvi2017/toolslib/custctrl/3DGraphCtr"
 Path Line0002 = "l.fp"
 File Type = "Function Panel"
 Disk Date = 3573619200
 In Projects = "1,"
 
 [File 0002]
-Path = "/c/Program Files (x86)/National Instruments/CVI2017/toolslib/custctrl/cviogl.fp"
+Path = "/c/program files (x86)/national instruments/cvi2017/toolslib/custctrl/cviogl.fp"
 File Type = "Function Panel"
 Disk Date = 3573619200
 In Projects = "1,"
 
 [File 0003]
-Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Si1153 nrf52832/Activity Discrim"
-Path Line0002 = "inator.uir"
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/Activi"
+Path Line0002 = "ty Discriminator.uir"
 File Type = "User Interface Resource"
-Disk Date = 3611051154
+Disk Date = 3611162347
 In Projects = "1,"
 Window Top = 38
 Window Left = 6
 Window Height = 349
 Window Width = 715
-Window Z-Order = 2
+Window Z-Order = 4
 
 [File 0004]
-Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Si1153 nrf52832/RT Serial Sensor"
-Path Line0002 = " Aqu.c"
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/RT Ser"
+Path Line0002 = "ial Sensor Aqu.c"
 File Type = "CSource"
-Disk Date = 3610533124
+Disk Date = 3611571644
 In Projects = "1,"
 Window Top = 110
 Window Left = 48
 Window Z-Order = 3
-Source Window State = "1,81,81,81,8,21,21,0,0,75,0,0,0,0,0,21,289,0,299,4,417,835,1,0,"
+Source Window State = "1,58,58,58,44,53,44,0,0,74,0,0,0,0,0,19,37,0,59,23,417,835,1,0,"
 
 [File 0005]
-Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Si1153 nrf52832/Peak Detector 3."
-Path Line0002 = "c"
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/Peak D"
+Path Line0002 = "etector 3.c"
 File Type = "CSource"
-Disk Date = 3611057421
+Disk Date = 3611662793
 In Projects = "1,"
 Window Top = 38
 Window Left = 6
 Window Z-Order = 1
-Source Window State = "1,508,508,508,4,5,5,0,0,144,0,0,0,0,0,48,548,0,508,5,427,718,1,0,"
+Source Window State = "1,408,411,408,4,31,4,0,0,138,0,0,0,0,0,43,495,0,518,8,427,718,1,0,"
 
 [File 0006]
-Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Si1153 nrf52832/Activity Discrim"
-Path Line0002 = "inator Main.c"
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/Activi"
+Path Line0002 = "ty Discriminator Main.c"
 File Type = "CSource"
-Disk Date = 3610714133
-In Projects = "1,"
-Window Top = 40
-Window Left = 11
-Window Z-Order = 4
-Source Window State = "1,43,43,43,37,38,38,0,0,63,0,0,0,0,0,17,27,0,45,6,349,715,1,0,"
-
-[File 0007]
-Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Si1153 nrf52832/Activity Discrim"
-Path Line0002 = "inator vars.h"
-File Type = "Include"
-Disk Date = 3610447436
-In Projects = "1,"
-Window Top = 230
-Window Left = 111
-Window Z-Order = 7
-Source Window State = "1,141,141,141,69,70,70,0,0,63,0,51,0,0,0,17,132,0,141,70,349,715,1,11,"
-
-[File 0008]
-Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Si1153 nrf52832/Raw Data Filters"
-Path Line0002 = ".c"
-File Type = "CSource"
-Disk Date = 3610459642
+Disk Date = 3611326751
 In Projects = "1,"
 Window Top = 40
 Window Left = 11
 Window Z-Order = 5
-Source Window State = "1,23,23,23,16,43,43,0,0,63,0,0,0,0,0,17,15,0,30,35,349,715,1,0,"
+Source Window State = "1,131,149,131,0,0,0,0,0,62,0,0,0,0,0,15,46,0,76,21,349,715,1,0,"
 
-[File 0009]
-Path = "/c/Program Files (x86)/National Instruments/CVI2017/include/userint.h"
+[File 0007]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/Activi"
+Path Line0002 = "ty Discriminator vars.h"
 File Type = "Include"
-Disk Date = 3573619200
-In Projects = ""
-Window Top = 306
-Window Left = 151
-Window Z-Order = 8
-Source Window State = "1,1127,1127,1127,8,24,24,0,3,64,0,0,0,0,0,22,1126,0,1127,8,427,726,1,0,"
-
-[File 0010]
-Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Si1153 nrf52832/Position Integra"
-Path Line0002 = "tor.c"
-File Type = "CSource"
-Disk Date = 3610453584
+Disk Date = 3611661282
 In Projects = "1,"
-Window Top = 192
-Window Left = 91
-Window Z-Order = 6
-Source Window State = "1,256,264,265,0,8160,0,1,0,65,0,0,0,0,0,17,240,0,256,0,349,739,1,0,"
+Window Top = 230
+Window Left = 111
+Window Z-Order = 2
+Source Window State = "1,136,136,136,96,98,98,0,0,62,0,51,0,0,0,15,132,0,136,99,349,715,1,11,"
 
-[File 0011]
-Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Si1153 nrf52832/Activity_Procedu"
-Path Line0002 = "ral.c"
+[File 0008]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/Activi"
+Path Line0002 = "ty_Procedural.c"
 File Type = "CSource"
-Disk Date = 3605091976
+Disk Date = 3611151731
 In Projects = "1,"
 Window Top = 268
 Window Left = 131
 Source Window State = "1,57,57,57,19,20,20,0,0,0,0,0,0,0,0,0,14,0,57,24,349,715,1,0,"
 
-[File 0012]
-Path = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Si1153 nrf52832/AX3dPlot.c"
+[File 0009]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/AX3dPl"
+Path Line0002 = "ot.c"
 File Type = "CSource"
-Disk Date = 3541415228
+Disk Date = 3611151731
 In Projects = "1,"
 Window Top = 38
-Source Window State = "1,70,70,70,75,78,78,0,0,0,0,0,0,0,0,0,118,0,142,16,400,600,0,0,"
+Source Window State = "1,70,70,70,75,78,78,0,0,0,0,0,0,0,0,0,50,0,60,0,400,600,1,0,"
 
-[File 0013]
-Path = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Si1153 nrf52832/Blood Hart.c"
+[File 0010]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/Blood "
+Path Line0002 = "Hart.c"
 File Type = "CSource"
-Disk Date = 3541933430
+Disk Date = 3611151731
 In Projects = "1,"
 Window Top = 40
 Window Left = 11
 Source Window State = "1,48,53,48,8,99,8,0,3,0,0,0,0,0,0,0,7,0,53,99,349,715,1,0,"
 
-[File 0014]
-Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Si1153 nrf52832/Gravity Vector O"
-Path Line0002 = "GL.c"
+[File 0011]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/Gravit"
+Path Line0002 = "y Vector OGL.c"
 File Type = "CSource"
-Disk Date = 3539805834
+Disk Date = 3611151731
 In Projects = "1,"
 Window Top = 306
 Window Left = 151
 Source Window State = "1,130,130,130,34,35,35,0,0,0,0,0,0,0,0,0,103,0,130,35,349,715,1,0,"
 
-[File 0015]
-Path = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Si1153 nrf52832/Gravity Vector.c"
+[File 0012]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/Gravit"
+Path Line0002 = "y Vector.c"
 File Type = "CSource"
-Disk Date = 3541419678
+Disk Date = 3611151731
 In Projects = "1,"
 Window Top = 116
 Window Left = 51
 Source Window State = "1,62,62,62,16,39,39,0,3,0,0,0,0,0,0,0,43,0,62,16,349,715,1,0,"
 
-[File 0016]
-Path = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Si1153 nrf52832/Histogram.c"
+[File 0013]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/Histog"
+Path Line0002 = "ram.c"
 File Type = "CSource"
-Disk Date = 3604751818
+Disk Date = 3611151731
 In Projects = "1,"
 Window Top = 425
 Window Left = 231
 Source Window State = "1,66,66,66,4,163,4,0,0,0,0,0,0,0,0,0,28,0,36,4,349,715,1,0,"
 
-[File 0017]
-Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Si1153 nrf52832/Load Store Data."
-Path Line0002 = "c"
+[File 0014]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/Load S"
+Path Line0002 = "tore Data.c"
 File Type = "CSource"
-Disk Date = 3610447744
+Disk Date = 3611151731
 In Projects = "1,"
 Window Top = 230
 Window Left = 111
-Source Window State = "1,127,127,127,8,30,8,0,0,0,0,0,0,0,0,0,107,0,118,13,349,715,1,0,"
+Source Window State = "1,70,70,70,30,44,30,0,0,0,0,0,0,0,0,0,91,0,99,21,349,715,1,0,"
 
-[File 0018]
-Path = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Si1153 nrf52832/Magnitude.c"
+[File 0015]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/Magnit"
+Path Line0002 = "ude.c"
 File Type = "CSource"
-Disk Date = 3541854330
+Disk Date = 3611151731
 In Projects = "1,"
 Window Top = 40
 Window Left = 11
 Source Window State = "1,21,21,21,5,18,5,0,3,0,0,0,0,0,0,0,6,0,21,18,349,715,1,0,"
 
-[File 0019]
-Path = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Si1153 nrf52832/Si1153 Cntrl.c"
+[File 0016]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/Positi"
+Path Line0002 = "on Integrator.c"
 File Type = "CSource"
-Disk Date = 3605635448
+Disk Date = 3611161340
+In Projects = "1,"
+Window Top = 192
+Window Left = 91
+Source Window State = "1,256,264,265,0,8160,0,1,0,0,0,0,0,0,0,0,0,0,90,2,349,739,1,0,"
+
+[File 0017]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/Raw Da"
+Path Line0002 = "ta Filters.c"
+File Type = "CSource"
+Disk Date = 3611151731
+In Projects = "1,"
+Window Top = 40
+Window Left = 11
+Source Window State = "1,23,23,23,16,43,43,0,0,0,0,0,0,0,0,0,15,0,30,35,349,715,1,0,"
+
+[File 0018]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/Si1153"
+Path Line0002 = " Cntrl.c"
+File Type = "CSource"
+Disk Date = 3611151731
 In Projects = "1,"
 Window Top = 38
 Window Left = 10
 Source Window State = "1,164,164,164,29,30,30,0,0,0,0,0,0,0,0,0,128,0,164,30,349,683,1,0,"
 
-[File 0020]
-Path = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Si1153 nrf52832/Sig Graph.c"
+[File 0019]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/Sig Gr"
+Path Line0002 = "aph.c"
 File Type = "CSource"
-Disk Date = 3608806468
+Disk Date = 3611151731
 In Projects = "1,"
 Window Top = 230
 Window Left = 111
 Source Window State = "1,411,411,411,16,149,16,0,0,0,0,0,0,0,0,0,393,0,411,14,349,715,1,0,"
 
-[File 0021]
-Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Si1153 nrf52832/Activity Discrim"
-Path Line0002 = "inator.h"
+[File 0020]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/Activi"
+Path Line0002 = "ty Discriminator.h"
 File Type = "Include"
-Disk Date = 3611051154
+Disk Date = 3611162347
 In Projects = "1,"
 Window Top = 38
-Source Window State = "1,155,155,155,17,29,17,0,0,0,0,0,0,0,0,0,143,0,185,17,400,600,1,0,"
+Source Window State = "1,155,155,155,17,29,17,0,0,0,0,0,0,0,0,0,149,0,166,19,400,600,1,0,"
 
-[File 0022]
-Path = "/c/Users/Mitch_Mason/675da3299148/mbed.h"
+[File 0021]
+Path = "/c/Users/Mitch_Mason/Desktop/675da3299148/mbed.h"
 File Type = "Include"
 Disk Date = 0
 In Projects = "1,"
 Source Window State = "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"
 
-[File 0023]
-Path = "/c/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x86/GlU32.Lib"
+[File 0022]
+Path = "/C/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x86/GlU32.Lib"
 File Type = "Library"
 Disk Date = 3459980018
 In Projects = "1,"
 
-[File 0024]
-Path = "/c/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x86/OpenGL32.Lib"
+[File 0023]
+Path = "/C/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x86/OpenGL32.Lib"
 File Type = "Library"
 Disk Date = 3459976106
 In Projects = "1,"
 
 [Tab Order]
-Tab 0001 = "/c/Program Files (x86)/National Instruments/CVI2017/include/userint.h"
-Tab 0002 Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Si1153 nrf52832/Activity Discrim"
-Tab 0002 Line0002 = "inator vars.h"
-Tab 0003 Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Si1153 nrf52832/Position Integra"
-Tab 0003 Line0002 = "tor.c"
-Tab 0004 Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Si1153 nrf52832/Raw Data Filters"
-Tab 0004 Line0002 = ".c"
-Tab 0005 Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Si1153 nrf52832/Activity Discrim"
-Tab 0005 Line0002 = "inator Main.c"
-Tab 0006 Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Si1153 nrf52832/RT Serial Sensor"
-Tab 0006 Line0002 = " Aqu.c"
-Tab 0007 Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Si1153 nrf52832/Activity Discrim"
-Tab 0007 Line0002 = "inator.uir"
-Tab 0008 Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Si1153 nrf52832/Peak Detector 3."
-Tab 0008 Line0002 = "c"
+Tab 0001 Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/Peak D"
+Tab 0001 Line0002 = "etector 3.c"
+Tab 0002 Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/Activi"
+Tab 0002 Line0002 = "ty Discriminator Main.c"
+Tab 0003 Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/Activi"
+Tab 0003 Line0002 = "ty Discriminator.uir"
+Tab 0004 Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/RT Ser"
+Tab 0004 Line0002 = "ial Sensor Aqu.c"
+Tab 0005 Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/Activi"
+Tab 0005 Line0002 = "ty Discriminator vars.h"
 
 [Default Build Config 0001 Debug]
 Generate Browse Info = True

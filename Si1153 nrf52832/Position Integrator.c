@@ -88,7 +88,7 @@ void Apply_Position_Integrator(void)
 		if( ser_input_size == 0)
 			return;
 		
-		Variance ( intgtr_gyr_p, ser_input_size ,&pvariance , &pmean );
+//		Variance ( intgtr_gyr_p, ser_input_size ,&pvariance , &pmean );
 		//sprintf(out_str, "pvariance %f, pmean %f\n", pvariance, pmean);
 		//SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
 		

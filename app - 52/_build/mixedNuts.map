@@ -6350,60 +6350,60 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
 
-        22          0          0          0          0        617   app_error.o
-      1814        100          0         32          0      57484   app_timer.o
-       112         26          0          1          0       3192   app_trace.o
-       124         14          0          0          0       9026   app_util_platform.o
+        22          0          0          0          0        625   app_error.o
+      1814        100          0         32          0      57744   app_timer.o
+       112         26          0          1          0       3248   app_trace.o
+       124         14          0          0          0       9066   app_util_platform.o
         36          8        512          0      16384        868   arm_startup_nrf52.o
-      2412        688        270         24         74      32709   battery.o
-      1540          0          0          0          0      19468   ble_advdata.o
-      1550        544          0         31        259       8724   ble_advertising.o
-       436         54          4         20         60      12896   ble_conn_params.o
-       578          8          0         74          0       5139   ble_dis.o
-       714         56         16          0          0       5446   ble_nus.o
-        30          0          0          0          0       1924   ble_srv_common.o
-      1022          0          0          0          0      13962   ble_vsp_bas.o
-      2008        550          0         16          0      10127   bq25120.o
-      5974       1904         66         36       1472      18092   comms.o
-      1550        106        392         32       1424      10723   data_crunch.o
-      2792       1222          0          8          0      12089   ext_flash.o
-        20          4          0          0         88       3356   fstorage.o
-      2492        632          0       3160          0      23856   hal_imu.o
-      5118       1850         12         20          0      14877   hal_nvm.o
-      1144        376         12         40         60       9740   hal_spim.o
-       888        284         36         28          0       5554   hal_twim.o
-      1172        284          0         16         32       8365   led.o
-      5612       1100        164         50        264      28450   lsm6ds3.o
-       160         48          8          8          0      18040   lsm6ds3_i2c.o
-      6780       1928        113        108       1828     205975   main.o
-       260         90          0          6          0       5049   manufacture_test.o
-      2702       1026          0         28       1725      15009   mem_manager.o
-       144          0          0          0          0       1559   nrf_delay.o
-        36          6          0          0         12       5813   nrf_drv_clock.o
-        60          0          0          0          0      30475   nrf_drv_common.o
-      1114         94          0          0         88      22467   nrf_drv_gpiote.o
-       262         36          0          8          0      10496   nrf_drv_ppi.o
-       836         68          3          0         44      15100   nrf_drv_saadc.o
-       962         46         16          0         32      19011   nrf_drv_spi.o
-      1548         56         28          0         40      56748   nrf_drv_twi.o
-       442         40          0          0         28      13244   nrf_drv_uart.o
-       232         54         12         12          0       7504   nrf_drv_wdt.o
-       188         38          0          8       2075       4925   nrf_log.o
-        96          6          0          0          0       6025   nrf_saadc.o
-      2618        402         40         40       1300      33278   pstorage.o
-      6188       1026          0         36       4464      27533   reports.o
-       716         62          0          0       2184      12254   segger_rtt.o
-       878          6         16          0          0       5893   segger_rtt_printf.o
-      2176         76         24         18        390      12443   si115x_functions.o
-       842        296          0         20         12      42789   softdevice_handler.o
-      5684       2054        255         28       1150      29502   spiflash.o
-       128         18          0         16        368       5508   step_detect_1.o
-      2952        360          0         32        432       8839   step_detect_2.o
-       772         68          0          4          0       3031   system_nrf52.o
-      9510       4002       1535         24        331      34879   vsp_device_manager_peripheral.o
+      2412        688        270         24         74      33025   battery.o
+      1540          0          0          0          0      19600   ble_advdata.o
+      1550        544          0         31        259       8820   ble_advertising.o
+       436         54          4         20         60      12988   ble_conn_params.o
+       578          8          0         74          0       5207   ble_dis.o
+       714         56         16          0          0       5498   ble_nus.o
+        30          0          0          0          0       1956   ble_srv_common.o
+      1022          0          0          0          0      14062   ble_vsp_bas.o
+      2008        550          0         16          0      10283   bq25120.o
+      5974       1904         66         36       1472      18256   comms.o
+      1550        106        392         32       1424      10875   data_crunch.o
+      2792       1222          0          8          0      12193   ext_flash.o
+        20          4          0          0         88       3396   fstorage.o
+      2492        632          0       3160          0      24252   hal_imu.o
+      5118       1850         12         20          0      15049   hal_nvm.o
+      1144        376         12         40         60       9836   hal_spim.o
+       888        284         36         28          0       5634   hal_twim.o
+      1172        284          0         16         32       8521   led.o
+      5612       1100        164         50        264      28782   lsm6ds3.o
+       160         48          8          8          0      18116   lsm6ds3_i2c.o
+      6780       1928        113        108       1828     206871   main.o
+       260         90          0          6          0       5133   manufacture_test.o
+      2702       1026          0         28       1725      15245   mem_manager.o
+       144          0          0          0          0       1587   nrf_delay.o
+        36          6          0          0         12       5869   nrf_drv_clock.o
+        60          0          0          0          0      30487   nrf_drv_common.o
+      1114         94          0          0         88      22687   nrf_drv_gpiote.o
+       262         36          0          8          0      10604   nrf_drv_ppi.o
+       836         68          3          0         44      15204   nrf_drv_saadc.o
+       962         46         16          0         32      19171   nrf_drv_spi.o
+      1548         56         28          0         40      56964   nrf_drv_twi.o
+       442         40          0          0         28      13380   nrf_drv_uart.o
+       232         54         12         12          0       7600   nrf_drv_wdt.o
+       188         38          0          8       2075       5001   nrf_log.o
+        96          6          0          0          0       6061   nrf_saadc.o
+      2618        402         40         40       1300      33690   pstorage.o
+      6188       1026          0         36       4464      27805   reports.o
+       716         62          0          0       2184      12394   segger_rtt.o
+       878          6         16          0          0       5945   segger_rtt_printf.o
+      2176         76         24         18        390      12599   si115x_functions.o
+       842        296          0         20         12      42933   softdevice_handler.o
+      5684       2054        255         28       1150      29822   spiflash.o
+       128         18          0         16        368       5568   step_detect_1.o
+      2952        360          0         32        432       8923   step_detect_2.o
+       772         68          0          4          0       3067   system_nrf52.o
+      9510       4002       1535         24        331      35207   vsp_device_manager_peripheral.o
 
     ----------------------------------------------------------------------
-     87540      21716       3576       3996      36632     970073   Object Totals
+     87540      21716       3576       3996      36632     977717   Object Totals
          0          0         32          0          0          0   (incl. Generated)
         94          0         10         12         12          0   (incl. Padding)
 
@@ -6483,8 +6483,8 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-     94400      22180       3960       4008      36632     917489   Grand Totals
-     94400      22180       3960        164      36632     917489   ELF Image Totals (compressed)
+     94400      22180       3960       4008      36632     925133   Grand Totals
+     94400      22180       3960        164      36632     925133   ELF Image Totals (compressed)
      94400      22180       3960        164          0          0   ROM Totals
 
 ==============================================================================

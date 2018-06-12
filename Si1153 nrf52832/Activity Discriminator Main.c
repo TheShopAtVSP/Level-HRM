@@ -74,6 +74,7 @@ int main (int argc, char *argv[])
 	fo_start = 1;
 	fo_hit = fo_miss = 0;
 	hrm_raw_index = 0;
+	current_hrm = 69;
 //	GetScreenSize (NULL, &screen_width);
 //	if(screen_width == 1600)
 //		SetPanelSize (mainpnl, 800, 1600);
@@ -129,21 +130,3 @@ int CVICALLBACK HelpCallback (int panel, int control, int event,
 }
 
 
-
-
-int CVICALLBACK ChangeBG (int panel, int control, int event,
-						  void *callbackData, int eventData1, int eventData2)
-{
-	int bg_forward;
-	switch (event)
-	{
-		case EVENT_COMMIT:
-
-			GetCtrlVal(mainpnl, MAINPNL_BG_BUTTON, &bg_forward);
-			
-			SetCtrlAttribute(mainpnl, MAINPNL_BLACK_BG, ATTR_VISIBLE, bg_forward);
-			SetCtrlAttribute(mainpnl, MAINPNL_HRM_7SEG_5, ATTR_VISIBLE, bg_forward);
-			break;
-	}
-	return 0;
-}

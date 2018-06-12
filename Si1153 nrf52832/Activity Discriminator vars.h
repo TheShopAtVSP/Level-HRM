@@ -132,15 +132,18 @@ double 	delta_t,delta_f,frequency,ffreq,frequency_array[2048];
 
 double	final_hrm_avg[256], final_hrm_avg_old, final_hrm_avg_second_diff;
 int		final_hrm_avg_index, final_hrm_avg_valid_index, fo_avg_len, fo_start, fo_hit, fo_miss;
-int		emi_peaks[64], num_emi_peaks, absop_peaks[64], num_absop_peaks, emi_peaks_xpos[64], absop_peaks_xpos[64];
+int		emi_peaks[128], num_emi_peaks, absop_peaks[128], num_absop_peaks, emi_peaks_xpos[128], absop_peaks_xpos[128];
 int		max_emi_peaks, max_absop_peaks;
-double  emi_peaks_dfp[64], emi_peaks_xpos_dfp[64], absop_peaks_dfp[64], absop_peaks_xpos_dfp[64]; 
+double  emi_peaks_dfp[128], emi_peaks_xpos_dfp[128], absop_peaks_dfp[128], absop_peaks_xpos_dfp[128]; 
 
 
 /// ===============================================================================================================================
 int16_t 	hrm_chan1_raw[256], hrm_chan2_raw[256], hrm_chan3_raw[256], hrm_raw_index_old, current_hrm;
 int16_t 	hrm_raw_index, hrm_chan1_raw_avg[256], hrm_chan2_raw_avg[256];
 int16_t 	avg_x_rng;
+unsigned char hrm_52;
+int16_t avg_x_diff;
+
 /*****************************************************************/
 /*                                                               */
 /*  Variable Descriptions                                        */

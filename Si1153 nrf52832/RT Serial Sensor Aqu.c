@@ -57,7 +57,8 @@ void RT_Scan_Loop(void)
 
 	byte_in_h = Serial_Get_Byte();
 	SetCtrlVal(mainpnl, MAINPNL_HRM_7SEG_4, byte_in_h);
-	SetCtrlVal(mainpnl, MAINPNL_HRM_7SEG_5, byte_in_h);
+	hrm_52 = byte_in_h;
+//	SetCtrlVal(mainpnl, MAINPNL_HRM_7SEG_5, byte_in_h);
 	byte_in_l = Serial_Get_Byte();
 	SetCtrlVal(mainpnl, MAINPNL_HRM_7SEG_6, byte_in_l);
 	si_az = (short)(byte_in_h << 8) + byte_in_l;
@@ -82,6 +83,7 @@ void RT_Scan_Loop(void)
 		hrm_raw_index -= gyravgfilt_val;
 		ser_input_size = hrm_raw_index;
 		Apply_Peak_Detector();
+		/// Apply_Peak_Detector();
 		if(!one_shot)
 			hrm_raw_index = 0;  
 	}

@@ -46,15 +46,15 @@ int16_t Si1153_Init(void)
 #ifdef LEDX3	
     retval += Si115xParamSet( PARAM_CH_LIST, 0x03); // Enable chan 1 and 2
 	
-	retval += Si115xParamSet(PARAM_LED1_A, 0x08);
-	retval += Si115xParamSet(PARAM_LED2_A, 0x08);
-	retval += Si115xParamSet(PARAM_LED3_A, 0x08);
-	retval += Si115xParamSet(PARAM_LED1_B, 0x08);/// 50mA = 0x12
-	retval += Si115xParamSet(PARAM_LED2_B, 0x08);/// 11mA = 0x08, 5.5 = 0x00, 22 = 0x18
-	retval += Si115xParamSet(PARAM_LED3_B, 0x08);///2A = 100 mA
+	retval += Si115xParamSet(PARAM_LED1_A, 0x00);
+	retval += Si115xParamSet(PARAM_LED2_A, 0x00);
+	retval += Si115xParamSet(PARAM_LED3_A, 0x00);
+	retval += Si115xParamSet(PARAM_LED1_B, 0x00);/// 50mA = 0x12
+	retval += Si115xParamSet(PARAM_LED2_B, 0x00);/// 11mA = 0x08, 5.5 = 0x00, 22 = 0x18
+	retval += Si115xParamSet(PARAM_LED3_B, 0x00);///2A = 100 mA
 	
 	retval += Si115xParamSet(PARAM_ADCCONFIG0, 0x62);	// mux 4xd 24.4 uSec
-	retval += Si115xParamSet(PARAM_MEASCONFIG0, 0x02);//1 = LEDA
+	retval += Si115xParamSet(PARAM_MEASCONFIG0, 0x06);//1 = LEDA
 	retval += Si115xParamSet( PARAM_ADCSENS0, 0x20);
     retval += Si115xParamSet( PARAM_ADCPOST0, 0x40);
 	
@@ -65,11 +65,11 @@ int16_t Si1153_Init(void)
 #else
 retval += Si115xParamSet( PARAM_CH_LIST, 0x03); // Enable chan 1 and 2
 	
-	retval += Si115xParamSet(PARAM_LED1_A, 0x08);
-	retval += Si115xParamSet(PARAM_LED2_A, 0x2A);
+	retval += Si115xParamSet(PARAM_LED1_A, 0x00);
+	retval += Si115xParamSet(PARAM_LED2_A, 0x00);
 	///retval += Si115xParamSet(PARAM_LED3_A, 0x3f);
-	retval += Si115xParamSet(PARAM_LED1_B, 0x08);
-	retval += Si115xParamSet(PARAM_LED2_B, 0x2A);
+	retval += Si115xParamSet(PARAM_LED1_B, 0x00);
+	retval += Si115xParamSet(PARAM_LED2_B, 0x00);
 	///retval += Si115xParamSet(PARAM_LED3_B, 0x3f);
 	
 	retval += Si115xParamSet(PARAM_ADCCONFIG0, 0x62);	// mux 4xd 24.4 uSec

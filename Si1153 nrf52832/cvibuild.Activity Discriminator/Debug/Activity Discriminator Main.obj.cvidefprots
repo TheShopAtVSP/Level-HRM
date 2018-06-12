@@ -10,7 +10,3 @@ Prototype="int Quit(int panel, int control, int event, void *callbackData, int e
 Class="Function"
 Prototype="int HelpCallback(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
 
-[ChangeBG]
-Class="Function"
-Prototype="int ChangeBG(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
-

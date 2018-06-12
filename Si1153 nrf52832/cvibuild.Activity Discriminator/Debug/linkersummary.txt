@@ -1,9 +1,6 @@
 Activity Discriminator Main.obj
 Activity_Procedural.obj
-AX3dPlot.obj
 Blood Hart.obj
-Gravity Vector OGL.obj
-Gravity Vector.obj
 Histogram.obj
 Load Store Data.obj
 Magnitude.obj
@@ -14,17 +11,10 @@ RT Serial Sensor Aqu.obj
 Si1153 Cntrl.obj
 Sig Graph.obj
 cvi.lib
-ckcviogl.obj
-cviauto.lib
-cvidemoa.bli
+analysis.lib
 cvistart.lib
-3DGraphCtrl.obj
-cviogl.lib
-GlU32.Lib
-OpenGL32.Lib
 kernel32.lib
 user32.lib
-uuid.lib
 EXE Symbol Module
 Exports Module
 Resource Module

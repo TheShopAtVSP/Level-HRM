@@ -42,10 +42,10 @@ int CVICALLBACK Peak_Detector_CB (int panel, int control, int event,
 void Apply_Peak_Detector(void)
 {
 	double 	pd_threshold_val;
-	int		pd_sel, pd_auto_threshold, pd_threshold_width, pd_source, one_shot;
+	int		i, j, pd_sel, pd_auto_threshold, pd_threshold_width, pd_source, one_shot;
 	char	tmp_str[64];
 	double 	hrm_7seg_out;
-	int 	i, j, dh, pd_emi_auto, pd_absop_auto, pd_emi_delta, pd_absop_delta, pd_emi_width;
+	int 	dh, pd_emi_auto, pd_absop_auto, pd_emi_delta, pd_absop_delta, pd_emi_width;
 	double	long_hart_fft[2048], raw_hart_fft[4100];
 
 	GetCtrlVal(mainpnl, MAINPNL_ONE_SHOT, &one_shot);
@@ -61,97 +61,7 @@ void Apply_Peak_Detector(void)
 	if(pd_auto_threshold)
 		pd_threshold_val = ssgp;	
 	
-	GetCtrlVal(mainpnl, MAINPNL_PD_SOURCE, &pd_source);
-	
-	if(pd_sel == 1)
-	{
-		if(pd_source == 1)
-		  	PeakDetector (filt_acl_x, ser_input_size + pd_threshold_width, pd_threshold_val, pd_threshold_width, DETECT_PEAKS, \
-					  		ANALYSIS_TRUE, ANALYSIS_TRUE, &pd_peak_cnt, &peak_position, &peak_ampl, &peak_deriv); 
-	
-		if(pd_source == 2)
-		  	PeakDetector (filt_acl_y, ser_input_size + pd_threshold_width, pd_threshold_val, pd_threshold_width, DETECT_PEAKS, \
-					  		ANALYSIS_TRUE, ANALYSIS_TRUE, &pd_peak_cnt, &peak_position, &peak_ampl, &peak_deriv); 
-	
-		if(pd_source == 3)
-		  	PeakDetector (filt_acl_z, ser_input_size + pd_threshold_width, pd_threshold_val, pd_threshold_width, DETECT_PEAKS, \
-					  		ANALYSIS_TRUE, ANALYSIS_TRUE, &pd_peak_cnt, &peak_position, &peak_ampl, &peak_deriv); 
-	
-		if(pd_source == 4)
-		{
-		  	PeakDetector (filt_gyr_p, ser_input_size + pd_threshold_width, pd_threshold_val, pd_threshold_width, DETECT_PEAKS, \
-					  		ANALYSIS_TRUE, ANALYSIS_TRUE, &pd_peak_cnt, &peak_position, &peak_ampl, &peak_deriv); 
-		}
-		if(pd_source == 5)
-		  	PeakDetector (filt_gyr_y, ser_input_size + pd_threshold_width, pd_threshold_val, pd_threshold_width, DETECT_PEAKS, \
-					  		ANALYSIS_TRUE, ANALYSIS_TRUE, &pd_peak_cnt, &peak_position, &peak_ampl, &peak_deriv); 
-	
-		if(pd_source == 6)
-		  	PeakDetector (filt_gyr_r, ser_input_size + pd_threshold_width, pd_threshold_val, pd_threshold_width, DETECT_PEAKS, \
-					  		ANALYSIS_TRUE, ANALYSIS_TRUE, &pd_peak_cnt, &peak_position, &peak_ampl, &peak_deriv); 
-		
-		if(pd_source == 7)
-		  	PeakDetector (intgtr_acl_x, ser_input_size + pd_threshold_width, pd_threshold_val, pd_threshold_width, DETECT_PEAKS, \
-					  		ANALYSIS_TRUE, ANALYSIS_TRUE, &pd_peak_cnt, &peak_position, &peak_ampl, &peak_deriv); 
-	
-		if(pd_source == 8)
-		  	PeakDetector (intgtr_acl_y, ser_input_size + pd_threshold_width, pd_threshold_val, pd_threshold_width, DETECT_PEAKS, \
-					  		ANALYSIS_TRUE, ANALYSIS_TRUE, &pd_peak_cnt, &peak_position, &peak_ampl, &peak_deriv); 
-	
-		if(pd_source == 9)
-		  	PeakDetector (intgtr_acl_z, ser_input_size + pd_threshold_width, pd_threshold_val, pd_threshold_width, DETECT_PEAKS, \
-					  		ANALYSIS_TRUE, ANALYSIS_TRUE, &pd_peak_cnt, &peak_position, &peak_ampl, &peak_deriv); 
-	
-		if(pd_source == 10)
-		  	PeakDetector (intgtr_gyr_p, ser_input_size + pd_threshold_width, pd_threshold_val, pd_threshold_width, DETECT_PEAKS, \
-					  		ANALYSIS_TRUE, ANALYSIS_TRUE, &pd_peak_cnt, &peak_position, &peak_ampl, &peak_deriv); 
-	
-		if(pd_source == 11)
-		  	PeakDetector (intgtr_gyr_y, ser_input_size + pd_threshold_width, pd_threshold_val, pd_threshold_width, DETECT_PEAKS, \
-					  		ANALYSIS_TRUE, ANALYSIS_TRUE, &pd_peak_cnt, &peak_position, &peak_ampl, &peak_deriv); 
-	
-		if(pd_source == 12)
-		  	PeakDetector (intgtr_gyr_r, ser_input_size + pd_threshold_width, pd_threshold_val, pd_threshold_width, DETECT_PEAKS, \
-					  		ANALYSIS_TRUE, ANALYSIS_TRUE, &pd_peak_cnt, &peak_position, &peak_ampl, &peak_deriv); 
-		
-		if(pd_source == 13)
-		{
-			Get_Manitude(0);
-		  	PeakDetector (acc_mag, ser_input_size + pd_threshold_width, pd_threshold_val, pd_threshold_width, DETECT_PEAKS, \
-					  		ANALYSIS_TRUE, ANALYSIS_TRUE, &pd_peak_cnt, &peak_position, &peak_ampl, &peak_deriv);
-		}
-		
-		if(pd_source == 14)
-		{
-			Get_Manitude(0);
-		  	PeakDetector (gyr_mag, ser_input_size + pd_threshold_width, pd_threshold_val, pd_threshold_width, DETECT_PEAKS, \
-					  		ANALYSIS_TRUE, ANALYSIS_TRUE, &pd_peak_cnt, &peak_position, &peak_ampl, &peak_deriv);
-		}
-		
-		if(pd_source == 15)
-		{
-			Get_Manitude(1);
-		  	PeakDetector (acc_mag, ser_input_size + pd_threshold_width, pd_threshold_val, pd_threshold_width, DETECT_PEAKS, \
-					  		ANALYSIS_TRUE, ANALYSIS_TRUE, &pd_peak_cnt, &peak_position, &peak_ampl, &peak_deriv);
-		}
-		
-		if(pd_source == 16)
-		{
-			Get_Manitude(1);
-		  	PeakDetector (gyr_mag, ser_input_size + pd_threshold_width, pd_threshold_val, pd_threshold_width, DETECT_PEAKS, \
-					  		ANALYSIS_TRUE, ANALYSIS_TRUE, &pd_peak_cnt, &peak_position, &peak_ampl, &peak_deriv);
-		}
-		
-		if(pd_source == 17)
-		{
-		  	PeakDetector (raw_hart, ser_input_size + pd_threshold_width, pd_threshold_val, pd_threshold_width, DETECT_PEAKS, \
-					  		ANALYSIS_TRUE, ANALYSIS_TRUE, &pd_peak_cnt, &peak_position, &peak_ampl, &peak_deriv); 
-			int hart_rate = pd_peak_cnt * (60 / run_time );
-			sprintf(tmp_str, "%d / Min", hart_rate);
-			SetCtrlVal(mainpnl, MAINPNL_HART_BEAT_DISP, tmp_str); 
-		//	Peak_MM(raw_hart, ser_input_size, pd_threshold_val, pd_threshold_width);
-		}
-		
+		GetCtrlVal(mainpnl, MAINPNL_PD_SOURCE, &pd_source);
 		GetCtrlVal(mainpnl, MAINPNL_NRTS, &run_time);
 		if(pd_peak_cnt > 2)
 			hrm_7seg_out = (double)( ((double)pd_peak_cnt + 0.0) / run_time ) * 60.0;
@@ -249,7 +159,7 @@ void Apply_Peak_Detector(void)
 		
 /// ===========================================================================================================================		
 /// =========> PD
-	int16_t 		i, j, k;
+	int16_t 	k;
 	int32_t		hrm_chan1_running_avg_accm, hrm_chan2_running_avg_accm;
 	int			HRM_AVG_SAMPLES, PD_DEBOUNCE_WIDTH;
 	
@@ -435,39 +345,19 @@ void Apply_Peak_Detector(void)
 		do
 		{	
 			detect_peak(hrm_chan3_raw, hrm_raw_index, pd_emi_delta, 1);
-	//		dh = 0;
-	//		int8_t pd_reduction_loop = num_emi_peaks;
-	//		if(pd_reduction_loop > num_absop_peaks)
-	//			pd_reduction_loop = num_absop_peaks;
-	//		for(i=0; i<(pd_reduction_loop - 1); i++)
-	//		{
-	//			if( ((emi_peaks_xpos[i+1] - emi_peaks_xpos[i]) < PD_DEBOUNCE_WIDTH) 
-	//				|| ((absop_peaks_xpos[i+1] - absop_peaks_xpos[i]) < PD_DEBOUNCE_WIDTH) )
-	//			{
-	//				dh++;
-	//			}
-	//		}
-	//		
-	//		if(dh > 0)
-	//		{
-	//			pd_emi_delta++;	
-	//		}
-	//		
-	//		if(dh == 25)
-	//			dh = 0;
 			pd_emi_delta--;
-		}while((num_emi_peaks + num_absop_peaks) < 10);
+		}while((num_emi_peaks < 5) || (num_absop_peaks < 5));
 		sprintf(out_str, "Eliminate bounce2: Delta = %d, emip = %d, absopp = %d\n", pd_emi_delta, num_emi_peaks, num_absop_peaks); 
 		 SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
 	 
-		pd_emi_delta--; // means delta - 2. should be porpotional...
+		pd_emi_delta -= 2; // means delta - 2. should be porpotional...
 	}
 	detect_peak(hrm_chan3_raw, hrm_raw_index, pd_emi_delta, 1); 
 	
 	 sprintf(out_str, "Eliminate bounce3: Delta = %d, emip = %d, absopp = %d\n", pd_emi_delta, num_emi_peaks, num_absop_peaks); 
 	 SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
 #else
-	detect_peak(hrm_chan3_raw, hrm_raw_index, 8, 1);
+///	detect_peak(hrm_chan3_raw, hrm_raw_index, 8, 1);
 #endif	
 	
 #if 0	
@@ -503,87 +393,231 @@ void Apply_Peak_Detector(void)
 //	 sprintf(out_str, "Eliminate bounce2: Delta = %d, emip = %d, absopp = %d\n", pd_emi_delta, num_emi_peaks, num_absop_peaks); 
 //	 SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
 #else
-	detect_peak(hrm_chan3_raw, hrm_raw_index, 8, 1);
+///	detect_peak(hrm_chan3_raw, hrm_raw_index, 8, 1);
 #endif	
 	
 #if 1		
 	/// Missing pulse correction:
 	// run thru the absop_peaks_xpos[num_absop_peaks[0]]. find delta x for each. avg delta x. if 1 is double the rest add 1 to num_absop_peaks[0].
 	
-	int8_t old_num_of_emi_peaks = num_emi_peaks;
-	int8_t old_num_of_absop_peaks = num_absop_peaks;
-//	sprintf(out_str, "Missing pulse correction1: emip = %d, absopp = %d\n", num_emi_peaks, num_absop_peaks);
-//	SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
+	int8_t old_num_of_emi_peaks;
+	int8_t old_num_of_absop_peaks;
+	int track;
 	
-	for(k=0; k<1; k++)
+	sprintf(out_str, "Missing pulse correction1: emip = %d, absopp = %d\n", num_emi_peaks, num_absop_peaks);
+	SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
+	if(num_emi_peaks > 63)
+		num_emi_peaks = 63;
+	if(num_absop_peaks > 63)
+		num_absop_peaks = 63;
+	// Add phantom end points to emi and absop arrays. 150 is used for debug and not processed.
+	emi_peaks_xpos[num_emi_peaks] = 135;
+	emi_peaks[num_emi_peaks] = 2;
+	num_emi_peaks++;
+	emi_peaks_xpos[num_emi_peaks] = 150;
+	emi_peaks[num_emi_peaks] = 2;
+	num_emi_peaks++;
+	for(i=num_emi_peaks; i>0; i--)      
+	{
+		emi_peaks_xpos[i] = emi_peaks_xpos[i - 1];
+		emi_peaks[i] = emi_peaks[i - 1];
+	}
+	emi_peaks_xpos[0] =  -16;
+	emi_peaks[0] = 2;
+
+//for(track=0; track<num_emi_peaks; track++)
+//{
+//	printf("in %d ex = %d, ey = %d\n", track, emi_peaks_xpos[track], emi_peaks[track]); 	
+//}
+
+	absop_peaks_xpos[num_absop_peaks] = 135;
+	absop_peaks[num_absop_peaks] = -2;
+	num_absop_peaks++;
+	absop_peaks_xpos[num_absop_peaks] = 150;
+	absop_peaks[num_absop_peaks] = -2;
+	num_absop_peaks++;
+	for(i=num_absop_peaks; i>0; i--)      
+	{
+		absop_peaks_xpos[i] = absop_peaks_xpos[i - 1];
+		absop_peaks[i] = absop_peaks[i - 1];
+	}
+	absop_peaks_xpos[0] =  -6;
+	absop_peaks[0] = -2;
+	
+	
+	for(k=0; k<2; k++)
 	{
 		int16_t avg_x_diff = 0;
+		old_num_of_emi_peaks = num_emi_peaks;
+		old_num_of_absop_peaks = num_absop_peaks;
 		
 		if(old_num_of_emi_peaks > 0)
 		{
-			for(i=0; i<(old_num_of_emi_peaks - 1); i++)
+			for(i=0; i<(old_num_of_emi_peaks - 1); i++) // Why limit x axis range???
+			//for(i=0; i<(old_num_of_emi_peaks); i++)   
 			{
 				avg_x_diff += (emi_peaks_xpos[i + 1] - emi_peaks_xpos[i]);   
 			}
 			avg_x_diff = avg_x_diff / old_num_of_emi_peaks; /// <================================
-			avg_x_rng = avg_x_diff + (avg_x_diff / 2) + (avg_x_diff / 4);
-			if(avg_x_rng == 0)
-			{
-				printf("epxi = %d, xpos = %d\n", i, emi_peaks_xpos[i]); 
-			}
+			avg_x_rng = avg_x_diff + (avg_x_diff / 2);// + (avg_x_diff / 4);
+		
+//printf("k%d START: avg ex = %d, avg_x_rng = %d, old_num_of_emi_peaks = %d, \n", k, avg_x_diff, avg_x_rng, old_num_of_emi_peaks); 
+		
 		}
 		
-		for(i=0; i<(old_num_of_emi_peaks - 1); i++)   /// 10 turned into 18 because avg x rng was too small or travelling shift.
+//for(track=0; track<num_emi_peaks; track++)
+//{
+//	printf("in %d ex = %d, ey = %d\n", track, emi_peaks_xpos[track], emi_peaks[track]); 	
+//}
+		
+		for(i=0; i<=(old_num_of_emi_peaks /*- 1*/); i++)   /// 10 turned into 18 because avg x rng was too small or travelling shift.
 		{
 			if((emi_peaks_xpos[i + 1] - emi_peaks_xpos[i]) > avg_x_rng) 
 			{
-				num_emi_peaks++;
-				/// for(j=old_num_of_emi_peaks; j<=(i+1); j--)
-				for(j=old_num_of_emi_peaks + 1; j<=(i+1); j--)
+				//for(j=old_num_of_emi_peaks; j<=(i+1); j--)
+				for(j=num_emi_peaks + 0; j>(i); j--)
 				{
-					emi_peaks_xpos[j] = emi_peaks_xpos[j-1];
+//printf("i = %d, J = %d ex = %d, ey = %d\n", i, j, emi_peaks_xpos[j], emi_peaks_xpos[j-1]);
+					emi_peaks_xpos[j] = emi_peaks_xpos[j - 1];
+					emi_peaks[j] = emi_peaks[j - 1];
+					 
 				}
-				emi_peaks_xpos[i] = emi_peaks_xpos[i] + (avg_x_diff / (old_num_of_emi_peaks +1));
+				//emi_peaks_xpos[i] = emi_peaks_xpos[i] + (avg_x_diff / (old_num_of_emi_peaks +1));
+				emi_peaks_xpos[j+1] = emi_peaks_xpos[j] + (avg_x_diff); 
+				emi_peaks[j+1] = 0;
+				num_emi_peaks++;
+				//sprintf(out_str, "Found missing emi: emi_peaks_xpos[i] %d\n", emi_peaks_xpos[i]);
+				//SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
 			}
 		}
-//		sprintf(out_str, "=>Missing pulse correction2: emixrng = %d, emip = %d, ", avg_x_rng, num_emi_peaks);
-//		SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
+	}
+	
+	// Get rid of the phantom data
+	j = 0;
+	for(i=0; i<(num_emi_peaks); i++)
+	{	 
+		if(emi_peaks_xpos[i] < 120)
+		{
+			emi_peaks_xpos[i] = emi_peaks_xpos[i+1];
+			emi_peaks[i] = emi_peaks[i+1];
+			j++;
+		}
+	}
+	num_emi_peaks = j - 1;
+		
+//for(track=0; track<num_emi_peaks; track++)
+//{
+//	printf("out %d ex = %d, ey = %d\n", track, emi_peaks_xpos[track], emi_peaks[track]); 	
+//}
+	
+		sprintf(out_str, "=>Missing pulse correction2: emixrng = %d, emip = %d, ", avg_x_rng, num_emi_peaks);
+		SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
+	for(k=0; k<2; k++)
+	{	
+		if(num_emi_peaks > 63)
+		num_emi_peaks = 63;
+		if(num_absop_peaks > 63)
+		num_absop_peaks = 63;
+		avg_x_diff = 0;
+		old_num_of_emi_peaks = num_emi_peaks;
+		old_num_of_absop_peaks = num_absop_peaks;
 		
 		if(old_num_of_absop_peaks > 0)
 		{
 			avg_x_diff = 0;
 			for(i=0; i<(old_num_of_absop_peaks - 1); i++)
+			//for(i=0; i<(old_num_of_absop_peaks); i++)
 			{
 				avg_x_diff += (absop_peaks_xpos[i + 1] - absop_peaks_xpos[i]);	
 			}
 			avg_x_diff = avg_x_diff / old_num_of_absop_peaks;
-			avg_x_rng = avg_x_diff + (avg_x_diff / 2) + (avg_x_diff / 4);
+			avg_x_rng = avg_x_diff + (avg_x_diff / 2);// + (avg_x_diff / 4);
 		}
 		
-		for(i=0; i<(old_num_of_absop_peaks - 1); i++)
+		for(i=0; i<(old_num_of_absop_peaks /*- 1*/); i++)
 		{
 			if((absop_peaks_xpos[i + 1] - absop_peaks_xpos[i]) > avg_x_rng)
 			{
-				num_absop_peaks++;
-				/// for(j=old_num_of_absop_peaks; j<=(i+1); j--)
-				for(j=old_num_of_absop_peaks + 1; j<=(i+1); j--) 
+				
+				for(j=num_absop_peaks; j>(i); j--)
+				//for(j=old_num_of_absop_peaks + 1; j<=(i+1); j--) 
 				{
 					absop_peaks_xpos[j] = absop_peaks_xpos[j-1];
+					absop_peaks[j] = absop_peaks[j-1];
 				}
-				absop_peaks_xpos[i] = absop_peaks_xpos[i] + (avg_x_diff / (old_num_of_emi_peaks +1));
+				//absop_peaks_xpos[i] = absop_peaks_xpos[i] + (avg_x_diff / (old_num_of_emi_peaks +1));
+				absop_peaks_xpos[j+1] = absop_peaks_xpos[j] + (avg_x_diff);
+				absop_peaks[j+1] = 0; 
+				num_absop_peaks++;
+				sprintf(out_str, "Found missing absop: absop_peaks_xpos[i] %d\n", absop_peaks_xpos[i]);
+				SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
 			}
 		}
-		sprintf(out_str, "absopxrng = %d, absopp = %d\n", avg_x_rng, num_absop_peaks);
+		
+		// Get rid of the phantom data
+		j = 0;
+		for(i=0; i<(num_absop_peaks); i++)
+		{	 
+			if(absop_peaks_xpos[i] < 120)
+			{
+				absop_peaks_xpos[i] = absop_peaks_xpos[i+1];
+				absop_peaks[i] = absop_peaks[i+1];
+				j++;
+			}
+		}
+		num_absop_peaks = j - 1;
+		
+		
+		
+		sprintf(out_str, "=>Missing pulse correction3: absopxrng = %d, absopp = %d\n", avg_x_rng, num_absop_peaks);
 		SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
 	}
 #endif
+
+#if 1	
+	/// Eliminate Bounce.
+	old_num_of_emi_peaks = num_emi_peaks;
+	avg_x_rng = avg_x_rng/3;
+	for(i=0; i<num_emi_peaks; i++)
+	{
+		if((emi_peaks_xpos[i + 1] - emi_peaks_xpos[i]) < avg_x_rng)
+		{
+			old_num_of_emi_peaks--;
+			sprintf(out_str, "Found extra emi: emi_peaks_xpos[i] %d\n", emi_peaks_xpos[i]);
+			SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
+		}
+	}
+	num_emi_peaks = old_num_of_emi_peaks;
 	
+	old_num_of_absop_peaks = num_absop_peaks;
+	for(i=0; i<num_absop_peaks; i++)
+	{
+		if((absop_peaks_xpos[i + 1] - absop_peaks_xpos[i]) < avg_x_rng)
+		{
+			old_num_of_absop_peaks--;
+			sprintf(out_str, "Found extra absop: absop_peaks_xpos[i] %d\n", absop_peaks_xpos[i]);
+			SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
+		}
+	}
+	num_absop_peaks = old_num_of_absop_peaks;
+	
+ 	sprintf(out_str, "Eliminate bounce2: Delta = %d, emip = %d, absopp = %d\n", pd_emi_delta, num_emi_peaks, num_absop_peaks); 
+ 	SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
+
+///	detect_peak(hrm_chan3_raw, hrm_raw_index, 8, 1);
+#endif	
+	
+	
+/// 7 SEG Output ///
+	//current_hrm = (((num_emi_peaks * 10) + (num_absop_peaks * 10)) / 2);  
+	SetCtrlVal(mainpnl, MAINPNL_HRM_7SEG_9, (unsigned char)(((num_emi_peaks * 10) + (num_absop_peaks * 10)) / 2));
     /// Average the hrm output.
 	/// current_hrm = ((num_emi_peaks * 10) + (current_hrm * 10) + (num_absop_peaks * 10)) / 12;
-	//current_hrm = ((num_emi_peaks * 10) + (current_hrm * 4) + (num_absop_peaks * 10)) / 6;
+	current_hrm = ((num_emi_peaks * 10) + (current_hrm * 4) + (num_absop_peaks * 10)) / 6;
 	//current_hrm = ((num_emi_peaks * 10) + (current_hrm * 3) + (num_absop_peaks * 0)) / 4;
-	current_hrm = ((num_emi_peaks * 10) + (num_absop_peaks * 10)) / 2;  
-	SetCtrlVal(mainpnl, MAINPNL_HRM_7SEG_9, (unsigned char)current_hrm);
+	//current_hrm = ((num_emi_peaks * 10) + (num_absop_peaks * 10)) / 2;  
+	SetCtrlVal(mainpnl, MAINPNL_HRM_7SEG, (double)current_hrm); //
+	SetCtrlVal(mainpnl, MAINPNL_HRM_7SEG_3 , (((double)current_hrm + (double)hrm_52 ) / 2)) ;
 	
 /// CVI Stuff: ///
 	
@@ -648,130 +682,7 @@ void Apply_Peak_Detector(void)
 /// ===========================================================================================================================	  
 /// =========> PD 	
 	
-	
-	//PlotXY (mainpnl, MAINPNL_SIG4GRAPH, peak_position, peak_ampl, pd_peak_cnt, VAL_DOUBLE, VAL_DOUBLE, VAL_SCATTER, VAL_SOLID_CIRCLE, VAL_SOLID, 1, VAL_RED);
-/// ========================================================================================================================================================
-//		do
-//		{	
-//			detect_peak(raw_hart, ser_input_size, emi_peaks, num_emi_peaks, 64, absop_peaks, num_absop_peaks, 64, (double)pd_emi_delta, 1);
-//			dh = 0;
-//			for(i=0; i<(num_emi_peaks[0] - 1); i++)
-//			{
-//				if((emi_peaks_xpos[i+1] - emi_peaks_xpos[i]) < pd_emi_width)
-//				{
-//					dh++;
-//				}
-//			}
-//			
-//			if((dh > 0) && pd_emi_auto)
-//			{
-//				pd_emi_delta++;
-//				SetCtrlVal(mainpnl, MAINPNL_PD_EMI_DELTA, pd_emi_delta);	
-//			}
-//			
-//			if(!pd_emi_auto || (dh == 25))
-//				dh = 0;
-//		}while(dh > 0);
-//		hrm_7seg_out = (double)( ((double)num_emi_peaks[0]) * 60.0 / run_time ); 
-//		sprintf(tmp_str, "num_emi_peaks %d, hrm = %d ppm\n", num_emi_peaks[0], (int)(hrm_7seg_out));
-//		SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, tmp_str);
-//		SetCtrlVal(mainpnl, MAINPNL_HRM_7SEG_7, (unsigned char)hrm_7seg_out);
-//		
-//		GetCtrlVal(mainpnl, MAINPNL_PD_ABSOP_DELTA, &pd_absop_delta);
-//		GetCtrlVal(mainpnl, MAINPNL_PD_ABSOP_THRESH_AUTO, &pd_absop_auto);
-//		if(pd_absop_auto)
-//			pd_absop_delta = 2;
-//		do
-//		{	
-//			detect_peak(raw_hart, ser_input_size, emi_peaks, num_emi_peaks, 64, absop_peaks, num_absop_peaks, 64, (double)pd_absop_delta, 1);
-//			dh = 0;
-//			for(i=0; i<(num_absop_peaks[0] - 1); i++)
-//			{
-//				if((absop_peaks_xpos[i+1] - absop_peaks_xpos[i]) < pd_emi_width)
-//				{
-//					dh++;
-//				}
-//			}
-//			
-//			if((dh > 0) && pd_absop_auto)
-//			{
-//				pd_absop_delta++;
-//				SetCtrlVal(mainpnl, MAINPNL_PD_ABSOP_DELTA, pd_absop_delta);	
-//			}
-//			 /// IF dh cannot = 0 then increase allowed dh and substract it from  num_absop_peaks[0] 
-//			if(!pd_absop_auto || (dh == 25))
-//				dh = 0;
-//		}while(dh > 0);	  
-//		hrm_7seg_out = (double)( ((double)num_absop_peaks[0])  * 60.0 / run_time ); 
-//		sprintf(tmp_str, "num_absop_peaks %d, hrm = %d ppm\n", num_absop_peaks[0], (int)(hrm_7seg_out));
-//		SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, tmp_str);
-//		SetCtrlVal(mainpnl, MAINPNL_HRM_7SEG_8, (unsigned char)hrm_7seg_out);
-//		
-//		/// missing pulse correction:
-//		// run thru the absop_peaks_xpos[num_absop_peaks[0]]. find delta x for each. avg delta x. if 1 is double the rest add 1 to num_absop_peaks[0].
-//		int avg_x_diff = 0;
-//		int avg_x_rng = 0;
-//		int old_num_emi_peaks = num_emi_peaks[0];
-//		for(int k=0; k<2; k++)
-//		{
-//			for(i=0; i<(old_num_emi_peaks - 1); i++)
-//			{
-//				avg_x_diff += (emi_peaks_xpos[i + 1] - emi_peaks_xpos[i]);	
-//			}
-//			avg_x_diff = avg_x_diff / old_num_emi_peaks;
-//			avg_x_rng = avg_x_diff + (avg_x_diff / 2);// + (avg_x_diff / 4);
-//		
-//			for(i=0; i<(old_num_emi_peaks - 1); i++)
-//			{
-//				if((emi_peaks_xpos[i + 1] - emi_peaks_xpos[i]) > avg_x_rng) 
-//				{
-//					num_emi_peaks[0]++;
-//					sprintf(tmp_str, "Added a peak\n");
-//					SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, tmp_str);
-//					for(j=old_num_emi_peaks; j<=(i+1); j--)
-//					{
-//						emi_peaks_xpos[j] = emi_peaks_xpos[j-1];
-//					}
-//					emi_peaks_xpos[i] = emi_peaks_xpos[i] + avg_x_diff;
-//					PlotPoint (mainpnl, MAINPNL_SIG4GRAPH, (double)emi_peaks_xpos[i], 0.0, VAL_BOLD_X, VAL_MAGENTA);	  	
-//				}
-//			}
-//		
-//			avg_x_diff = 0;
-//			int old_num_absop_peaks = num_absop_peaks[0];
-//			for(i=0; i<(old_num_absop_peaks - 1); i++)
-//			{
-//				avg_x_diff += (absop_peaks_xpos[i + 1] - absop_peaks_xpos[i]);	
-//			}
-//			avg_x_diff = avg_x_diff / old_num_absop_peaks;
-//			avg_x_rng = avg_x_diff + (avg_x_diff / 2);// + (avg_x_diff / 4);
-//		
-//			for(i=0; i<(old_num_absop_peaks - 1); i++)
-//			{
-//				if((absop_peaks_xpos[i + 1] - absop_peaks_xpos[i]) > avg_x_rng)
-//				{
-//					num_absop_peaks[0]++;
-//					sprintf(tmp_str, "Added a valley\n");
-//					SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, tmp_str);
-//					for(j=old_num_absop_peaks; j<=(i+1); j--)
-//					{
-//						absop_peaks_xpos[j] = absop_peaks_xpos[j-1];
-//					}
-//					absop_peaks_xpos[i] = absop_peaks_xpos[i] + avg_x_diff;
-//					PlotPoint (mainpnl, MAINPNL_SIG4GRAPH, (double)absop_peaks_xpos[i], 0.0, VAL_BOLD_X, VAL_CYAN);
-//				}
-//			}
-//		}
-		
-		
-//		hrm_7seg_out = ((double)( ((double)num_absop_peaks) * 60.0 / run_time )) + ((double)( ((double)num_emi_peaks) * 60.0 / run_time )); 
-//		hrm_7seg_out = hrm_7seg_out / 2;
-//		SetCtrlVal(mainpnl, MAINPNL_HRM_7SEG_9, (unsigned char)hrm_7seg_out);
-		
-		//PlotXY (mainpnl, MAINPNL_SIG4GRAPH, peak_position, peak_ampl, pd_peak_cnt, VAL_DOUBLE, VAL_DOUBLE, VAL_SCATTER, VAL_SOLID_CIRCLE, VAL_SOLID, 1, VAL_RED);
-		//if( pdcount > 0)
 
-		//fft
 #if 0
 		for(i=look_back_starting_point; i<(look_back_starting_point + ser_input_size); i++)
 		{
@@ -852,7 +763,7 @@ void Apply_Peak_Detector(void)
 	            VAL_DOUBLE, VAL_DOUBLE, VAL_THIN_LINE, VAL_EMPTY_SQUARE,
 	            VAL_SOLID,1, VAL_RED); 
 #endif		
-	}   
+	   
 }
 
 
