@@ -138,11 +138,15 @@ double  emi_peaks_dfp[128], emi_peaks_xpos_dfp[128], absop_peaks_dfp[128], absop
 
 
 /// ===============================================================================================================================
-int16_t 	hrm_chan1_raw[256], hrm_chan2_raw[256], hrm_chan3_raw[256], hrm_raw_index_old, current_hrm;
+int16_t 	hrm_chan1_raw[256], hrm_chan2_raw[256], hrm_chan3_raw[256], hrm_raw_index_old, current_hrm, last4hrmavg[8], last4hrmavgidx;
 int16_t 	hrm_raw_index, hrm_chan1_raw_avg[256], hrm_chan2_raw_avg[256];
 int16_t 	avg_x_rng;
 unsigned char hrm_52;
-int16_t avg_x_diff;
+int16_t 	avg_x_diff;
+int 		trialidx, trialerrorcnt[4], trialhr[4], oldemiandabsoppd[4], emiandabsoppd[4], total_emiandabsops;
+double  	last_pvariance, pvariance, pmax, pmin, pmaxi, pmini, pmean;
+double 		ymin, ymax;
+char		scaledeltastr[32];
 
 /*****************************************************************/
 /*                                                               */

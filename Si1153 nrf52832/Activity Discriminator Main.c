@@ -75,6 +75,10 @@ int main (int argc, char *argv[])
 	fo_hit = fo_miss = 0;
 	hrm_raw_index = 0;
 	current_hrm = 69;
+	memset(last4hrmavg, 71, 8);
+	for(int i = 0; i < 8; i++)
+		last4hrmavg[i] = 71;
+	last4hrmavgidx = 0;
 //	GetScreenSize (NULL, &screen_width);
 //	if(screen_width == 1600)
 //		SetPanelSize (mainpnl, 800, 1600);

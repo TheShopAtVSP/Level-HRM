@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+int16_t PeakDiff1D(const int16_t *arr, size_t length);
 
 int CVICALLBACK Peak_Detector_CB (int panel, int control, int event,
 								  void *callbackData, int eventData1, int eventData2)
@@ -69,7 +70,7 @@ void Apply_Peak_Detector(void)
 			hrm_7seg_out = 0;
 		SetCtrlVal(mainpnl, MAINPNL_HRM_7SEG_2, hrm_7seg_out);
 		/// ================================================================== ///
-		DeleteGraphPlot (mainpnl, MAINPNL_SIG4GRAPH, -1, VAL_IMMEDIATE_DRAW);
+///		DeleteGraphPlot (mainpnl, MAINPNL_SIG4GRAPH, -1, VAL_IMMEDIATE_DRAW);
 ///		Peak_MM(raw_hart, ser_input_size, pd_threshold_val, pd_threshold_width); 
 //int detect_peak(
 //        const double*   data, /* the data */ 
@@ -111,7 +112,7 @@ void Apply_Peak_Detector(void)
 			PlotXY (mainpnl, MAINPNL_SIG4GRAPH, absop_peaks_xpos_dfp, absop_peaks_dfp, num_absop_peaks[0], VAL_DOUBLE, VAL_DOUBLE, VAL_SCATTER, VAL_SOLID_CIRCLE, VAL_SOLID, 1, VAL_BLUE);
 		
 #endif   /* formerly excluded lines */
-		/// double	final_hrm_avg[64], final_hrm_avg_old, final_hrm_avg_second_diff ///
+	/*	/// double	final_hrm_avg[64], final_hrm_avg_old, final_hrm_avg_second_diff ///
 		/// int		final_hrm_avg_index, final_hrm_avg_valid_index, fo_avg_len, fo_start; ///
 		fo_avg_len = 2;  // zero based
 		final_hrm_avg_second_diff = 0.85;
@@ -152,9 +153,9 @@ void Apply_Peak_Detector(void)
 		 final_hrm_avg_index++;
 		 final_hrm_avg[final_hrm_avg_index] = hrm_7seg_out; 
 		 final_hrm_avg_old = hrm_7seg_out;
+		 */
 		 
-		 
-		Update_Sig_Plots();
+///		Update_Sig_Plots();
 		
 		
 /// ===========================================================================================================================		
@@ -162,6 +163,7 @@ void Apply_Peak_Detector(void)
 	int16_t 	k;
 	int32_t		hrm_chan1_running_avg_accm, hrm_chan2_running_avg_accm;
 	int			HRM_AVG_SAMPLES, PD_DEBOUNCE_WIDTH;
+	char 		out_str[128]; 
 	
 	GetCtrlVal(mainpnl, MAINPNL_GYRAVGFV, &HRM_AVG_SAMPLES);
 	GetCtrlVal(mainpnl, MAINPNL_PD_EMI_WIDTH, &PD_DEBOUNCE_WIDTH);
@@ -198,7 +200,7 @@ void Apply_Peak_Detector(void)
 #endif
 				
 	
-#if 1
+#if 0
 	/// Quick Bias subtraction. ///
 	
 	int16_t bais_sub_c1 = hrm_chan1_raw_avg[1];
@@ -212,10 +214,25 @@ void Apply_Peak_Detector(void)
 	}
 #endif
 
-/// Auto Subtract ///
-	int  	run_auto_p2sf;
-	double  last_pvariance, pvariance, pmax, pmin, pmaxi, pmini, pmean=0;
-	char 	out_str[128];
+// added a three step loop that processes chan 1, then chan 2 then subtracted channel while counting the total added peaks and 
+// doubles. after all three have been processed the lower error count deturmines which emi + absop peaks are to be used as the HR.
+// trialidx 0-2, trialerrorcnt(0-2), trialhr0-2(emi+absop).
+// This allows the prdominate LED to win a fight and auto switches to subtract mode without using a threshold.
+// Later add a frame invalid and use the last current_hrm if errors are too high or if sub and result P2P is greater than xxx.
+// also trying: trialerrorcnt[] will be evaluated by  taking the starting (oldemiandabsoppd) pd and abs old - new
+// 				trialerrorcnt[trialidx] = abs(oldemiandabsoppd[trialidx] - (num_emi_peaks + num_absop_peaks)); 	
+for(trialidx = 0; trialidx < 3; trialidx++)	
+{	
+	trialerrorcnt[trialidx] = 0;
+	
+	
+	if(trialidx == 2) // do this one last so that we can scipp it if trialerrorcnt(0 or 1) is low.
+	{
+		/// Auto Subtract ///
+		int  	run_auto_p2sf;
+		
+	//	printf("%d\n", PeakDiff1D(hrm_chan1_raw, ser_input_size));
+		pmean=0;
 	
 		for(j=0; j<(ser_input_size + HRM_AVG_SAMPLES + HRM_AVG_SAMPLES); j++)
 		{
@@ -228,109 +245,115 @@ void Apply_Peak_Detector(void)
 		sprintf(out_str, "pvariance %f, pmean %f\n", pvariance, pmean);
 		SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
 		
-		if(pvariance > 200.0)
+		GetCtrlVal(mainpnl, MAINPNL_AUTO_P2SF, &run_auto_p2sf);
+		if(run_auto_p2sf)
 		{
-			GetCtrlVal(mainpnl, MAINPNL_AUTO_P2SF, &run_auto_p2sf);
-			if(run_auto_p2sf)
-			{
 //				for(j=0; j<(ser_input_size + HRM_AVG_SAMPLES + HRM_AVG_SAMPLES); j++)
 //				{
 //					intgtr_gyr_p[j] = (double)hrm_chan1_raw[j];
 //					intgtr_gyr_y[j] = (double)hrm_chan2_raw[j];
 //				}
 //				Variance ( intgtr_gyr_p, ser_input_size ,&pmean , &pvariance );
-				phase2sf = 0.0;
-				phase2sfcof = 0.5;
-					MaxMin1D ( intgtr_gyr_p, ser_input_size, &pmax , &pmaxi, &pmin, &pmini );
-					pvariance = pmax - pmin;
-					MaxMin1D ( intgtr_gyr_y, ser_input_size, &pmax , &pmaxi, &pmin, &pmini );
-					phase2sf = fabs(pvariance / (pmax - pmin));
-					last_pvariance = 1000000.0;
-					/// printf("%f\n",phase2sf);
-				for(int ol=0;  ol < 1; ol++)  /// 3
-				{
-					if(ol==0) /// 1
-						phase2sfcof = 0.05; /// 0.05
-					if(ol==1) /// 2
-						phase2sfcof = 0.001; /// 0.005
-						
-					last_pvariance = 1000000.0;	 
-
-					while(fabs(last_pvariance) > fabs(pvariance))
-					{
-						last_pvariance = pvariance;
-						phase2sf += phase2sfcof;
-						SetCtrlVal(mainpnl, MAINPNL_PHASE2SF, phase2sf);
+			phase2sf = 0.0;
+			phase2sfcof = 0.5;
+				MaxMin1D ( intgtr_gyr_p, ser_input_size, &pmax , &pmaxi, &pmin, &pmini );
+				pvariance = pmax - pmin;
+				MaxMin1D ( intgtr_gyr_y, ser_input_size, &pmax , &pmaxi, &pmin, &pmini );
+				phase2sf = fabs(pvariance / (pmax - pmin));
+				last_pvariance = 1000000.0;
+				/// printf("%f\n",phase2sf);
+			for(int ol=0;  ol < 1; ol++)  /// 3
+			{
+				if(ol==0) /// 1
+					phase2sfcof = 0.05; /// 0.05
+				if(ol==1) /// 2
+					phase2sfcof = 0.001; /// 0.005
 					
-						for(i=0; i<(ser_input_size  + HRM_AVG_SAMPLES + HRM_AVG_SAMPLES); i++)
-						{
-							hrm_chan3_raw[i] = (int16_t)((double)hrm_chan1_raw_avg[i] - ((double)hrm_chan2_raw_avg[i] * phase2sf));
-						}
-						for(j=0; j<(ser_input_size  + HRM_AVG_SAMPLES); j++)
-						{
-							intgtr_gyr_p[j] = (double)hrm_chan3_raw[j];
-						}
-						MaxMin1D ( intgtr_gyr_p, ser_input_size, &pmax , &pmaxi, &pmin, &pmini );
-						if(pmax > pmin)
-							pvariance = pmax - pmin;
-						else
-							pvariance = pmin - pmax;
+				last_pvariance = 1000000.0;	 
+
+				while(fabs(last_pvariance) > fabs(pvariance))
+				{
+					last_pvariance = pvariance;
+					phase2sf += phase2sfcof;
+					SetCtrlVal(mainpnl, MAINPNL_PHASE2SF, phase2sf);
+				
+					for(i=0; i<(ser_input_size  + HRM_AVG_SAMPLES + HRM_AVG_SAMPLES); i++)
+					{
+						hrm_chan3_raw[i] = (int16_t)((double)hrm_chan1_raw_avg[i] - ((double)hrm_chan2_raw_avg[i] * phase2sf));
+					}
+					for(j=0; j<(ser_input_size  + HRM_AVG_SAMPLES); j++)
+					{
+						intgtr_gyr_p[j] = (double)hrm_chan3_raw[j];
+					}
+					MaxMin1D ( intgtr_gyr_p, ser_input_size, &pmax , &pmaxi, &pmin, &pmini );
+					if(pmax > pmin)
+						pvariance = pmax - pmin;
+					else
+						pvariance = pmin - pmax;
 //						sprintf(out_str, "phase2sf=%f,  +pvariance %f < %f\n", phase2sf, pvariance, last_pvariance);
 //						SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
-					}
-					
-					last_pvariance = 1000000.0;
-					///phase2sf -= 0.1;
-					while(fabs(last_pvariance) > fabs(pvariance))
+				}
+				
+				last_pvariance = 1000000.0;
+				///phase2sf -= 0.1;
+				while(fabs(last_pvariance) > fabs(pvariance))
+				{
+					last_pvariance = pvariance;
+					phase2sf -= phase2sfcof;
+					SetCtrlVal(mainpnl, MAINPNL_PHASE2SF, phase2sf);
+				
+					for(i=0; i<(ser_input_size  + HRM_AVG_SAMPLES + HRM_AVG_SAMPLES); i++)
 					{
-						last_pvariance = pvariance;
-						phase2sf -= phase2sfcof;
-						SetCtrlVal(mainpnl, MAINPNL_PHASE2SF, phase2sf);
-					
-						for(i=0; i<(ser_input_size  + HRM_AVG_SAMPLES + HRM_AVG_SAMPLES); i++)
-						{
-							hrm_chan3_raw[i] = (int16_t)((double)hrm_chan1_raw_avg[i] - ((double)hrm_chan2_raw_avg[i] * phase2sf));
-						}
-					
-						for(j=0; j<(ser_input_size  + HRM_AVG_SAMPLES + HRM_AVG_SAMPLES); j++)
-						{
-							intgtr_gyr_p[j] = (double)hrm_chan3_raw[j];
-						}
-						MaxMin1D ( intgtr_gyr_p, ser_input_size, &pmax , &pmaxi, &pmin, &pmini );
-						if(pmax > pmin)
-							pvariance = pmax - pmin;
-						else
-							pvariance = pmin - pmax;	
+						hrm_chan3_raw[i] = (int16_t)((double)hrm_chan1_raw_avg[i] - ((double)hrm_chan2_raw_avg[i] * phase2sf));
+					}
+				
+					for(j=0; j<(ser_input_size  + HRM_AVG_SAMPLES + HRM_AVG_SAMPLES); j++)
+					{
+						intgtr_gyr_p[j] = (double)hrm_chan3_raw[j];
+					}
+					MaxMin1D ( intgtr_gyr_p, ser_input_size, &pmax , &pmaxi, &pmin, &pmini );
+					if(pmax > pmin)
+						pvariance = pmax - pmin;
+					else
+						pvariance = pmin - pmax;	
 //						sprintf(out_str, "phase2sf=%f,  -pvariance %f, <%f\n",phase2sf, pvariance, last_pvariance);
 //						SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
-					}
 				}
-				for(i=0; i<(ser_input_size  + HRM_AVG_SAMPLES + HRM_AVG_SAMPLES); i++)
-				{
-					hrm_chan3_raw[i] = (int16_t)((double)hrm_chan1_raw_avg[i] - ((double)hrm_chan2_raw_avg[i] * (phase2sf + phase2sfcof)));
-				}
-			
-				sprintf(out_str, "=========================\n");
-				SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
 			}
-			else
+			for(i=0; i<(ser_input_size  + HRM_AVG_SAMPLES + HRM_AVG_SAMPLES); i++)
 			{
-				
-				for(i = 0; i < hrm_raw_index + HRM_AVG_SAMPLES + HRM_AVG_SAMPLES; i++)
-				{
-					hrm_chan3_raw[i] = (int16_t)((double)hrm_chan1_raw_avg[i] - ((double)hrm_chan2_raw_avg[i] * phase2sf));
-				}
+				hrm_chan3_raw[i] = (int16_t)((double)hrm_chan1_raw_avg[i] - ((double)hrm_chan2_raw_avg[i] * (phase2sf + phase2sfcof)));
 			}
-		}	
+		
+			sprintf(out_str, "=========================\n");
+			SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
+		}
 		else
-		{	 	
+		{
+			
 			for(i = 0; i < hrm_raw_index + HRM_AVG_SAMPLES + HRM_AVG_SAMPLES; i++)
 			{
-				hrm_chan3_raw[i] = hrm_chan1_raw_avg[i];
+				hrm_chan3_raw[i] = (int16_t)((double)hrm_chan1_raw_avg[i] - ((double)hrm_chan2_raw_avg[i] * phase2sf));
 			}
 		}
 		
-#if 1	
+	}
+	else  // do not do subtract and load chan 3 for next step. trialidx=0 will be chan1 and trialidx=1 will be chan2.
+	{	 	
+		for(i = 0; i < hrm_raw_index + HRM_AVG_SAMPLES + HRM_AVG_SAMPLES; i++)
+		{
+			if(trialidx == 0)
+				hrm_chan3_raw[i] = hrm_chan1_raw_avg[i];
+			if(trialidx == 1)
+				hrm_chan3_raw[i] = hrm_chan2_raw_avg[i];
+		}
+	}
+
+
+
+
+#if 1
+	// dH Threshold control
 	/// Eliminate bounce by increasing delta (dh). Basicaly acts as a auto peak detector threshold control.
 	/// It looks like starting from low to high sometimes eliminates wanted peaks. 
 	/// If we start from high and look for a minimum number of peaks we could post process after substracting a proprtional
@@ -338,7 +361,7 @@ void Apply_Peak_Detector(void)
 	/// routine.  Adding more averaging may yeild a completly different result.
 	
 	pd_emi_delta = 40;
-	sprintf(out_str, "Eliminate bounce1: Delta = %d, emip = %d, absopp = %d\n", pd_emi_delta, num_emi_peaks, num_absop_peaks);
+	sprintf(out_str, "dH Threshold control 1: Delta = %d, emip = %d, absopp = %d\n", pd_emi_delta, num_emi_peaks, num_absop_peaks);
 	SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
 	if(pd_emi_auto)
 	{
@@ -347,15 +370,18 @@ void Apply_Peak_Detector(void)
 			detect_peak(hrm_chan3_raw, hrm_raw_index, pd_emi_delta, 1);
 			pd_emi_delta--;
 		}while((num_emi_peaks < 5) || (num_absop_peaks < 5));
-		sprintf(out_str, "Eliminate bounce2: Delta = %d, emip = %d, absopp = %d\n", pd_emi_delta, num_emi_peaks, num_absop_peaks); 
+		sprintf(out_str, "dH Threshold control 2: Delta = %d, emip = %d, absopp = %d\n", pd_emi_delta, num_emi_peaks, num_absop_peaks); 
 		 SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
 	 
 		pd_emi_delta -= 2; // means delta - 2. should be porpotional...
 	}
+	if(pd_emi_delta < 1)
+		pd_emi_delta = 1;
 	detect_peak(hrm_chan3_raw, hrm_raw_index, pd_emi_delta, 1); 
 	
-	 sprintf(out_str, "Eliminate bounce3: Delta = %d, emip = %d, absopp = %d\n", pd_emi_delta, num_emi_peaks, num_absop_peaks); 
+	 sprintf(out_str, "*** %d dH Threshold control 3: Delta = %d, emip = %d, absopp = %d\n", trialidx, pd_emi_delta, num_emi_peaks, num_absop_peaks); 
 	 SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
+	 oldemiandabsoppd[trialidx] = num_emi_peaks + num_absop_peaks;
 #else
 ///	detect_peak(hrm_chan3_raw, hrm_raw_index, 8, 1);
 #endif	
@@ -445,7 +471,7 @@ void Apply_Peak_Detector(void)
 	absop_peaks[0] = -2;
 	
 	
-	for(k=0; k<2; k++)
+	for(k=0; k<1; k++)
 	{
 		int16_t avg_x_diff = 0;
 		old_num_of_emi_peaks = num_emi_peaks;
@@ -486,6 +512,7 @@ void Apply_Peak_Detector(void)
 				emi_peaks_xpos[j+1] = emi_peaks_xpos[j] + (avg_x_diff); 
 				emi_peaks[j+1] = 0;
 				num_emi_peaks++;
+				trialerrorcnt[trialidx]++;
 				//sprintf(out_str, "Found missing emi: emi_peaks_xpos[i] %d\n", emi_peaks_xpos[i]);
 				//SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
 			}
@@ -512,7 +539,7 @@ void Apply_Peak_Detector(void)
 	
 		sprintf(out_str, "=>Missing pulse correction2: emixrng = %d, emip = %d, ", avg_x_rng, num_emi_peaks);
 		SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
-	for(k=0; k<2; k++)
+	for(k=0; k<1; k++)
 	{	
 		if(num_emi_peaks > 63)
 		num_emi_peaks = 63;
@@ -549,6 +576,7 @@ void Apply_Peak_Detector(void)
 				absop_peaks_xpos[j+1] = absop_peaks_xpos[j] + (avg_x_diff);
 				absop_peaks[j+1] = 0; 
 				num_absop_peaks++;
+				trialerrorcnt[trialidx]++;
 				sprintf(out_str, "Found missing absop: absop_peaks_xpos[i] %d\n", absop_peaks_xpos[i]);
 				SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
 			}
@@ -577,12 +605,15 @@ void Apply_Peak_Detector(void)
 #if 1	
 	/// Eliminate Bounce.
 	old_num_of_emi_peaks = num_emi_peaks;
-	avg_x_rng = avg_x_rng/3;
+///	avg_x_rng = avg_x_rng/3; // might be changed to depend on the last HR * some multipl
+	avg_x_rng = current_hrm / 10;   // 60hbpm @ 20sps => 10 for half cycle. 6 * 10 * 2 = 120.  60/10=6  = quarter cycle
 	for(i=0; i<num_emi_peaks; i++)
 	{
 		if((emi_peaks_xpos[i + 1] - emi_peaks_xpos[i]) < avg_x_rng)
 		{
 			old_num_of_emi_peaks--;
+			i=i+1;
+			trialerrorcnt[trialidx]++;
 			sprintf(out_str, "Found extra emi: emi_peaks_xpos[i] %d\n", emi_peaks_xpos[i]);
 			SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
 		}
@@ -595,54 +626,188 @@ void Apply_Peak_Detector(void)
 		if((absop_peaks_xpos[i + 1] - absop_peaks_xpos[i]) < avg_x_rng)
 		{
 			old_num_of_absop_peaks--;
+			i=i+1;
+			trialerrorcnt[trialidx]++;
 			sprintf(out_str, "Found extra absop: absop_peaks_xpos[i] %d\n", absop_peaks_xpos[i]);
 			SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
 		}
 	}
 	num_absop_peaks = old_num_of_absop_peaks;
 	
- 	sprintf(out_str, "Eliminate bounce2: Delta = %d, emip = %d, absopp = %d\n", pd_emi_delta, num_emi_peaks, num_absop_peaks); 
+ 	sprintf(out_str, "Eliminate bounce final: Dh = %d, avg_x_rng = %d, emip = %d, absopp = %d\n", pd_emi_delta, avg_x_rng, num_emi_peaks, num_absop_peaks); 
  	SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
 
 ///	detect_peak(hrm_chan3_raw, hrm_raw_index, 8, 1);
 #endif	
+
+//	trialerrorcnt[trialidx] = abs(oldemiandabsoppd[trialidx] - (num_emi_peaks + num_absop_peaks));
+	emiandabsoppd[trialidx] = num_emi_peaks + num_absop_peaks;
 	
-	
+#if 1
+	/// Plot peaks
+//		printf("===================================\n");	
+	for(i=0; i<num_emi_peaks; i++)
+	{
+		emi_peaks_dfp[i] = (double)emi_peaks[i]; 
+		emi_peaks_xpos_dfp[i] = (double)emi_peaks_xpos[i]; 
+//			printf("\nindx %d, expos = %d, ey= %d\n", i, emi_peaks_xpos[i], emi_peaks[i]);
+	}
+//		printf("ABSORPSION\n");
+	for(i=0; i<num_absop_peaks; i++)
+	{											 
+		absop_peaks_dfp[i] = (double)absop_peaks[i];
+		absop_peaks_xpos_dfp[i] = (double)absop_peaks_xpos[i];
+//			printf("indx %d, axpos = %d, ay= %d\n", i, absop_peaks_xpos[i], absop_peaks[i]);
+	}
+	if(trialidx == 2)
+	{
+		DeleteGraphPlot (mainpnl, MAINPNL_SIG4GRAPH, -1, VAL_IMMEDIATE_DRAW);
+		/// Plot subtract
+		GetCtrlVal(mainpnl, MAINPNL_PHASE2SF, &phase2sf);
+		if(phase2sf)
+		{
+			for(i = 0; i < hrm_raw_index; i++)
+			{
+				raw_hart[i] = (double)(hrm_chan3_raw[i]);
+			}
+		//	DeleteGraphPlot (mainpnl, MAINPNL_SIG4GRAPH, -1, VAL_IMMEDIATE_DRAW);
+			PlotY (mainpnl, MAINPNL_SIG4GRAPH, raw_hart, hrm_raw_index, VAL_DOUBLE,VAL_THIN_LINE, VAL_EMPTY_SQUARE, VAL_SOLID, 1, VAL_BLUE);
+			GetAxisScalingMode (mainpnl, MAINPNL_SIG4GRAPH, VAL_LEFT_YAXIS, NULL, &ymin, &ymax);
+			sprintf(scaledeltastr, "%f", ymax - ymin);
+			PlotText (mainpnl, MAINPNL_SIG4GRAPH, 0.0, raw_hart[2], scaledeltastr, VAL_APP_META_FONT, VAL_BLACK, VAL_TRANSPARENT);
+		}
+		if(num_emi_peaks >= 1)
+			PlotXY (mainpnl, MAINPNL_SIG4GRAPH, emi_peaks_xpos_dfp, emi_peaks_dfp, num_emi_peaks, VAL_DOUBLE, VAL_DOUBLE, VAL_SCATTER, VAL_SOLID_CIRCLE, VAL_SOLID, 1, VAL_GREEN);
+		if(num_absop_peaks >= 1)
+			PlotXY (mainpnl, MAINPNL_SIG4GRAPH, absop_peaks_xpos_dfp, absop_peaks_dfp, num_absop_peaks, VAL_DOUBLE, VAL_DOUBLE, VAL_SCATTER, VAL_SOLID_CIRCLE, VAL_SOLID, 1, VAL_BLUE);
+	}
+	if(trialidx == 1)
+	{
+		DeleteGraphPlot (mainpnl, MAINPNL_SIG3GRAPH, -1, VAL_IMMEDIATE_DRAW);
+		for(i = 0; i < hrm_raw_index; i++)
+		{
+			raw_hart[i] = (double)hrm_chan3_raw[i];
+		}
+		//DeleteGraphPlot (mainpnl, MAINPNL_SIG3GRAPH, -1, VAL_IMMEDIATE_DRAW);
+		PlotY (mainpnl, MAINPNL_SIG3GRAPH, raw_hart, hrm_raw_index, VAL_DOUBLE,VAL_THIN_LINE, VAL_EMPTY_SQUARE, VAL_SOLID, 1, VAL_GREEN);
+		GetAxisScalingMode (mainpnl, MAINPNL_SIG3GRAPH, VAL_LEFT_YAXIS, NULL, &ymin, &ymax);
+		sprintf(scaledeltastr, "%f", ymax - ymin);
+		PlotText (mainpnl, MAINPNL_SIG3GRAPH, 0.0, raw_hart[2], scaledeltastr, VAL_APP_META_FONT, VAL_BLACK, VAL_TRANSPARENT);
+		if(num_emi_peaks >= 1)
+			PlotXY (mainpnl, MAINPNL_SIG3GRAPH, emi_peaks_xpos_dfp, emi_peaks_dfp, num_emi_peaks, VAL_DOUBLE, VAL_DOUBLE, VAL_SCATTER, VAL_SOLID_CIRCLE, VAL_SOLID, 1, VAL_GREEN);
+		if(num_absop_peaks >= 1)
+			PlotXY (mainpnl, MAINPNL_SIG3GRAPH, absop_peaks_xpos_dfp, absop_peaks_dfp, num_absop_peaks, VAL_DOUBLE, VAL_DOUBLE, VAL_SCATTER, VAL_SOLID_CIRCLE, VAL_SOLID, 1, VAL_BLUE);
+	}
+	if(trialidx == 0)
+	{
+		DeleteGraphPlot (mainpnl, MAINPNL_SIG2GRAPH, -1, VAL_IMMEDIATE_DRAW);
+		for(i = 0; i < hrm_raw_index; i++)
+		{
+			raw_hart[i] = (double)hrm_chan3_raw[i];
+		}
+		//DeleteGraphPlot (mainpnl, MAINPNL_SIG2GRAPH, -1, VAL_IMMEDIATE_DRAW);
+		PlotY (mainpnl, MAINPNL_SIG2GRAPH, raw_hart, hrm_raw_index, VAL_DOUBLE,VAL_THIN_LINE, VAL_EMPTY_SQUARE, VAL_SOLID, 1, VAL_RED);
+		GetAxisScalingMode (mainpnl, MAINPNL_SIG2GRAPH, VAL_LEFT_YAXIS, NULL, &ymin, &ymax);
+		sprintf(scaledeltastr, "%f", ymax - ymin);
+		PlotText (mainpnl, MAINPNL_SIG2GRAPH, 0.0, raw_hart[2], scaledeltastr, VAL_APP_META_FONT, VAL_BLACK, VAL_TRANSPARENT);
+		if(num_emi_peaks >= 1)
+			PlotXY (mainpnl, MAINPNL_SIG2GRAPH, emi_peaks_xpos_dfp, emi_peaks_dfp, num_emi_peaks, VAL_DOUBLE, VAL_DOUBLE, VAL_SCATTER, VAL_SOLID_CIRCLE, VAL_SOLID, 1, VAL_GREEN);
+		if(num_absop_peaks >= 1)
+			PlotXY (mainpnl, MAINPNL_SIG2GRAPH, absop_peaks_xpos_dfp, absop_peaks_dfp, num_absop_peaks, VAL_DOUBLE, VAL_DOUBLE, VAL_SCATTER, VAL_SOLID_CIRCLE, VAL_SOLID, 1, VAL_BLUE);
+	}
+
+#endif
+} // end of trial loop
+
+/// Mode Seletor
+int dp_mode;
+
+//if((emiandabsoppd[0] >= emiandabsoppd[1]) && (emiandabsoppd[0] <= emiandabsoppd[2]))
+//	dp_mode = 0;
+//else if((emiandabsoppd[1] >= emiandabsoppd[0]) && (emiandabsoppd[1] <= emiandabsoppd[2]))
+//	dp_mode = 1;
+//else if((emiandabsoppd[2] >= emiandabsoppd[0]) && (emiandabsoppd[2] <= emiandabsoppd[1]))
+//	dp_mode = 2;
+
+//if((emiandabsoppd[0] >= emiandabsoppd[1]) && (emiandabsoppd[0] <= emiandabsoppd[2]))
+if(((emiandabsoppd[0] >= emiandabsoppd[1]) && (emiandabsoppd[0] <= emiandabsoppd[2])) || ((emiandabsoppd[0] <= emiandabsoppd[1]) && (emiandabsoppd[0] >= emiandabsoppd[2])))
+	dp_mode = 0;
+//else if((emiandabsoppd[1] >= emiandabsoppd[0]) && (emiandabsoppd[1] <= emiandabsoppd[2]))
+else if(((emiandabsoppd[1] >= emiandabsoppd[0]) && (emiandabsoppd[1] <= emiandabsoppd[2])) || ((emiandabsoppd[1] <= emiandabsoppd[0]) && (emiandabsoppd[1] >= emiandabsoppd[2])))
+	dp_mode = 1;
+else if(((emiandabsoppd[2] >= emiandabsoppd[0]) && (emiandabsoppd[2] <= emiandabsoppd[1])) || ((emiandabsoppd[2] <= emiandabsoppd[0]) && (emiandabsoppd[2] >= emiandabsoppd[1])))
+	dp_mode = 2;
+
+//if((trialerrorcnt[0] <= trialerrorcnt[1]) && (trialerrorcnt[0] <= trialerrorcnt[2]))
+//	dp_mode = 0;
+//else if((trialerrorcnt[1] <= trialerrorcnt[0]) && (trialerrorcnt[1] <= trialerrorcnt[2]))
+//	dp_mode = 1;
+//else if((trialerrorcnt[2] <= trialerrorcnt[0]) && (trialerrorcnt[2] <= trialerrorcnt[1]))
+//	dp_mode = 2;
+//if(pvariance > 200)
+//	dp_mode = 3;
+
+total_emiandabsops = emiandabsoppd[dp_mode];
+//total_emiandabsops = (((double)(emiandabsoppd[0] * 5) + (double)(emiandabsoppd[1] * 5) + (double)(emiandabsoppd[2] * 5)) / 3);
+emiandabsoppd[3] = emiandabsoppd[dp_mode]; // save for skip frame //
+
 /// 7 SEG Output ///
-	//current_hrm = (((num_emi_peaks * 10) + (num_absop_peaks * 10)) / 2);  
-	SetCtrlVal(mainpnl, MAINPNL_HRM_7SEG_9, (unsigned char)(((num_emi_peaks * 10) + (num_absop_peaks * 10)) / 2));
+	
     /// Average the hrm output.
-	/// current_hrm = ((num_emi_peaks * 10) + (current_hrm * 10) + (num_absop_peaks * 10)) / 12;
-	current_hrm = ((num_emi_peaks * 10) + (current_hrm * 4) + (num_absop_peaks * 10)) / 6;
-	//current_hrm = ((num_emi_peaks * 10) + (current_hrm * 3) + (num_absop_peaks * 0)) / 4;
-	//current_hrm = ((num_emi_peaks * 10) + (num_absop_peaks * 10)) / 2;  
-	SetCtrlVal(mainpnl, MAINPNL_HRM_7SEG, (double)current_hrm); //
-	SetCtrlVal(mainpnl, MAINPNL_HRM_7SEG_3 , (((double)current_hrm + (double)hrm_52 ) / 2)) ;
+	// current_hrm = ((num_emi_peaks * 10) + (current_hrm * 10) + (num_absop_peaks * 10)) / 12;
+	// current_hrm = ((num_emi_peaks * 10) + (current_hrm * 2) + (num_absop_peaks * 10)) / 4;
+	last4hrmavg[last4hrmavgidx] = total_emiandabsops * 5; //(num_emi_peaks * 5) + (num_absop_peaks * 5);
+	last4hrmavgidx++;
+	if(last4hrmavgidx == 4)// 4 samples = 24 seconds.
+		last4hrmavgidx = 0;
+	current_hrm = 0;
+	for(i = 0; i < 4; i++)
+		current_hrm += last4hrmavg[i];
+	current_hrm = current_hrm / 4;
+		
+	SetCtrlVal(mainpnl, MAINPNL_HRM_7SEG, (double)current_hrm); //blue
+	//SetCtrlVal(mainpnl, MAINPNL_HRM_7SEG_3 , (((double)current_hrm + (double)hrm_52 ) / 2)) ;//green
+	SetCtrlVal(mainpnl, MAINPNL_HRM_7SEG_9, (unsigned char)(total_emiandabsops * 5)); //yellow
+	
+	SetCtrlAttribute (mainpnl, MAINPNL_HRM_7SEG_Y0, ATTR_TEXT_COLOR, VAL_YELLOW);
+	SetCtrlAttribute (mainpnl, MAINPNL_HRM_7SEG_Y1, ATTR_TEXT_COLOR, VAL_YELLOW);
+	SetCtrlAttribute (mainpnl, MAINPNL_HRM_7SEG_Y2, ATTR_TEXT_COLOR, VAL_YELLOW);
+	SetCtrlVal(mainpnl, MAINPNL_HRM_7SEG_Y0, (unsigned char)(emiandabsoppd[0] * 5));
+	SetCtrlVal(mainpnl, MAINPNL_HRM_7SEG_Y1, (unsigned char)(emiandabsoppd[1] * 5)); 
+	SetCtrlVal(mainpnl, MAINPNL_HRM_7SEG_Y2, (unsigned char)(emiandabsoppd[2] * 5));
+	if(dp_mode == 0)
+		SetCtrlAttribute (mainpnl, MAINPNL_HRM_7SEG_Y0, ATTR_TEXT_COLOR, VAL_RED); 
+	if(dp_mode == 1)
+		SetCtrlAttribute (mainpnl, MAINPNL_HRM_7SEG_Y1, ATTR_TEXT_COLOR, VAL_RED);
+	if(dp_mode == 2)
+		SetCtrlAttribute (mainpnl, MAINPNL_HRM_7SEG_Y2, ATTR_TEXT_COLOR, VAL_RED); 
+	
+	SetCtrlVal(mainpnl, MAINPNL_HRM_7SEG_3 , (((double)(emiandabsoppd[0] * 5) + (double)(emiandabsoppd[1] * 5) + (double)(emiandabsoppd[2] * 5)) / 3)) ;//green 
 	
 /// CVI Stuff: ///
 	
-	double 	ymin, ymax;
-	char	scaledeltastr[32];
+	/*double 	ymin, ymax;
+	char	scaledeltastr[32];*/
 	/// Plot  raw
-	for(i = 0; i < hrm_raw_index; i++)
+	/*for(i = 0; i < hrm_raw_index; i++)
 	{
 		raw_hart[i] = (double)hrm_chan1_raw[i];
 	}
-	DeleteGraphPlot (mainpnl, MAINPNL_SIG2GRAPH, -1, VAL_IMMEDIATE_DRAW);
+	//DeleteGraphPlot (mainpnl, MAINPNL_SIG2GRAPH, -1, VAL_IMMEDIATE_DRAW);
 	PlotY (mainpnl, MAINPNL_SIG2GRAPH, raw_hart, hrm_raw_index, VAL_DOUBLE,VAL_THIN_LINE, VAL_EMPTY_SQUARE, VAL_SOLID, 1, VAL_RED);
 	GetAxisScalingMode (mainpnl, MAINPNL_SIG2GRAPH, VAL_LEFT_YAXIS, NULL, &ymin, &ymax);
 	sprintf(scaledeltastr, "%f", ymax - ymin);
-	PlotText (mainpnl, MAINPNL_SIG2GRAPH, 0.0, raw_hart[2], scaledeltastr, VAL_APP_META_FONT, VAL_BLACK, VAL_TRANSPARENT);
-	for(i = 0; i < hrm_raw_index; i++)
+	PlotText (mainpnl, MAINPNL_SIG2GRAPH, 0.0, raw_hart[2], scaledeltastr, VAL_APP_META_FONT, VAL_BLACK, VAL_TRANSPARENT);*/
+	/*for(i = 0; i < hrm_raw_index; i++)
 	{
 		raw_hart[i] = (double)hrm_chan2_raw[i];
 	}
-	DeleteGraphPlot (mainpnl, MAINPNL_SIG3GRAPH, -1, VAL_IMMEDIATE_DRAW);
+	//DeleteGraphPlot (mainpnl, MAINPNL_SIG3GRAPH, -1, VAL_IMMEDIATE_DRAW);
 	PlotY (mainpnl, MAINPNL_SIG3GRAPH, raw_hart, hrm_raw_index, VAL_DOUBLE,VAL_THIN_LINE, VAL_EMPTY_SQUARE, VAL_SOLID, 1, VAL_GREEN);
 	GetAxisScalingMode (mainpnl, MAINPNL_SIG3GRAPH, VAL_LEFT_YAXIS, NULL, &ymin, &ymax);
 	sprintf(scaledeltastr, "%f", ymax - ymin);
-	PlotText (mainpnl, MAINPNL_SIG3GRAPH, 0.0, raw_hart[2], scaledeltastr, VAL_APP_META_FONT, VAL_BLACK, VAL_TRANSPARENT);
-	/// Plot subtract
+	PlotText (mainpnl, MAINPNL_SIG3GRAPH, 0.0, raw_hart[2], scaledeltastr, VAL_APP_META_FONT, VAL_BLACK, VAL_TRANSPARENT);*/
+	/*/// Plot subtract
 	GetCtrlVal(mainpnl, MAINPNL_PHASE2SF, &phase2sf);
 	if(phase2sf)
 	{
@@ -650,15 +815,18 @@ void Apply_Peak_Detector(void)
 		{
 			raw_hart[i] = (double)(hrm_chan3_raw[i]);
 		}
-		DeleteGraphPlot (mainpnl, MAINPNL_SIG4GRAPH, -1, VAL_IMMEDIATE_DRAW);
+	//	DeleteGraphPlot (mainpnl, MAINPNL_SIG4GRAPH, -1, VAL_IMMEDIATE_DRAW);
 		PlotY (mainpnl, MAINPNL_SIG4GRAPH, raw_hart, hrm_raw_index, VAL_DOUBLE,VAL_THIN_LINE, VAL_EMPTY_SQUARE, VAL_SOLID, 1, VAL_BLUE);
 		GetAxisScalingMode (mainpnl, MAINPNL_SIG4GRAPH, VAL_LEFT_YAXIS, NULL, &ymin, &ymax);
 		sprintf(scaledeltastr, "%f", ymax - ymin);
 		PlotText (mainpnl, MAINPNL_SIG4GRAPH, 0.0, raw_hart[2], scaledeltastr, VAL_APP_META_FONT, VAL_BLACK, VAL_TRANSPARENT);
-	}
+	}*/
 
+	
+#if 0
 	/// Plot peaks
-#if 1
+	if(trialidx == 2)
+	{
 //		printf("===================================\n");	
 		for(i=0; i<num_emi_peaks; i++)
 		{
@@ -677,7 +845,7 @@ void Apply_Peak_Detector(void)
 			PlotXY (mainpnl, MAINPNL_SIG4GRAPH, emi_peaks_xpos_dfp, emi_peaks_dfp, num_emi_peaks, VAL_DOUBLE, VAL_DOUBLE, VAL_SCATTER, VAL_SOLID_CIRCLE, VAL_SOLID, 1, VAL_GREEN);
 		if(num_absop_peaks >= 1)
 			PlotXY (mainpnl, MAINPNL_SIG4GRAPH, absop_peaks_xpos_dfp, absop_peaks_dfp, num_absop_peaks, VAL_DOUBLE, VAL_DOUBLE, VAL_SCATTER, VAL_SOLID_CIRCLE, VAL_SOLID, 1, VAL_BLUE);
-
+	}
 #endif
 /// ===========================================================================================================================	  
 /// =========> PD 	
@@ -940,3 +1108,22 @@ int8_t detect_peak(
 //
 //    return 0;
 //}
+int16_t PeakDiff1D(const int16_t *arr, size_t length) 
+{
+    // returns the maximum value of array
+    size_t i;
+    int16_t maximum = arr[0];
+	int16_t minimum = arr[0];
+	int16_t peakdiff;
+    for (i = 1; i < length; ++i) 
+	{
+        if (maximum < arr[i]) {
+            maximum = arr[i];
+        }
+		if (minimum > arr[i]) {
+            minimum = arr[i];
+        }
+    }
+	peakdiff = maximum - minimum;
+    return peakdiff;
+}

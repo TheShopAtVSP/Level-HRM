@@ -42,7 +42,7 @@ void RT_Scan_Loop(void)
 		total_run_time = total_peaks = 0;
 	}
 	
-	Serial_Get_Byte();
+	Serial_Get_Byte();  // suckup the index counter
 	while(Serial_Get_Byte() != 0x69){}
 	
 	byte_in_h = Serial_Get_Byte(); 
@@ -50,7 +50,8 @@ void RT_Scan_Loop(void)
 	si_ax = (short)(byte_in_h << 8) + byte_in_l;
 	raw_acl_x[raw_hart_cir_buff_idx] = (double)(si_ax) / a_scale;
 		
-	byte_in_h = Serial_Get_Byte(); 
+	byte_in_h = Serial_Get_Byte();
+	//unsigned char topchan1 = Serial_Get_Byte();
 	byte_in_l = Serial_Get_Byte(); 
 	si_ay = (short)(byte_in_h << 8) + byte_in_l;
 	raw_acl_y[raw_hart_cir_buff_idx] = (double)(si_ay) / a_scale;
@@ -73,21 +74,39 @@ void RT_Scan_Loop(void)
 	si_gy = (short)(byte_in_h << 8) + byte_in_l;
 	
 	/// int16_t 	hrm_chan1_raw[156], hrm_chan2_raw[156], hrm_raw_index = 0, hrm_raw_index_old;
+//	unsigned int chan1_32 =  si_gp | (topchan1 << 16);
 	
 	hrm_chan1_raw[hrm_raw_index] = (int16_t)si_gp;
 	hrm_chan2_raw[hrm_raw_index] = (int16_t)si_gy;
+	pgy[0] = (double)hrm_chan1_raw[hrm_raw_index];
+	pgy[1] = (double)hrm_chan2_raw[hrm_raw_index];
+	pgy[2] = (double)hrm_chan1_raw[hrm_raw_index];
+	pgy[3] = (double)hrm_chan2_raw[hrm_raw_index];
+	//printf("%x  %x %f\n", chan1_32, si_gp, pgy[0]); 
+	PlotStripChart (mainpnl, MAINPNL_SIG1GRAPH, pgy , 4, 0, 0, VAL_DOUBLE);
 	hrm_raw_index++;
 	if(hrm_raw_index == 120 + gyravgfilt_val)
 	{
+		SetCtrlVal(mainpnl, MAINPNL_SAMP_PER_SEC, (120 + gyravgfilt_val) / (Timer() - aquisition_start_time));    
+		aquisition_start_time = Timer();
 		/// Apply_Raw_Data_Filtering();
 		hrm_raw_index -= gyravgfilt_val;
 		ser_input_size = hrm_raw_index;
+		for(i=0; i<ser_input_size+64; i++)
+		{
+			 fio_array[i*6+0] = raw_acl_x[i];
+			 fio_array[i*6+1] = raw_acl_y[i];
+			 fio_array[i*6+2] = raw_acl_z[i];
+			 fio_array[i*6+3] = raw_gyr_p[i];
+			 fio_array[i*6+4] = raw_gyr_y[i];
+			 fio_array[i*6+5] = raw_gyr_r[i];
+		}
 		Apply_Peak_Detector();
 		/// Apply_Peak_Detector();
 		if(!one_shot)
 			hrm_raw_index = 0;  
 	}
-	
+/*	
 	///////   if(!selfsteadyhasrun)
 	if(1) /// <=============== debug
 	{
@@ -256,7 +275,7 @@ void RT_Scan_Loop(void)
 			//SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
 			//SetCtrlVal(mainpnl, MAINPNL_SAMP_PER_SEC, raw_hart_cir_buff_idx / (Timer() - aquisition_start_time)); 
 			SetCtrlVal(mainpnl, MAINPNL_SAMP_PER_SEC, raw_hart_cir_buff_idx / run_time);    
-			
+		//	aquisition_start_time = Timer();
 			for(i=0; i<ser_input_size+64; i++)
 			{
 				 fio_array[i*6+0] = raw_acl_x[i];
@@ -275,7 +294,9 @@ void RT_Scan_Loop(void)
 			FlushInQ (ser_com_port); 
 			aquisition_start_time = Timer();
 		}
-	}
+}
+*/
+
 	return; 	
 }
 
@@ -287,7 +308,7 @@ unsigned char Serial_Get_Byte(void)
 	
 	while( GetInQLen(ser_com_port) == 0 ) 
 	{ 
-		if(ser_to == 100)
+		if(ser_to == 200)
 		{
 			return 0;
 			CloseCom (ser_com_port);

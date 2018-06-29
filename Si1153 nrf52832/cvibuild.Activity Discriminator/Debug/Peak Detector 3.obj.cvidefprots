@@ -14,3 +14,7 @@ Prototype="int ReStart_FO(int panel, int control, int event, void *callbackData,
 Class="Function"
 Prototype="signed char detect_peak(const short *data, signed char data_count, short delta, signed char emi_first);"
 
+[PeakDiff1D]
+Class="Function"
+Prototype="short PeakDiff1D(const short *arr, unsigned int length);"
+

@@ -15,9 +15,9 @@ Active Project = 1
 Project 0001 = "Activity Discriminator.prj"
 Drag Bar Left = 309
 Window Top = 36
-Window Left = 47
+Window Left = 1938
 Window Bottom = 1181
-Window Right = 1825
+Window Right = 3776
 Maximized = False
 Maximized Children = True
 Max32 Number Of Errors = 20
@@ -63,7 +63,7 @@ In Projects = "1,"
 Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/Activi"
 Path Line0002 = "ty Discriminator.uir"
 File Type = "User Interface Resource"
-Disk Date = 3611162347
+Disk Date = 3612787579
 In Projects = "1,"
 Window Top = 38
 Window Left = 6
@@ -75,45 +75,45 @@ Window Z-Order = 4
 Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/RT Ser"
 Path Line0002 = "ial Sensor Aqu.c"
 File Type = "CSource"
-Disk Date = 3611571644
+Disk Date = 3612876068
 In Projects = "1,"
 Window Top = 110
 Window Left = 48
 Window Z-Order = 3
-Source Window State = "1,58,58,58,44,53,44,0,0,74,0,0,0,0,0,19,37,0,59,23,417,835,1,0,"
+Source Window State = "1,95,102,95,12,15,12,0,0,74,0,0,0,0,0,19,319,0,322,4,417,835,1,0,"
 
 [File 0005]
 Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/Peak D"
 Path Line0002 = "etector 3.c"
 File Type = "CSource"
-Disk Date = 3611662793
+Disk Date = 3613049605
 In Projects = "1,"
 Window Top = 38
 Window Left = 6
 Window Z-Order = 1
-Source Window State = "1,408,411,408,4,31,4,0,0,138,0,0,0,0,0,43,495,0,518,8,427,718,1,0,"
+Source Window State = "1,164,164,164,16,31,31,0,3,144,0,599,0,0,0,43,152,0,164,16,427,718,1,0,"
 
 [File 0006]
 Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/Activi"
 Path Line0002 = "ty Discriminator Main.c"
 File Type = "CSource"
-Disk Date = 3611326751
+Disk Date = 3612182211
 In Projects = "1,"
 Window Top = 40
 Window Left = 11
 Window Z-Order = 5
-Source Window State = "1,131,149,131,0,0,0,0,0,62,0,0,0,0,0,15,46,0,76,21,349,715,1,0,"
+Source Window State = "1,78,78,78,23,24,24,0,0,62,0,0,0,0,0,15,88,0,95,4,349,715,1,0,"
 
 [File 0007]
 Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/Activi"
 Path Line0002 = "ty Discriminator vars.h"
 File Type = "Include"
-Disk Date = 3611661282
+Disk Date = 3612452029
 In Projects = "1,"
 Window Top = 230
 Window Left = 111
 Window Z-Order = 2
-Source Window State = "1,136,136,136,96,98,98,0,0,62,0,51,0,0,0,15,132,0,136,99,349,715,1,11,"
+Source Window State = "1,140,140,140,12,25,25,0,3,62,0,51,0,0,0,15,59,0,140,12,349,715,1,11,"
 
 [File 0008]
 Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/Activi"
@@ -232,13 +232,13 @@ Disk Date = 3611151731
 In Projects = "1,"
 Window Top = 230
 Window Left = 111
-Source Window State = "1,411,411,411,16,149,16,0,0,0,0,0,0,0,0,0,393,0,411,14,349,715,1,0,"
+Source Window State = "1,475,475,475,5,21,5,0,3,0,0,0,0,0,0,0,444,0,475,21,349,715,1,0,"
 
 [File 0020]
 Path Line0001 = "/c/Users/Mitch_Mason/Desktop/HRM 1153 level_1_1/Level-HRM/Si1153 nrf52832/Activi"
 Path Line0002 = "ty Discriminator.h"
 File Type = "Include"
-Disk Date = 3611162347
+Disk Date = 3612787579
 In Projects = "1,"
 Window Top = 38
 Source Window State = "1,155,155,155,17,29,17,0,0,0,0,0,0,0,0,0,149,0,166,19,400,600,1,0,"
