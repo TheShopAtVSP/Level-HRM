@@ -32,7 +32,7 @@ typedef enum {
 
 bool imu_debug = true;
 
-#define ACCEL_PD_TO		4000		//motion timeout in milliseconds to wait before going into low power mode
+#define ACCEL_PD_TO		18000		//motion timeout in milliseconds to wait before going into low power mode
 #define GYRO_PD_TO		1500
 #define MAG_PD_TO		4000
 
@@ -142,7 +142,7 @@ void add_accel_buffer( T_3AXIS * data ) {
 	if( IMU_DATA_DEBUG ) app_trace_log(DEBUG_LOW, "(%04u)", accel_buf.fifo[accel_buf.head].m);
 	
 	accel_buf.head = (accel_buf.head+1)&IMU_FIFO_MASK;
-	lock_accel(1);
+///	lock_accel(1);
 }
 
 ///

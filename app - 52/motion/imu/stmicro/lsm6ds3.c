@@ -220,7 +220,7 @@ ret_code_t lsm6ds3_init_sensors( void )
 	//Set Up Accelerometer
 	err = lsm6ds3_set_fs( LSM6DS3_ACCEL, DEF_ACCEL_FSR );
 	err = lsm6ds3_write_data_with_mask( LSM6DS3_CTRL6_G, CTRL6_XL_HPERF_MODE_MASK, LSM6DS3_HPERF_DISABLE );
-	err = lsm6ds3_write_data_with_mask( LSM6DS3_WAKE_UP_THS, WAKE_UP_THS_MASK, 0x02 );			//Wake Threshold = X*(Accel FSR)/64
+	err = lsm6ds3_write_data_with_mask( LSM6DS3_WAKE_UP_THS, WAKE_UP_THS_MASK, 0x01 );			//Wake Threshold = X*(Accel FSR)/64
 	err = lsm6ds3_write_data_with_mask( LSM6DS3_WAKE_UP_DUR, WAKE_UP_DUR_WAKE_DUR_MASK, 0x01 );	//Wake Duration = X*(Accel Samp Rate)
 	err = lsm6ds3_write_data_with_mask( LSM6DS3_TAP_CFG, TAP_CFG_SLOPE_FDS_MASK, 0 );			//0: Slope Filter, 1: HP Filter for Wake Up
 	if ( err != NRF_SUCCESS ) return err;

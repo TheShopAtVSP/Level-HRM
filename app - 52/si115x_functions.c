@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "nrf.h"
 #include "nrf_drv_gpiote.h"
 #include "app_util_platform.h"
@@ -18,22 +19,27 @@
 #include "si115x_functions.h"
 
 #define	HRM_AVG_SAMPLES		4
-#define HRM_DP_DATA_SIZE 	64
+#define HRM_DP_DATA_SIZE 	156
 #define PD_DEBOUNCE_WIDTH 	7
 
 extern uint8_t tx_payload[ ];
 extern uint8_t current_hrm;
 extern uint16_t hrm_ch1_avg, hrm_ch2_avg;
-extern int16_t hrm_chan1_raw[], hrm_chan2_raw[], hrm_raw_index;
+extern int16_t hrm_chan1_raw[], hrm_chan2_raw[], hrm_chan3_raw[], hrm_raw_index;
+extern int16_t 	pd_emi_delta;
 /// extern uint16_t second_counter;
 static const nrf_drv_twi_t m_twi_Si1153 = NRF_DRV_TWI_INSTANCE(0);
 uint8_t 	reg[2], timer_count_out = 0;
 uint16_t 	delay = 500;
 uint32_t 	hrm_timer_start, hrm_current_time, hrm_add_time, hrm_run_time;
-int8_t		num_emi_peaks, num_absop_peaks, emi_peaks_xpos[HRM_DP_DATA_SIZE+1], absop_peaks_xpos[HRM_DP_DATA_SIZE+1];
-int16_t		emi_peaks[HRM_DP_DATA_SIZE+1], absop_peaks[HRM_DP_DATA_SIZE+1];
+static int16_t		num_emi_peaks, num_absop_peaks, emi_peaks_xpos[HRM_DP_DATA_SIZE+1], absop_peaks_xpos[HRM_DP_DATA_SIZE+1];
+static int16_t		emi_peaks[HRM_DP_DATA_SIZE+1], absop_peaks[HRM_DP_DATA_SIZE+1];
 int8_t 		i, j, k, dh, old_num_of_emi_peaks, old_num_of_absop_peaks, pd_reduction_loop;
-int16_t 	pd_emi_delta, pd_absop_delta, avg_x_diff, avg_x_rng;
+static int16_t 	avg_x_diff, avg_x_rng;
+//static int16_t 	pd_absop_delta;
+//static int16_t 	hrm_chan1_raw_avg[256], hrm_chan2_raw_avg[256];
+double  	emi_peaks_dfp[128], emi_peaks_xpos_dfp[128], absop_peaks_dfp[128], absop_peaks_xpos_dfp[128], intgtr_gyr_p[156], intgtr_gyr_y[156];
+///static int16_t		last4hrmavg[8], last4hrmavgidx;
 
 /* Si1153 initialization. */
 int16_t Si1153_Init(void)
@@ -46,21 +52,21 @@ int16_t Si1153_Init(void)
 #ifdef LEDX3	
     retval += Si115xParamSet( PARAM_CH_LIST, 0x03); // Enable chan 1 and 2
 	
-	retval += Si115xParamSet(PARAM_LED1_A, 0x00);
+	retval += Si115xParamSet(PARAM_LED1_A, 0x18);
 	retval += Si115xParamSet(PARAM_LED2_A, 0x00);
-	retval += Si115xParamSet(PARAM_LED3_A, 0x00);
-	retval += Si115xParamSet(PARAM_LED1_B, 0x00);/// 50mA = 0x12
+	retval += Si115xParamSet(PARAM_LED3_A, 0x18);
+	retval += Si115xParamSet(PARAM_LED1_B, 0x18);/// 50mA = 0x12
 	retval += Si115xParamSet(PARAM_LED2_B, 0x00);/// 11mA = 0x08, 5.5 = 0x00, 22 = 0x18
-	retval += Si115xParamSet(PARAM_LED3_B, 0x00);///2A = 100 mA
+	retval += Si115xParamSet(PARAM_LED3_B, 0x18);///2A = 100 mA
 	
 	retval += Si115xParamSet(PARAM_ADCCONFIG0, 0x62);	// mux 4xd 24.4 uSec
-	retval += Si115xParamSet(PARAM_MEASCONFIG0, 0x06);//1 = LEDA
-	retval += Si115xParamSet( PARAM_ADCSENS0, 0x20);
-    retval += Si115xParamSet( PARAM_ADCPOST0, 0x40);
+	retval += Si115xParamSet(PARAM_MEASCONFIG0, 0x01);//1 = LEDA 2 = LEDC 4 = LEDB
+	retval += Si115xParamSet( PARAM_ADCSENS0, 0x20);//20
+    retval += Si115xParamSet( PARAM_ADCPOST0, 0x40);// 24bit signed int
 	
 	retval += Si115xParamSet(PARAM_ADCCONFIG1, 0x62);	// mux 4xd 24.4 uSec
-	retval += Si115xParamSet(PARAM_MEASCONFIG1, 0x01); //	0x02 LEDC// bank B led 2 (data sheet wong)  //6
-    retval += Si115xParamSet( PARAM_ADCSENS1, 0x20);
+	retval += Si115xParamSet(PARAM_MEASCONFIG1, 0x02); //	0x02 LEDC// bank B led 2 (data sheet wong)  //6
+    retval += Si115xParamSet( PARAM_ADCSENS1, 0x20); // HW/SW Gain deflt 0x20
 	retval += Si115xParamSet( PARAM_ADCPOST1, 0x40);	// 24 bit
 #else
 retval += Si115xParamSet( PARAM_CH_LIST, 0x03); // Enable chan 1 and 2
@@ -571,7 +577,7 @@ uint8_t SendCmd(HANDLE si115x_handle, uint8_t cmd)
   Si115xWriteToRegister(SI115x_REG_COMMAND, cmd);
   while((temp & 0x1f)
          == (Si115xReadFromRegister(SI115x_REG_RESPONSE0)
-             & 0x1f));
+             & 0x1f))
   {
     ;
   }
@@ -777,50 +783,386 @@ void hrm_read_cmd(void)
 	}
 }
 
-//========================================================================================================//
-/*==============================================*/
-/* 				 HRM Post Processing 				
-	unix_time = 1 sec
-second_counter = uint32_t app_timer_cnt_get()   30.5us/tick
-
-uint32_t app_timer_cnt_diff_compute	(	uint32_t 	ticks_to,
-uint32_t 	ticks_from,
-uint32_t * 	p_ticks_diff 
-)		
-Function for computing the difference between two RTC1 counter values.
-
-Parameters
-[in]	ticks_to	Value returned by app_timer_cnt_get().
-[in]	ticks_from	Value returned by app_timer_cnt_get().
-[out]	p_ticks_diff	Number of ticks from ticks_from to ticks_to.
-uint32_t hrm_timer_start, hrm_add_time, hrm_run_time;
-
-// This code can be applied to both front and rear channels.
-// bellCurveOfSameLength is a [Float], with length = 20, storing a Gaussian function with maxima at the center of the array, sum of the function = 1.  This is reusable.
-// last20Points is a [Float] array with the last 20 data points of the heart rate data, casted to floating point values for a given channel.
-// last data point is the floating representation of the last heart rate data point.
-// This is the convolution, which will return a single Float value.
-func fgn(n: Int, f: [Float], g: [Float]) -> Float {
-        var sum : Double = 0
-        let M = g.count/2
-        for m in -M..<M {
-            let gm = g.data[m+M]
-            guard n+m > 0, n+m < f.count else {
-                continue
-            }
-            let fnm = f.data[n+m]
-            sum += gm*fnm
-        }
-        return sum
-    }
-
-let n = bellCurveOfSameLength.count/2
-let lowPass  = fgn(n, last20Points, bellCurveOfSameLength)
-let newValue = lastDataPoint - lowPass
-Add CommentCollapse 
+//========================================================================================================
+/*
+		HRM Post Processing 				
 */
-/*==============================================*/
-//========================================================================================================//
+//========================================================================================================
+
+void Get_HRMs(void)
+{
+	int16_t 	trialidx, trialerrorcnt[4], emiandabsoppd[4], total_emiandabsops; 
+	int16_t  	last_pvariance, pvariance;
+	double  	phase2sf, phase2sfcof;
+	int16_t		ser_input_size = 120, justanextraint16;
+	
+	// Added a three step loop that processes chan 1, then chan 2 then subtracted channel while counting the total added peaks and 
+	// doubles. after all three have been processed the lower error count determines which emi + absop peaks are to be used as the HR.
+	// trialidx 0-2, trialerrorcnt(0-2), trialhr0-2(emi+absop).
+	// This allows the prdominate LED to win a fight and auto switches to subtract mode without using a threshold.
+	// Later add a frame invalid and use the last current_hrm if errors are too high or if sub and result P2P is greater than xxx.
+	// also trying: trialerrorcnt[] will be evaluated by  taking the starting (oldemiandabsoppd) pd and abs old - new
+	// 				trialerrorcnt[trialidx] = abs(oldemiandabsoppd[trialidx] - (num_emi_peaks + num_absop_peaks)); 	
+	for(trialidx = 0; trialidx < 3; trialidx++)	
+	{	
+		trialerrorcnt[trialidx] = 0;
+		
+		
+		if(trialidx == 2) // do this one last so that we can skip it if trialerrorcnt(0 or 1) is low.
+		{
+			/// Auto Subtract ///
+			phase2sfcof = 0.5;
+			pvariance = PeakDiff1D(hrm_chan1_raw, ser_input_size);
+			justanextraint16 = PeakDiff1D(hrm_chan2_raw, ser_input_size);
+			phase2sf = fabs((double)justanextraint16 / phase2sf);
+			
+			last_pvariance = 30000;
+			/// printf("%f\n",phase2sf);
+			for(int ol=0;  ol < 1; ol++)  /// 3
+			{
+				if(ol==0) /// 1
+					phase2sfcof = 0.05; /// 0.05
+				if(ol==1) /// 2
+					phase2sfcof = 0.001; /// 0.005
+					
+				last_pvariance = 30000;	 
+
+				while(abs(last_pvariance) > abs(pvariance))
+				{
+					last_pvariance = pvariance;
+					phase2sf += phase2sfcof;
+					for(i = 0; i < ser_input_size; i++)
+					{
+						hrm_chan3_raw[i] = (int16_t)((double)hrm_chan1_raw[i] - ((double)hrm_chan2_raw[i] * phase2sf));
+					}
+					pvariance = PeakDiff1D(hrm_chan3_raw, ser_input_size);
+				}
+				
+				last_pvariance = 30000;
+			
+				while(abs(last_pvariance) > abs(pvariance))
+				{
+					last_pvariance = pvariance;
+					phase2sf -= phase2sfcof;
+					for(i = 0; i < ser_input_size; i++)
+					{
+						hrm_chan3_raw[i] = (int16_t)((double)hrm_chan1_raw[i] - ((double)hrm_chan2_raw[i] * phase2sf));
+					}
+					pvariance = PeakDiff1D(hrm_chan3_raw, ser_input_size);
+				}
+			}
+			for(i = 0; i < ser_input_size; i++)
+			{
+				hrm_chan3_raw[i] = (int16_t)((double)hrm_chan1_raw[i] - ((double)hrm_chan2_raw[i] * (phase2sf + phase2sfcof)));
+			}
+		}
+		else  // do not do subtract and load chan 3 for next step. trialidx=0 will be chan1 and trialidx=1 will be chan2.
+		{	 	
+			for(i = 0; i < hrm_raw_index ; i++)
+			{
+				if(trialidx == 0)
+					hrm_chan3_raw[i] = hrm_chan1_raw[i];
+				if(trialidx == 1)
+					hrm_chan3_raw[i] = hrm_chan2_raw[i];
+			}
+		}
+
+
+#if 1
+		// dH Threshold control
+		/// Eliminate bounce by increasing delta (dh). Basicaly acts as a auto peak detector threshold control.
+		/// It looks like starting from low to high sometimes eliminates wanted peaks. 
+		/// If we start from high and look for a minimum number of peaks we could post process after substracting a proprtional
+		/// amount to insure that we get some of the dis-qualified peaks. De bounce would have to then take the form of the missing peaks
+		/// routine.  Adding more averaging may yeild a completly different result.
+		
+		pd_emi_delta = 35;
+		do
+		{	
+			detect_peak(hrm_chan3_raw, hrm_raw_index, pd_emi_delta, 1);
+			pd_emi_delta -= 2;
+		}while((num_emi_peaks < 5) || (num_absop_peaks < 5));
+		pd_emi_delta -= 2; // means delta - 2. should be porpotional...
+		if(pd_emi_delta < 4)
+			pd_emi_delta = 4;
+		
+//		pd_emi_delta = 3; // To play with going low to high.
+//		do
+//		{	
+//			detect_peak(hrm_chan3_raw, hrm_raw_index, pd_emi_delta, 1);
+//			pd_emi_delta += 2;
+//		}while((num_emi_peaks > 5) || (num_absop_peaks > 5));
+//		pd_emi_delta -= 2; // means delta - 2. should be porpotional...
+//		if(pd_emi_delta > 35)
+//			pd_emi_delta = 35;
+		
+		detect_peak(hrm_chan3_raw, hrm_raw_index, pd_emi_delta, 1); 
+#endif	
+		
+   #if 0	
+		/// Eliminate bounce by increasing delta (dh). Basicaly acts as a auto peak detector threshold control. 
+		/// This is used with the Stitcher and works rather well, but is #ifdefed out for this  architecture.
+		if(pd_emi_auto)
+			pd_emi_delta = 4;
+	//	sprintf(out_str, "Eliminate bounce1: Delta = %d, emip = %d, absopp = %d\n", pd_emi_delta, num_emi_peaks, num_absop_peaks);
+	//	SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
+		do
+		{	
+			detect_peak(hrm_chan3_raw, hrm_raw_index, pd_emi_delta, 1);
+			dh = 0;
+			int8_t pd_reduction_loop = num_emi_peaks;
+			if(pd_reduction_loop > num_absop_peaks)
+				pd_reduction_loop = num_absop_peaks;
+			for(i=0; i<(pd_reduction_loop - 1); i++)
+			{
+				if( ((emi_peaks_xpos[i+1] - emi_peaks_xpos[i]) < PD_DEBOUNCE_WIDTH) 
+					|| ((absop_peaks_xpos[i+1] - absop_peaks_xpos[i]) < PD_DEBOUNCE_WIDTH) )
+				{
+					dh++;
+				}
+			}
+			
+			if(dh > 0)
+			{
+				pd_emi_delta++;	
+			}
+			
+			if(dh == 25)
+				dh = 0;
+		}while(dh > 0);
+	//	 sprintf(out_str, "Eliminate bounce2: Delta = %d, emip = %d, absopp = %d\n", pd_emi_delta, num_emi_peaks, num_absop_peaks); 
+	//	 SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
+#else
+	///	detect_peak(hrm_chan3_raw, hrm_raw_index, 8, 1);
+#endif	
+		
+#if 1		
+		/// Missing pulse correction:
+		// run thru the absop_peaks_xpos[num_absop_peaks[0]]. find delta x for each. avg delta x. if 1 is double the rest add 1 to num_absop_peaks[0].
+		
+		int8_t old_num_of_emi_peaks;
+		int8_t old_num_of_absop_peaks;
+
+		if(num_emi_peaks > 63)  // Don't diddle those kids.
+			num_emi_peaks = 63;
+		if(num_absop_peaks > 63)
+			num_absop_peaks = 63;
+		
+		// Add phantom end points to emi and absop arrays. 150 is used for debug and not processed.
+		emi_peaks_xpos[num_emi_peaks] = 135;
+		emi_peaks[num_emi_peaks] = 2;
+		num_emi_peaks++;
+		emi_peaks_xpos[num_emi_peaks] = 150;
+		emi_peaks[num_emi_peaks] = 2;
+		num_emi_peaks++;
+		for(i=num_emi_peaks; i>0; i--)      
+		{
+			emi_peaks_xpos[i] = emi_peaks_xpos[i - 1];
+			emi_peaks[i] = emi_peaks[i - 1];
+		}
+		emi_peaks_xpos[0] =  -16;
+		emi_peaks[0] = 2;
+		absop_peaks_xpos[num_absop_peaks] = 135;
+		absop_peaks[num_absop_peaks] = -2;
+		num_absop_peaks++;
+		absop_peaks_xpos[num_absop_peaks] = 150;
+		absop_peaks[num_absop_peaks] = -2;
+		num_absop_peaks++;
+		for(i=num_absop_peaks; i>0; i--)      
+		{
+			absop_peaks_xpos[i] = absop_peaks_xpos[i - 1];
+			absop_peaks[i] = absop_peaks[i - 1];
+		}
+		absop_peaks_xpos[0] =  -6;
+		absop_peaks[0] = -2;
+		
+		//Start emi
+		for(k=0; k<1; k++)
+		{
+			int16_t avg_x_diff = 0;
+			old_num_of_emi_peaks = num_emi_peaks;
+			
+			if(old_num_of_emi_peaks > 0)
+			{
+				for(i=0; i<(old_num_of_emi_peaks - 1); i++) // Why limit x axis range???
+				//for(i=0; i<(old_num_of_emi_peaks); i++)   
+				{
+					avg_x_diff += (emi_peaks_xpos[i + 1] - emi_peaks_xpos[i]);   
+				}
+				avg_x_diff = avg_x_diff / old_num_of_emi_peaks;
+				avg_x_rng = avg_x_diff + (avg_x_diff / 2);// + (avg_x_diff / 4);
+			}
+			
+			for(i=0; i<=(old_num_of_emi_peaks /*- 1*/); i++)   /// 10 turned into 18 because avg x rng was too small or travelling shift.
+			{
+				if((emi_peaks_xpos[i + 1] - emi_peaks_xpos[i]) > avg_x_rng) 
+				{
+					//for(j=old_num_of_emi_peaks; j<=(i+1); j--)
+					for(j=num_emi_peaks + 0; j>(i); j--)
+					{
+						emi_peaks_xpos[j] = emi_peaks_xpos[j - 1];
+						emi_peaks[j] = emi_peaks[j - 1];
+						 
+					}
+					//emi_peaks_xpos[i] = emi_peaks_xpos[i] + (avg_x_diff / (old_num_of_emi_peaks +1));
+					emi_peaks_xpos[j+1] = emi_peaks_xpos[j] + (avg_x_diff); 
+					emi_peaks[j+1] = 0;
+					num_emi_peaks++;
+					trialerrorcnt[trialidx]++;
+				}
+			}
+		}
+		
+		// Get rid of the phantom data
+		j = 0;
+		for(i=0; i<(num_emi_peaks); i++)
+		{	 
+			if(emi_peaks_xpos[i] < 120)
+			{
+				emi_peaks_xpos[i] = emi_peaks_xpos[i+1];
+				emi_peaks[i] = emi_peaks[i+1];
+				j++;
+			}
+		}
+		num_emi_peaks = j - 1;
+		
+		//Start absop
+		for(k=0; k<1; k++)
+		{	
+			if(num_emi_peaks > 63)
+			num_emi_peaks = 63;
+			if(num_absop_peaks > 63)
+			num_absop_peaks = 63;
+			avg_x_diff = 0;
+			old_num_of_absop_peaks = num_absop_peaks;
+			
+			if(old_num_of_absop_peaks > 0)
+			{
+				avg_x_diff = 0;
+				for(i=0; i<(old_num_of_absop_peaks - 1); i++)
+				//for(i=0; i<(old_num_of_absop_peaks); i++)
+				{
+					avg_x_diff += (absop_peaks_xpos[i + 1] - absop_peaks_xpos[i]);	
+				}
+				avg_x_diff = avg_x_diff / old_num_of_absop_peaks;
+				avg_x_rng = avg_x_diff + (avg_x_diff / 2);// + (avg_x_diff / 4);
+			}
+			
+			for(i=0; i<(old_num_of_absop_peaks /*- 1*/); i++)
+			{
+				if((absop_peaks_xpos[i + 1] - absop_peaks_xpos[i]) > avg_x_rng)
+				{
+					
+					for(j=num_absop_peaks; j>(i); j--)
+					//for(j=old_num_of_absop_peaks + 1; j<=(i+1); j--) 
+					{
+						absop_peaks_xpos[j] = absop_peaks_xpos[j-1];
+						absop_peaks[j] = absop_peaks[j-1];
+					}
+					//absop_peaks_xpos[i] = absop_peaks_xpos[i] + (avg_x_diff / (old_num_of_emi_peaks +1));
+					absop_peaks_xpos[j+1] = absop_peaks_xpos[j] + (avg_x_diff);
+					absop_peaks[j+1] = 0; 
+					num_absop_peaks++;
+					trialerrorcnt[trialidx]++;
+				}
+			}
+			
+			// Get rid of the phantom data
+			j = 0;
+			for(i=0; i<(num_absop_peaks); i++)
+			{	 
+				if(absop_peaks_xpos[i] < 120)
+				{
+					absop_peaks_xpos[i] = absop_peaks_xpos[i+1];
+					absop_peaks[i] = absop_peaks[i+1];
+					j++;
+				}
+			}
+			num_absop_peaks = j - 1;
+		}
+#endif
+
+#if 1	
+		/// Eliminate Bounce.
+		old_num_of_emi_peaks = num_emi_peaks;
+		///	avg_x_rng = avg_x_rng/3; // might be changed to depend on the last HR * some multipl
+		avg_x_rng = current_hrm / 10;   // 60hbpm @ 20sps => 10 for half cycle. 6 * 10 * 2 = 120.  60/10=6  = quarter cycle
+		for(i=0; i<num_emi_peaks; i++)
+		{
+			if((emi_peaks_xpos[i + 1] - emi_peaks_xpos[i]) < avg_x_rng)
+			{
+				old_num_of_emi_peaks--;
+				i=i+1;
+				trialerrorcnt[trialidx]++;
+//				sprintf(out_str, "Found extra emi: emi_peaks_xpos[i] %d\n", emi_peaks_xpos[i]);
+//				SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
+			}
+		}
+		num_emi_peaks = old_num_of_emi_peaks;
+		
+		old_num_of_absop_peaks = num_absop_peaks;
+		for(i=0; i<num_absop_peaks; i++)
+		{
+			if((absop_peaks_xpos[i + 1] - absop_peaks_xpos[i]) < avg_x_rng)
+			{
+				old_num_of_absop_peaks--;
+				i=i+1;
+				trialerrorcnt[trialidx]++;
+//				sprintf(out_str, "Found extra absop: absop_peaks_xpos[i] %d\n", absop_peaks_xpos[i]);
+//				SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
+			}
+		}
+		num_absop_peaks = old_num_of_absop_peaks;
+		
+//		sprintf(out_str, "Eliminate bounce final: Dh = %d, avg_x_rng = %d, emip = %d, absopp = %d\n", pd_emi_delta, avg_x_rng, num_emi_peaks, num_absop_peaks); 
+//		SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
+
+		///	detect_peak(hrm_chan3_raw, hrm_raw_index, 8, 1);
+#endif	
+		emiandabsoppd[trialidx] = num_emi_peaks + num_absop_peaks;	
+	} // end of trial loop 
+
+	///============== Post processing =====================///
+
+	/// Mode Selector
+	int dp_mode = 0;
+
+	//if((emiandabsoppd[0] >= emiandabsoppd[1]) && (emiandabsoppd[0] <= emiandabsoppd[2]))
+	//	dp_mode = 0;
+	//else if((emiandabsoppd[1] >= emiandabsoppd[0]) && (emiandabsoppd[1] <= emiandabsoppd[2]))
+	//	dp_mode = 1;
+	//else if((emiandabsoppd[2] >= emiandabsoppd[0]) && (emiandabsoppd[2] <= emiandabsoppd[1]))
+	//	dp_mode = 2;
+	//if((emiandabsoppd[0] >= emiandabsoppd[1]) && (emiandabsoppd[0] <= emiandabsoppd[2]))
+	
+	if(((emiandabsoppd[0] >= emiandabsoppd[1]) && (emiandabsoppd[0] <= emiandabsoppd[2])) || ((emiandabsoppd[0] <= emiandabsoppd[1]) && (emiandabsoppd[0] >= emiandabsoppd[2])))
+		dp_mode = 0;
+	//else if((emiandabsoppd[1] >= emiandabsoppd[0]) && (emiandabsoppd[1] <= emiandabsoppd[2]))
+	else if(((emiandabsoppd[1] >= emiandabsoppd[0]) && (emiandabsoppd[1] <= emiandabsoppd[2])) || ((emiandabsoppd[1] <= emiandabsoppd[0]) && (emiandabsoppd[1] >= emiandabsoppd[2])))
+		dp_mode = 1;
+	else if(((emiandabsoppd[2] >= emiandabsoppd[0]) && (emiandabsoppd[2] <= emiandabsoppd[1])) || ((emiandabsoppd[2] <= emiandabsoppd[0]) && (emiandabsoppd[2] >= emiandabsoppd[1])))
+		dp_mode = 2;
+
+	//if((trialerrorcnt[0] <= trialerrorcnt[1]) && (trialerrorcnt[0] <= trialerrorcnt[2]))
+	//	dp_mode = 0;
+	//else if((trialerrorcnt[1] <= trialerrorcnt[0]) && (trialerrorcnt[1] <= trialerrorcnt[2]))
+	//	dp_mode = 1;
+	//else if((trialerrorcnt[2] <= trialerrorcnt[0]) && (trialerrorcnt[2] <= trialerrorcnt[1]))
+	//	dp_mode = 2;
+	//if(pvariance > 200)
+	//	dp_mode = 3;
+
+	total_emiandabsops = emiandabsoppd[dp_mode];
+	//total_emiandabsops = (((double)(emiandabsoppd[0] * 5) + (double)(emiandabsoppd[1] * 5) + (double)(emiandabsoppd[2] * 5)) / 3);
+	emiandabsoppd[3] = emiandabsoppd[dp_mode]; // save for skip frame //
+
+    /// Average the hrm output.
+	current_hrm = ((total_emiandabsops * 5) + (current_hrm * 3)) / 4;
+}
+
+
+
+/*========================================================================================================//
 
 void Get_HRMs(void)
 {
@@ -966,14 +1308,13 @@ void Get_HRMs(void)
 ///	current_hrm = ((num_emi_peaks * 10) + (current_hrm * 4) + (num_absop_peaks * 10)) / 6;
 	//current_hrm = ((num_emi_peaks * 10) + (current_hrm * 3) + (num_absop_peaks * 0)) / 4;
 }
-/// ========================================================================================== ///
+/// ========================================================================================== */
 
 int8_t detect_peak(
 					const int16_t*   	data, 		/* the data */ 
 					int8_t             	data_count, /* row count of data */  
 					int16_t          	delta, 		/* delta used for distinguishing peaks */
-					int8_t             	emi_first 	/* should we search emission peak first of
-														absorption peak first? */
+					int8_t             	emi_first 	/* should we search emission peak first of absorption peak first? */
 					)
 {
     int     i;
@@ -1041,3 +1382,26 @@ int8_t detect_peak(
 
     return 0;
 }
+
+
+int16_t PeakDiff1D(const int16_t *arr, size_t length) 
+{
+    // returns the maximum value of array
+    size_t i;
+    int16_t maximum = arr[0];
+	int16_t minimum = arr[0];
+	int16_t peakdiff;
+    for (i = 1; i < length; ++i) 
+	{
+        if (maximum < arr[i]) {
+            maximum = arr[i];
+        }
+		if (minimum > arr[i]) {
+            minimum = arr[i];
+        }
+    }
+	peakdiff = maximum - minimum;
+    return peakdiff;
+}
+
+

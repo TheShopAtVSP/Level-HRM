@@ -2,6 +2,7 @@
 .\_build\si115x_functions.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 .\_build\si115x_functions.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\_build\si115x_functions.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+.\_build\si115x_functions.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 .\_build\si115x_functions.o: ..\components\device\nrf.h
 .\_build\si115x_functions.o: ..\components\device\nrf52.h
 .\_build\si115x_functions.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include\core_cm4.h

@@ -73,6 +73,7 @@
 #endif // BLE_DFU_APP_SUPPORT
 #include "si115x_functions.h"
 
+
 #define ERASE_BONDS false
 
 #define NRF_CLOCK_LFCLKSRC      {.source        = NRF_CLOCK_LF_SRC_XTAL,            \
@@ -175,10 +176,14 @@ struct
 } dis_str;
 
 // ====================> Some HRM test globals <=======================
-#define		HRM_AVG_SAMPLES		4
+#define		HRM_RUNNING_AVG_SAMPLES		64 
 // HRM_SAMPLE_TIME = 6667 * 150 uSec = 50 mSec = 20Hz
-#define 	HRM_SAMPLE_TIME		6667
+#define 	HRM_SAMPLE_TIME		6333
+// HRM_SAMPLE_TIME = 10000 * 150 uSec = 50 mSec = 20Hz
+//#define 	HRM_SAMPLE_TIME		13333
 #define		HRM_STITCH_TRESH	300
+#define		HRM_ZERO_SEEKER_TRESH	10000
+#define		HRM_AVG_SIZE	8
 uint16_t 	accel_x;
 uint16_t 	accel_y;
 uint16_t 	accel_z;
@@ -187,19 +192,24 @@ uint8_t 	uart_rx_ubyte;
 T_PKT_TYPES tx_type;			//T_PKT_TYPES type;
 uint8_t 	tx_payload[ MAX_PKT_PAYLOAD ];
 int8_t 		tx_pay_len = -1;	//default no response
-uint8_t 	current_hrm = 69, hrm_step = 0;
+volatile uint8_t 	current_hrm = 69;
+uint8_t 	hrm_step = 0;
 uint16_t	hrm_tx_rdy_cntr = 0;
 uint16_t 	run_get_hrms = 0;
-int16_t 	hrm_chan1_raw[156], hrm_chan2_raw[156], hrm_raw_index = 0, hrm_raw_index_old;
-int16_t		hrm_chan_1_raw, hrm_chan_2_raw;
-uint8_t		hrm_running_avg_indx = 0;
-int16_t		hrm_chan1_running_avg[HRM_AVG_SAMPLES], hrm_chan2_running_avg[HRM_AVG_SAMPLES];
+int16_t 	hrm_chan1_raw[256], hrm_chan2_raw[256], hrm_chan3_raw[256], hrm_raw_index = 0, hrm_raw_index_old;
+int32_t		hrm_chan_1_raw32, hrm_chan_2_raw32;
+uint8_t		hrm_running_avg_indx = 0, hac_index = 0;
+int32_t		hrm_chan1_running_avg[HRM_RUNNING_AVG_SAMPLES], hrm_chan2_running_avg[HRM_RUNNING_AVG_SAMPLES];
 int32_t		hrm_chan1_running_avg_accm, hrm_chan2_running_avg_accm;
-int16_t 	hrm_ch1_avg, hrm_ch2_avg;
-int16_t 	hrm_chan1_fbs = 0, hrm_chan2_fbs = 0;
+int32_t 	hrm_ch1_avg, hrm_ch2_avg;
+int32_t 	hrm_chan1_fbs = 0, hrm_chan2_fbs = 0;
+int32_t		hrm_avg_chan132[HRM_AVG_SIZE], hrm_avg_chan232[HRM_AVG_SIZE], hrm_avg_chan132_accm, hrm_avg_chan232_accm;
+int16_t 	pd_emi_delta;
+
 bool		hrm_stitch_flag = 0;
 /// note default index = 8 = 0x12 = 50mA
-uint8_t hrm_agc_led_current_idx = 8;
+uint8_t hrm_agc_led_current_idx1 = 29;
+uint8_t hrm_agc_led_current_idx3 = 29;
 uint8_t hrm_agc_led_current[30] = {0x00, 0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38, 0x12, 0x21, 0x29, 0x31, 0x22, 0x39, 0x2A, 
 									0x23, 0x32, 0x3A, 0x24, 0x33, 0x2C, 0x3B, 0x34, 0x2D, 0x3C, 0x35, 0x3D, 0x36, 0x3E, 0x3F};
 									
@@ -974,8 +984,8 @@ static void  ticks_timer_handler(void * p_context)
 //	{
 //		//if( hrm_timer_counter = HRM_SAMPLE_TIME)
 //		//{	 	
-////			hrm_chan_1_raw = ((uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT1) << 8) + (uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT2);
-////			hrm_chan_2_raw = ((uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT4) << 8) + (uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT5);
+////			hrm_chan_1_raw32 = ((uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT1) << 8) + (uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT2);
+////			hrm_chan_2_raw32 = ((uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT4) << 8) + (uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT5);
 ////			Si115xWriteToRegister(SI115x_REG_COMMAND, 0x11); // Force cmd
 ////			hrm_read_cmd();
 //			hrm_tx_rdy_flag = 1;
@@ -991,8 +1001,8 @@ static void  ticks_timer_handler(void * p_context)
 //	
 //	if( hrm_timer_counter == HRM_SAMPLE_TIME)
 //	{	 	
-//		hrm_chan_1_raw = ((uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT1) << 8) + (uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT2);
-//		hrm_chan_2_raw = ((uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT4) << 8) + (uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT5);
+//		hrm_chan_1_raw32 = ((uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT1) << 8) + (uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT2);
+//		hrm_chan_2_raw32 = ((uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT4) << 8) + (uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT5);
 //		Si115xWriteToRegister(SI115x_REG_COMMAND, 0x11); // Force cmd
 //		hrm_read_cmd();
 //		hrm_tx_rdy_flag = 1;
@@ -1923,96 +1933,66 @@ int main(void)
 ///uint8_t hrm_agc_led_current[30] = {0x00, 0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38, 0x12, 0x21, 0x29, 0x31, 0x22, 0x39, 0x2A, 
 ///									0x23, 0x32, 0x3A, 0x24, 0x33, 0x2C, 0x3B, 0x34, 0x2D, 0x3C, 0x35, 0x3D, 0x36, 0x3E, 0x3F};	
 
-	if (m_conn_handle != BLE_CONN_HANDLE_INVALID)
+	if ((m_conn_handle != BLE_CONN_HANDLE_INVALID) && get_accel_en())
 	{		
 		if(hrm_tx_rdy_cntr == HRM_SAMPLE_TIME) 
 		{		
 			/// Get a hrm sample every 0.05 seconds = 20 Hz.
-			hrm_chan_1_raw = ((uint16_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT1) << 8) + (uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT2);
-			hrm_chan_2_raw = ((uint16_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT4) << 8) + (uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT5);
-			Si115xWriteToRegister(SI115x_REG_COMMAND, 0x11); // Force cmd
-			hrm_chan_1_raw -= hrm_chan1_fbs;
-			hrm_chan_2_raw -= hrm_chan2_fbs;
+			hrm_chan_1_raw32 = 	(Si115xReadFromRegister(SI115x_REG_HOSTOUT0) << 16) | 
+								(uint16_t)(Si115xReadFromRegister(SI115x_REG_HOSTOUT1) << 8) | 
+								(uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT2);
 			
-			/// Running Average.
-#if 0
-			hrm_chan1_running_avg[hrm_running_avg_indx] = hrm_chan_1_raw;
-			hrm_chan2_running_avg[hrm_running_avg_indx] = hrm_chan_2_raw;
+			hrm_chan_2_raw32 = 	(Si115xReadFromRegister(SI115x_REG_HOSTOUT3) << 16) | 
+								(uint16_t)(Si115xReadFromRegister(SI115x_REG_HOSTOUT4) << 8) | 
+								(uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT5);
+				
+			Si115xWriteToRegister(SI115x_REG_COMMAND, 0x11); // Force cmd
+			
+#if 1			
+			/// Running Signal Average
+			hrm_avg_chan132[hac_index] = hrm_chan_1_raw32;
+			hrm_avg_chan232[hac_index] = hrm_chan_2_raw32;
+			hrm_avg_chan132_accm = hrm_avg_chan232_accm = 0;
+			for(i = 0; i < HRM_AVG_SIZE; i++)
+			{
+				hrm_avg_chan132_accm += hrm_avg_chan132[hac_index];
+				hrm_avg_chan232_accm += hrm_avg_chan232[hac_index];
+			}
+			hrm_chan_1_raw32 = hrm_avg_chan132_accm / HRM_AVG_SIZE;
+			hrm_chan_2_raw32 = hrm_avg_chan232_accm / HRM_AVG_SIZE;
+			hac_index++;
+			if(hac_index == HRM_AVG_SIZE)
+				hac_index = 0;
+#endif		
+			
+			
+#if 1
+			/// Running Bias Average.
+			// To make this better and save memory reduce HRM_RUNNING_AVG_SAMPLES[64] and spread the samples over the entire last 6 sec frame.
+			hrm_chan1_running_avg[hrm_running_avg_indx] = hrm_chan_1_raw32;
+			hrm_chan2_running_avg[hrm_running_avg_indx] = hrm_chan_2_raw32;
 			hrm_chan1_running_avg_accm = 0;
 			hrm_chan2_running_avg_accm = 0;
-			for(i=0; i<HRM_AVG_SAMPLES; i++)
+			for(i=0; i<HRM_RUNNING_AVG_SAMPLES; i++)
 			{
-				hrm_chan1_running_avg_accm += (int32_t)hrm_chan1_running_avg[i] * 100;
-				hrm_chan2_running_avg_accm += (int32_t)hrm_chan2_running_avg[i] * 100;
+				hrm_chan1_running_avg_accm += hrm_chan1_running_avg[i];
+				hrm_chan2_running_avg_accm += hrm_chan2_running_avg[i];
 			}
-			hrm_chan_1_raw = (int16_t)(hrm_chan1_running_avg_accm / HRM_AVG_SAMPLES / 100);
-			hrm_chan_2_raw = (int16_t)(hrm_chan2_running_avg_accm / HRM_AVG_SAMPLES / 100);
-#endif	
-			
-			/// Done, throw it in the pile.
-			hrm_chan1_raw[hrm_raw_index] = hrm_chan_1_raw;
-			hrm_chan2_raw[hrm_raw_index] = hrm_chan_2_raw;
-			
-#if 0
-			/// LED Current Control (AGC).
-			if( ((uint16_t)hrm_chan_1_raw + hrm_chan1_fbs > 12000) && (hrm_agc_led_current_idx > 0))
-			{
-				hrm_agc_led_current_idx--;
-				Si115xParamSet(PARAM_LED1_A, hrm_agc_led_current[hrm_agc_led_current_idx]);
-				Si115xParamSet(PARAM_LED1_B, hrm_agc_led_current[hrm_agc_led_current_idx]);
-			}
-			
-			if( ((uint16_t)hrm_chan_1_raw + hrm_chan1_fbs < 12000) && (hrm_agc_led_current_idx < 29))
-			{
-				hrm_agc_led_current_idx++;
-				Si115xParamSet(PARAM_LED1_A, hrm_agc_led_current[hrm_agc_led_current_idx]);
-				Si115xParamSet(PARAM_LED1_B, hrm_agc_led_current[hrm_agc_led_current_idx]);
-			}
+			hrm_chan1_fbs = hrm_chan1_running_avg_accm / HRM_RUNNING_AVG_SAMPLES;
+			hrm_chan2_fbs = hrm_chan2_running_avg_accm / HRM_RUNNING_AVG_SAMPLES;
+			hrm_running_avg_indx++;
+			if(hrm_running_avg_indx == HRM_RUNNING_AVG_SAMPLES)
+				hrm_running_avg_indx = 0;
+#else
+			hrm_chan1_fbs = hrm_chan2_fbs = 0;
 #endif
 			
-#if 0			
-			/// Seeking Zero the Bias.
-			if(hrm_raw_index == 0)
-			{
-				hrm_chan1_fbs = hrm_chan_1_raw + hrm_chan1_fbs;
-				hrm_chan2_fbs = hrm_chan_2_raw + hrm_chan2_fbs;
-			}
-			if(hrm_raw_index > 5)
-			{		
-				if( (hrm_chan_1_raw > (hrm_chan1_raw[hrm_raw_index - 5] + HRM_STITCH_TRESH)) || 
-				  (hrm_chan_1_raw < (hrm_chan1_raw[hrm_raw_index - 5] - HRM_STITCH_TRESH)) )
-				{
-					hrm_chan1_fbs = hrm_chan1_fbs + ((hrm_chan_1_raw) / 2);
-				}
-				else
-					hrm_chan1_fbs = hrm_chan1_fbs + ((hrm_chan_1_raw) / 10);
-				
-				if( (hrm_chan_2_raw > (hrm_chan2_raw[hrm_raw_index - 5] + HRM_STITCH_TRESH)) || 
-				  (hrm_chan_2_raw < (hrm_chan2_raw[hrm_raw_index - 5] - HRM_STITCH_TRESH)) )
-				{
-					hrm_chan2_fbs = hrm_chan2_fbs + ((hrm_chan_2_raw) / 2);
-				}
-				else
-					hrm_chan2_fbs = hrm_chan2_fbs + ((hrm_chan_2_raw) / 10);
-			}
-#endif		
-#if 0
-			/// LED Current Control (AGC).
-			if( ((uint16_t)hrm_chan1_fbs > 12000) && (hrm_agc_led_current_idx > 0))
-			{
-				hrm_agc_led_current_idx--;
-				Si115xParamSet(PARAM_LED1_A, hrm_agc_led_current[hrm_agc_led_current_idx]);
-				Si115xParamSet(PARAM_LED1_B, hrm_agc_led_current[hrm_agc_led_current_idx]);
-			}
-			
-			if( ((uint16_t)hrm_chan1_fbs < 12000) && (hrm_agc_led_current_idx < 29))
-			{
-				hrm_agc_led_current_idx++;
-				Si115xParamSet(PARAM_LED1_A, hrm_agc_led_current[hrm_agc_led_current_idx]);
-				Si115xParamSet(PARAM_LED1_B, hrm_agc_led_current[hrm_agc_led_current_idx]);
-			}
-#endif			
-/// ==>
+			/// Done, throw it in the pile. Now that the bias has been subtracted we can move down to 16 bits
+			hrm_chan_1_raw32 = hrm_chan_1_raw32 - hrm_chan1_fbs;
+			hrm_chan_2_raw32 = hrm_chan_2_raw32 - hrm_chan2_fbs;
+			hrm_chan1_raw[hrm_raw_index] = hrm_chan_1_raw32; //cast as (int16_t)
+			hrm_chan2_raw[hrm_raw_index] = hrm_chan_2_raw32;
+		
 #if 0			
 			/// Stitcher.
 			/* 	Break this into two pices. Calc the new bias while timing a threshold rejection. 
@@ -2020,14 +2000,14 @@ int main(void)
 				if the event lasts it was a level change. A problem will occur if the event happens 
 				in the last xx seconds of the frame. */
 
-			if( (hrm_chan_1_raw > HRM_STITCH_TRESH) || (hrm_chan_1_raw < -HRM_STITCH_TRESH) || 
-				(hrm_chan_2_raw > HRM_STITCH_TRESH) || (hrm_chan_2_raw < -HRM_STITCH_TRESH) )
+			if( (hrm_chan_1_raw32 > HRM_STITCH_TRESH) || (hrm_chan_1_raw32 < -HRM_STITCH_TRESH) || 
+				(hrm_chan_2_raw32 > HRM_STITCH_TRESH) || (hrm_chan_2_raw32 < -HRM_STITCH_TRESH) )
 			{
 				if(!hrm_stitch_flag)
 					hrm_raw_index_old = hrm_raw_index;
 				hrm_stitch_flag = 1;
-				hrm_chan1_fbs = hrm_chan1_fbs + ((hrm_chan_1_raw) / 2);
-				hrm_chan2_fbs = hrm_chan2_fbs + ((hrm_chan_2_raw) / 2);
+				hrm_chan1_fbs = hrm_chan1_fbs + ((hrm_chan_1_raw32) / 2);
+				hrm_chan2_fbs = hrm_chan2_fbs + ((hrm_chan_2_raw32) / 2);
 			}
 			else if(hrm_stitch_flag)
 			{
@@ -2039,11 +2019,12 @@ int main(void)
 				
 				for(i=0; i<HRM_AVG_SAMPLES; i++)
 				{
-					hrm_chan1_running_avg[i] = hrm_chan_1_raw; 
-					hrm_chan2_running_avg[i] = hrm_chan_2_raw; 
+					hrm_chan1_running_avg[i] = hrm_chan_1_raw32; 
+					hrm_chan2_running_avg[i] = hrm_chan_2_raw32; 
 				}	
 			}				
-#endif			
+#endif		
+			
 			/// Pump it out. Pass queued messages to the radio.
 			if(!hrm_stitch_flag)
 			{
@@ -2051,19 +2032,73 @@ int main(void)
 				tx_pay_len = 11;
 				tx_payload[0] = hrm_ch1_avg >> 8;
 				tx_payload[1] = hrm_ch1_avg & 0xFF;
-				tx_payload[2] = (uint16_t)(hrm_chan_1_raw + hrm_chan1_fbs) >> 8;
-				tx_payload[3] = (uint16_t)(hrm_chan_1_raw + hrm_chan1_fbs) & 0xFF;
+				//tx_payload[2] = (uint16_t)(hrm_chan_1_raw32 + hrm_chan1_fbs) >> 8; Si115xReadFromRegister(SI115x_REG_HOSTOUT0
+				//tx_payload[2] = (uint16_t) (hrm_chan_1_raw32 & 0x00FF0000) >> 16;
+				tx_payload[2] = (uint16_t) pd_emi_delta;
+				tx_payload[3] = (uint16_t)(hrm_chan_1_raw32 + hrm_chan1_fbs) & 0xFF;
 				tx_payload[4] = current_hrm;
-				tx_payload[5] = hrm_agc_led_current_idx;
-				tx_payload[6] = hrm_chan1_raw[hrm_raw_index] >> 8;
-				tx_payload[7] = hrm_chan1_raw[hrm_raw_index] & 0xFF;
-				tx_payload[8] = hrm_chan2_raw[hrm_raw_index] >> 8;
-				tx_payload[9] = hrm_chan2_raw[hrm_raw_index] & 0xFF;
+				tx_payload[5] = pd_emi_delta;
+				//tx_payload[6] = (uint16_t) (hrm_chan_1_raw32 & 0x0000FF00) >> 8;;
+				//tx_payload[7] = (uint16_t) (hrm_chan_1_raw32 & 0x000000FF);
+				tx_payload[6] = (hrm_chan1_raw[hrm_raw_index]) >> 8;
+				tx_payload[7] = hrm_chan1_raw[hrm_raw_index]  ;
+				tx_payload[8] = (hrm_chan2_raw[hrm_raw_index]) >> 8;
+				tx_payload[9] = hrm_chan2_raw[hrm_raw_index]  ;
 				queue_packet_wrapper( tx_type, tx_payload, tx_pay_len );
 				ble_transfer_packets_wrapper();		
 				run_get_hrms++;
+				
 				if(run_get_hrms == 6 * 20) // 6sec * 20 sps
 				{
+#if 0
+					/// LED Current Control (AGC).
+					hrm_agc_led_current_idx1 = 14 - (uint8_t)((abs(hrm_chan1_fbs) >> 8) - 25) / 3; // 32000 = 29(354mA), 1000 = 0(5.5mA), 14=100 mA
+					if(hrm_agc_led_current_idx1 < 0)
+						hrm_agc_led_current_idx1 = 0; // (5.5mA)
+					if(hrm_agc_led_current_idx1 > 14)
+						hrm_agc_led_current_idx1 = 14; // (14 = 100 mA limit)
+					Si115xParamSet(PARAM_LED1_A, hrm_agc_led_current[hrm_agc_led_current_idx1]);
+					///hrm_agc_led_current_idx1 = (uint8_t)(hrm_chan1_fbs >> 8);
+					hrm_agc_led_current_idx3 = 14 - (uint8_t)((abs(hrm_chan2_fbs) >> 8) - 25) / 3; // 32000 = 29(354mA), 1000 = 0(5.5mA), 14=100 mA
+					if(hrm_agc_led_current_idx3 < 0)
+						hrm_agc_led_current_idx3 = 0; // (5.5mA)
+					if(hrm_agc_led_current_idx3 > 14)
+						hrm_agc_led_current_idx3 = 14; // (14 = 100 mA limit)
+					Si115xParamSet(PARAM_LED3_A, hrm_agc_led_current[hrm_agc_led_current_idx3]);
+					
+#endif	
+#if 0
+					/// LED Current Control (AGC). 
+					//  chan1 = 2.6k(OPEN), 8.2k(OD29), 16.2k(OF29)   		
+					//  chan2 = 500(OPEN), 16.3k(OD29), 21.4k(OF29)
+					if( (hrm_chan1_fbs < 10000) && (hrm_agc_led_current_idx1 > 15)) // limit to 100mA
+					{
+						hrm_agc_led_current_idx1--;
+						Si115xParamSet(PARAM_LED1_A, hrm_agc_led_current[hrm_agc_led_current_idx1]);
+						//Si115xParamSet(PARAM_LED1_B, hrm_agc_led_current[hrm_agc_led_current_idx]);
+					}
+					
+					if( (hrm_chan1_fbs > 16000) && (hrm_agc_led_current_idx1 < 29)) // limit to 5.5 mA
+					{
+						hrm_agc_led_current_idx1++;
+						Si115xParamSet(PARAM_LED1_A, hrm_agc_led_current[hrm_agc_led_current_idx1]);
+						//Si115xParamSet(PARAM_LED1_B, hrm_agc_led_current[hrm_agc_led_current_idx]);
+					}
+					
+					if( (hrm_chan2_fbs < 10000) && (hrm_agc_led_current_idx3 > 15))
+					{
+						hrm_agc_led_current_idx3--;
+						Si115xParamSet(PARAM_LED3_A, hrm_agc_led_current[hrm_agc_led_current_idx3]);
+						//Si115xParamSet(PARAM_LED1_B, hrm_agc_led_current[hrm_agc_led_current_idx]);
+					}
+					
+					if( (hrm_chan2_fbs > 16000) && (hrm_agc_led_current_idx3 < 29))
+					{
+						hrm_agc_led_current_idx3++;
+						Si115xParamSet(PARAM_LED3_A, hrm_agc_led_current[hrm_agc_led_current_idx3]);
+						//Si115xParamSet(PARAM_LED1_B, hrm_agc_led_current[hrm_agc_led_current_idx]);
+					}
+#endif						
 					Get_HRMs();
 					hrm_raw_index = 0;
 					run_get_hrms = 0;
@@ -2071,9 +2106,6 @@ int main(void)
 				hrm_tx_rdy_cntr = 0;
 				hrm_raw_index++;
 			}
-			//hrm_raw_index++;
-			if(hrm_running_avg_indx == HRM_AVG_SAMPLES)
-				hrm_running_avg_indx = 0;
 			
 			/// See if the host wants anything.
 			hrm_read_cmd(); 

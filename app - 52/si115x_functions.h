@@ -1,5 +1,5 @@
-#ifndef SI115X_FUNCTIONS_H_
-#define SI115X_FUNCTIONS_H_
+#ifndef SI115X_FUNCTIONS_H__
+#define SI115X_FUNCTIONS_H__
 
 #ifndef int16_t
 #include <stdint.h>
@@ -9,14 +9,9 @@
 typedef void *HANDLE;
 #endif
 
-
-
-
-
-
 /*******************************************************************************
- *******************************   STRUCTS   ***********************************
- ******************************************************************************/
+ **********************************   VARS   ***********************************
+ *****************************************************************************/
 
 /*******************************************************************************
  ***************   Functions Needed by Si115x_functions.c   ********************
@@ -75,24 +70,17 @@ void     SetParam(              HANDLE si115x_handle,
 
 void 	hrm_read_cmd(void);
 
-void Get_HRMs(void);
+void 	Get_HRMs(void);
 
-int8_t detect_peak(
+int16_t 	PeakDiff1D(const int16_t *arr, size_t length);
+
+int8_t 	detect_peak(
         const int16_t*   	data, /* the data */ 
         int8_t             	data_count, /* row count of data */  
         int16_t          	delta, /* delta used for distinguishing peaks */
         int8_t             	emi_first /* should we search emission peak first of
                                      absorption peak first? */
         );
-		
-//int detect_peak(
-//        const int16_t*   	data, /* the data */ 
-//        int8_t             	data_count, /* row count of data */  
-//        int8_t*            	num_emi_peaks, /* number of emission peaks found */ 
-//        int8_t*            	num_absop_peaks, /* number of absorption peaks found */
-//        int16_t          	delta, /* delta used for distinguishing peaks */
-//        int8_t             	emi_first /* should we search emission peak first or absorption peak first? */
-//        );
 
 /*******************************************************************************
  ************************** Si115x I2C Registers *******************************
@@ -209,3 +197,5 @@ int8_t detect_peak(
 #define RSP0_SLEEP              0x20
 
 #endif /* SI115X_FUNCTIONS_H_ */
+
+/** @} */
