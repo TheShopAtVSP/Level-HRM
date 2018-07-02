@@ -45,17 +45,27 @@ void RT_Scan_Loop(void)
 	Serial_Get_Byte();  // suckup the index counter
 	while(Serial_Get_Byte() != 0x69){}
 	
-	byte_in_h = Serial_Get_Byte(); 
-	byte_in_l = Serial_Get_Byte(); 
-	si_ax = (short)(byte_in_h << 8) + byte_in_l;
-	raw_acl_x[raw_hart_cir_buff_idx] = (double)(si_ax) / a_scale;
-		
-	byte_in_h = Serial_Get_Byte();
-	//unsigned char topchan1 = Serial_Get_Byte();
-	byte_in_l = Serial_Get_Byte(); 
-	si_ay = (short)(byte_in_h << 8) + byte_in_l;
-	raw_acl_y[raw_hart_cir_buff_idx] = (double)(si_ay) / a_scale;
+	//byte_in_h = Serial_Get_Byte(); 
+	//byte_in_l = Serial_Get_Byte(); 
+	//si_ax = (short)(byte_in_h << 8) + byte_in_l;
+	//raw_acl_x[raw_hart_cir_buff_idx] = (double)(si_ax) / a_scale;
+	//	
+	//byte_in_h = Serial_Get_Byte();
+	////unsigned char topchan1 = Serial_Get_Byte();
+	//byte_in_l = Serial_Get_Byte(); 
+	//si_ay = (short)(byte_in_h << 8) + byte_in_l;
+	//raw_acl_y[raw_hart_cir_buff_idx] = (double)(si_ay) / a_scale;
 
+	char silly_data[sizeof(float)];
+	silly_data[0] = Serial_Get_Byte();
+	silly_data[1] = Serial_Get_Byte();
+	silly_data[2] = Serial_Get_Byte();
+	silly_data[3] = Serial_Get_Byte();
+	
+	//float silly_ratio;
+	memcpy(&silly_ratio, silly_data, sizeof silly_ratio); 
+	//printf("%f/n", silly_ratio);
+	
 	byte_in_h = Serial_Get_Byte();
 	SetCtrlVal(mainpnl, MAINPNL_HRM_7SEG_4, byte_in_h);
 	hrm_52 = byte_in_h;

@@ -176,14 +176,14 @@ struct
 } dis_str;
 
 // ====================> Some HRM test globals <=======================
-#define		HRM_RUNNING_AVG_SAMPLES		64 
-// HRM_SAMPLE_TIME = 6667 * 150 uSec = 50 mSec = 20Hz
-#define 	HRM_SAMPLE_TIME		6333
-// HRM_SAMPLE_TIME = 10000 * 150 uSec = 50 mSec = 20Hz
+#define		HRM_RUNNING_AVG_SAMPLES		32 
+// HRM_SAMPLE_TIME = 6000  = 50 mSec = 20Hz
+#define 	HRM_SAMPLE_TIME		6000
+// HRM_SAMPLE_TIME = 13333  = 10Hz
 //#define 	HRM_SAMPLE_TIME		13333
 #define		HRM_STITCH_TRESH	300
 #define		HRM_ZERO_SEEKER_TRESH	10000
-#define		HRM_AVG_SIZE	8
+#define		HRM_AVG_SIZE	2
 uint16_t 	accel_x;
 uint16_t 	accel_y;
 uint16_t 	accel_z;
@@ -205,7 +205,7 @@ int32_t 	hrm_ch1_avg, hrm_ch2_avg;
 int32_t 	hrm_chan1_fbs = 0, hrm_chan2_fbs = 0;
 int32_t		hrm_avg_chan132[HRM_AVG_SIZE], hrm_avg_chan232[HRM_AVG_SIZE], hrm_avg_chan132_accm, hrm_avg_chan232_accm;
 int16_t 	pd_emi_delta;
-
+float		silly_ratio;
 bool		hrm_stitch_flag = 0;
 /// note default index = 8 = 0x12 = 50mA
 uint8_t hrm_agc_led_current_idx1 = 29;
@@ -1933,7 +1933,8 @@ int main(void)
 ///uint8_t hrm_agc_led_current[30] = {0x00, 0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38, 0x12, 0x21, 0x29, 0x31, 0x22, 0x39, 0x2A, 
 ///									0x23, 0x32, 0x3A, 0x24, 0x33, 0x2C, 0x3B, 0x34, 0x2D, 0x3C, 0x35, 0x3D, 0x36, 0x3E, 0x3F};	
 
-	if ((m_conn_handle != BLE_CONN_HANDLE_INVALID) && get_accel_en())
+	//if ((m_conn_handle != BLE_CONN_HANDLE_INVALID) && get_accel_en())  // Auto Off
+	if (m_conn_handle != BLE_CONN_HANDLE_INVALID)
 	{		
 		if(hrm_tx_rdy_cntr == HRM_SAMPLE_TIME) 
 		{		
@@ -1968,23 +1969,28 @@ int main(void)
 			
 #if 1
 			/// Running Bias Average.
-			// To make this better and save memory reduce HRM_RUNNING_AVG_SAMPLES[64] and spread the samples over the entire last 6 sec frame.
-			hrm_chan1_running_avg[hrm_running_avg_indx] = hrm_chan_1_raw32;
-			hrm_chan2_running_avg[hrm_running_avg_indx] = hrm_chan_2_raw32;
-			hrm_chan1_running_avg_accm = 0;
-			hrm_chan2_running_avg_accm = 0;
-			for(i=0; i<HRM_RUNNING_AVG_SAMPLES; i++)
-			{
-				hrm_chan1_running_avg_accm += hrm_chan1_running_avg[i];
-				hrm_chan2_running_avg_accm += hrm_chan2_running_avg[i];
-			}
-			hrm_chan1_fbs = hrm_chan1_running_avg_accm / HRM_RUNNING_AVG_SAMPLES;
-			hrm_chan2_fbs = hrm_chan2_running_avg_accm / HRM_RUNNING_AVG_SAMPLES;
-			hrm_running_avg_indx++;
-			if(hrm_running_avg_indx == HRM_RUNNING_AVG_SAMPLES)
-				hrm_running_avg_indx = 0;
-#else
-			hrm_chan1_fbs = hrm_chan2_fbs = 0;
+			// To make this better and save memory reduce HRM_RUNNING_AVG_SAMPLES[<120>>2] and spread the samples over the entire last 6 sec frame.
+//			hrm_chan1_running_avg[hrm_running_avg_indx] = hrm_chan_1_raw32;
+//			hrm_chan2_running_avg[hrm_running_avg_indx] = hrm_chan_2_raw32;
+//			hrm_chan1_running_avg_accm = 0;
+//			hrm_chan2_running_avg_accm = 0;
+//			for(i=0; i<HRM_RUNNING_AVG_SAMPLES; i++)
+//			{
+//				hrm_chan1_running_avg_accm += hrm_chan1_running_avg[i];
+//				hrm_chan2_running_avg_accm += hrm_chan2_running_avg[i];
+//			}
+//			hrm_chan1_fbs = hrm_chan1_running_avg_accm / HRM_RUNNING_AVG_SAMPLES;
+//			hrm_chan2_fbs = hrm_chan2_running_avg_accm / HRM_RUNNING_AVG_SAMPLES;
+		//	if(((hrm_raw_index >> 1) & 0x01) == 0x01)
+		//	{
+				hrm_chan1_running_avg[(hrm_raw_index >> 2)] = hrm_chan_1_raw32;//cheeper to assign than qualify every forth one.
+				hrm_chan2_running_avg[(hrm_raw_index >> 2)] = hrm_chan_2_raw32;
+		//		hrm_running_avg_indx++;
+				//if(hrm_running_avg_indx == HRM_RUNNING_AVG_SAMPLES)
+					//hrm_running_avg_indx = 0;
+		//	}
+//#else
+//			hrm_chan1_fbs = hrm_chan2_fbs = 0;
 #endif
 			
 			/// Done, throw it in the pile. Now that the bias has been subtracted we can move down to 16 bits
@@ -2017,25 +2023,32 @@ int main(void)
 				else
 					hrm_raw_index = hrm_raw_index_old; /// make rolling!!!
 				
-				for(i=0; i<HRM_AVG_SAMPLES; i++)
-				{
-					hrm_chan1_running_avg[i] = hrm_chan_1_raw32; 
-					hrm_chan2_running_avg[i] = hrm_chan_2_raw32; 
-				}	
+//				for(i=0; i<HRM_AVG_SAMPLES; i++)
+//				{
+//					hrm_chan1_running_avg[i] = hrm_chan_1_raw32; 
+//					hrm_chan2_running_avg[i] = hrm_chan_2_raw32; 
+//				}	
 			}				
 #endif		
 			
 			/// Pump it out. Pass queued messages to the radio.
 			if(!hrm_stitch_flag)
 			{
+				char silly_data[sizeof(float)];
+				memcpy(silly_data, &silly_ratio, sizeof silly_ratio);
 				tx_type = HRM_PKT;
 				tx_pay_len = 11;
-				tx_payload[0] = hrm_ch1_avg >> 8;
-				tx_payload[1] = hrm_ch1_avg & 0xFF;
+				tx_payload[0] = (uint16_t) silly_data[0];
+				tx_payload[1] = (uint16_t) silly_data[1];
+				tx_payload[2] = (uint16_t) silly_data[2];
+				tx_payload[3] = (uint16_t) silly_data[3];
+				//tx_payload[0] = hrm_ch1_avg >> 8;
+				//tx_payload[1] = hrm_ch1_avg & 0xFF;
 				//tx_payload[2] = (uint16_t)(hrm_chan_1_raw32 + hrm_chan1_fbs) >> 8; Si115xReadFromRegister(SI115x_REG_HOSTOUT0
 				//tx_payload[2] = (uint16_t) (hrm_chan_1_raw32 & 0x00FF0000) >> 16;
-				tx_payload[2] = (uint16_t) pd_emi_delta;
-				tx_payload[3] = (uint16_t)(hrm_chan_1_raw32 + hrm_chan1_fbs) & 0xFF;
+				//tx_payload[3] = (uint16_t) (hrm_chan_2_raw32 & 0x00FF0000) >> 16;
+				//tx_payload[2] = (uint16_t) pd_emi_delta;
+				//tx_payload[3] = (uint16_t)(hrm_chan_1_raw32 + hrm_chan1_fbs) & 0xFF;
 				tx_payload[4] = current_hrm;
 				tx_payload[5] = pd_emi_delta;
 				//tx_payload[6] = (uint16_t) (hrm_chan_1_raw32 & 0x0000FF00) >> 8;;
@@ -2050,6 +2063,22 @@ int main(void)
 				
 				if(run_get_hrms == 6 * 20) // 6sec * 20 sps
 				{
+					hrm_chan1_running_avg_accm = 0;
+					hrm_chan2_running_avg_accm = 0;
+					for(i = 0; i < 30; i++)
+					{
+						hrm_chan1_running_avg_accm += hrm_chan1_running_avg[i];
+						hrm_chan2_running_avg_accm += hrm_chan2_running_avg[i];
+					}
+					hrm_chan1_fbs = hrm_chan1_running_avg_accm / 30;//(int32_t)(hrm_running_avg_indx);
+					hrm_chan2_fbs = hrm_chan2_running_avg_accm / 30;//(int32_t)(hrm_running_avg_indx);
+					silly_ratio = (float)hrm_chan1_fbs / (float)hrm_chan2_fbs;
+					hrm_running_avg_indx = 0;
+					
+					Get_HRMs();
+					
+					hrm_raw_index = 0;
+					run_get_hrms = 0;
 #if 0
 					/// LED Current Control (AGC).
 					hrm_agc_led_current_idx1 = 14 - (uint8_t)((abs(hrm_chan1_fbs) >> 8) - 25) / 3; // 32000 = 29(354mA), 1000 = 0(5.5mA), 14=100 mA
@@ -2099,9 +2128,6 @@ int main(void)
 						//Si115xParamSet(PARAM_LED1_B, hrm_agc_led_current[hrm_agc_led_current_idx]);
 					}
 #endif						
-					Get_HRMs();
-					hrm_raw_index = 0;
-					run_get_hrms = 0;
 				}
 				hrm_tx_rdy_cntr = 0;
 				hrm_raw_index++;

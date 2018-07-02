@@ -147,7 +147,7 @@ int 		trialidx, trialerrorcnt[4], trialhr[4], oldemiandabsoppd[4], emiandabsoppd
 double  	last_pvariance, pvariance, pmax, pmin, pmaxi, pmini, pmean;
 double 		ymin, ymax;
 char		scaledeltastr[32];
-
+float 		silly_ratio; 
 /*****************************************************************/
 /*                                                               */
 /*  Variable Descriptions                                        */

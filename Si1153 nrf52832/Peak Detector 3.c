@@ -171,7 +171,7 @@ void Apply_Peak_Detector(void)
 	GetCtrlVal(mainpnl, MAINPNL_PD_EMI_THRESH_AUTO, &pd_emi_auto);
 	
 	/// Average.
-#if 1
+#if 0
 	for(i = 0; i < (hrm_raw_index - HRM_AVG_SAMPLES); i++)
 	{
 		hrm_chan1_running_avg_accm = hrm_chan2_running_avg_accm = 0;
@@ -185,7 +185,7 @@ void Apply_Peak_Detector(void)
 	}
 	/// Add nomalization here. ///
 #endif
-#if 1
+#if 0
 	for(i = (hrm_raw_index); i > (hrm_raw_index - HRM_AVG_SAMPLES - HRM_AVG_SAMPLES); i--)
 	{
 		hrm_chan1_running_avg_accm = hrm_chan2_running_avg_accm = 0;
@@ -229,12 +229,22 @@ for(trialidx = 0; trialidx < 3; trialidx++)
 	if(trialidx == 2) // do this one last so that we can scipp it if trialerrorcnt(0 or 1) is low.
 	{
 		/// Auto Subtract ///
-		int  	run_auto_p2sf;
+		int  	run_auto_p2sf; 
 		
+		GetCtrlVal(mainpnl, MAINPNL_AUTO_P2SF, &run_auto_p2sf);
+		if(run_auto_p2sf == 0)
+		{
+			for(i = 0; i < ser_input_size; i++)
+			{
+				hrm_chan3_raw[i] = (int16_t)((double)hrm_chan1_raw[i] - ((double)hrm_chan2_raw[i] * (silly_ratio)));
+			}
+		}
+		else
+		{
 	//	printf("%d\n", PeakDiff1D(hrm_chan1_raw, ser_input_size));
 		pmean=0;
 	
-		for(j=0; j<(ser_input_size + HRM_AVG_SAMPLES + HRM_AVG_SAMPLES); j++)
+		for(j=0; j<(ser_input_size ); j++)
 		{
 			intgtr_gyr_p[j] = (double)hrm_chan1_raw[j];
 			intgtr_gyr_y[j] = (double)hrm_chan2_raw[j];
@@ -245,10 +255,8 @@ for(trialidx = 0; trialidx < 3; trialidx++)
 		sprintf(out_str, "pvariance %f, pmean %f\n", pvariance, pmean);
 		SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
 		
-		GetCtrlVal(mainpnl, MAINPNL_AUTO_P2SF, &run_auto_p2sf);
-		if(run_auto_p2sf)
-		{
-//				for(j=0; j<(ser_input_size + HRM_AVG_SAMPLES + HRM_AVG_SAMPLES); j++)
+		
+//				for(j=0; j<(ser_input_size ); j++)
 //				{
 //					intgtr_gyr_p[j] = (double)hrm_chan1_raw[j];
 //					intgtr_gyr_y[j] = (double)hrm_chan2_raw[j];
@@ -277,7 +285,7 @@ for(trialidx = 0; trialidx < 3; trialidx++)
 					phase2sf += phase2sfcof;
 					SetCtrlVal(mainpnl, MAINPNL_PHASE2SF, phase2sf);
 				
-					for(i=0; i<(ser_input_size  + HRM_AVG_SAMPLES + HRM_AVG_SAMPLES); i++)
+					for(i=0; i<(ser_input_size  ); i++)
 					{
 						hrm_chan3_raw[i] = (int16_t)((double)hrm_chan1_raw_avg[i] - ((double)hrm_chan2_raw_avg[i] * phase2sf));
 					}
@@ -302,12 +310,12 @@ for(trialidx = 0; trialidx < 3; trialidx++)
 					phase2sf -= phase2sfcof;
 					SetCtrlVal(mainpnl, MAINPNL_PHASE2SF, phase2sf);
 				
-					for(i=0; i<(ser_input_size  + HRM_AVG_SAMPLES + HRM_AVG_SAMPLES); i++)
+					for(i=0; i<(ser_input_size  ); i++)
 					{
 						hrm_chan3_raw[i] = (int16_t)((double)hrm_chan1_raw_avg[i] - ((double)hrm_chan2_raw_avg[i] * phase2sf));
 					}
 				
-					for(j=0; j<(ser_input_size  + HRM_AVG_SAMPLES + HRM_AVG_SAMPLES); j++)
+					for(j=0; j<(ser_input_size  ); j++)
 					{
 						intgtr_gyr_p[j] = (double)hrm_chan3_raw[j];
 					}
@@ -320,32 +328,32 @@ for(trialidx = 0; trialidx < 3; trialidx++)
 //						SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
 				}
 			}
-			for(i=0; i<(ser_input_size  + HRM_AVG_SAMPLES + HRM_AVG_SAMPLES); i++)
+			for(i=0; i<(ser_input_size  ); i++)
 			{
-				hrm_chan3_raw[i] = (int16_t)((double)hrm_chan1_raw_avg[i] - ((double)hrm_chan2_raw_avg[i] * (phase2sf + phase2sfcof)));
+				hrm_chan3_raw[i] = (int16_t)((double)hrm_chan1_raw[i] - ((double)hrm_chan2_raw[i] * (phase2sf + phase2sfcof)));
 			}
 		
 			sprintf(out_str, "=========================\n");
 			SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
 		}
-		else
-		{
-			
-			for(i = 0; i < hrm_raw_index + HRM_AVG_SAMPLES + HRM_AVG_SAMPLES; i++)
-			{
-				hrm_chan3_raw[i] = (int16_t)((double)hrm_chan1_raw_avg[i] - ((double)hrm_chan2_raw_avg[i] * phase2sf));
-			}
-		}
-		
+		//else
+		//{
+		//	
+		//	for(i = 0; i < hrm_raw_index ; i++)
+		//	{
+		//		hrm_chan3_raw[i] = (int16_t)((double)hrm_chan1_raw[i] - ((double)hrm_chan2_raw[i] * phase2sf));
+		//	}
+		//}
+		//
 	}
 	else  // do not do subtract and load chan 3 for next step. trialidx=0 will be chan1 and trialidx=1 will be chan2.
 	{	 	
-		for(i = 0; i < hrm_raw_index + HRM_AVG_SAMPLES + HRM_AVG_SAMPLES; i++)
+		for(i = 0; i < hrm_raw_index ; i++)
 		{
 			if(trialidx == 0)
-				hrm_chan3_raw[i] = hrm_chan1_raw_avg[i];
+				hrm_chan3_raw[i] = hrm_chan1_raw[i];
 			if(trialidx == 1)
-				hrm_chan3_raw[i] = hrm_chan2_raw_avg[i];
+				hrm_chan3_raw[i] = hrm_chan2_raw[i];
 		}
 	}
 
@@ -360,7 +368,7 @@ for(trialidx = 0; trialidx < 3; trialidx++)
 	/// amount to insure that we get some of the dis-qualified peaks. De bounce would have to then take the form of the missing peaks
 	/// routine.  Adding more averaging may yeild a completly different result.
 	
-	pd_emi_delta = 40;
+	pd_emi_delta = 35;
 	sprintf(out_str, "dH Threshold control 1: Delta = %d, emip = %d, absopp = %d\n", pd_emi_delta, num_emi_peaks, num_absop_peaks);
 	SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
 	if(pd_emi_auto)
@@ -368,15 +376,15 @@ for(trialidx = 0; trialidx < 3; trialidx++)
 		do
 		{	
 			detect_peak(hrm_chan3_raw, hrm_raw_index, pd_emi_delta, 1);
-			pd_emi_delta--;
-		}while((num_emi_peaks < 5) || (num_absop_peaks < 5));
+			pd_emi_delta -= 2;
+		}while((num_emi_peaks < 4) || (num_absop_peaks < 4));
 		sprintf(out_str, "dH Threshold control 2: Delta = %d, emip = %d, absopp = %d\n", pd_emi_delta, num_emi_peaks, num_absop_peaks); 
 		 SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
 	 
 		pd_emi_delta -= 2; // means delta - 2. should be porpotional...
 	}
-	if(pd_emi_delta < 1)
-		pd_emi_delta = 1;
+	if(pd_emi_delta < 4)
+		pd_emi_delta = 4;
 	detect_peak(hrm_chan3_raw, hrm_raw_index, pd_emi_delta, 1); 
 	
 	 sprintf(out_str, "*** %d dH Threshold control 3: Delta = %d, emip = %d, absopp = %d\n", trialidx, pd_emi_delta, num_emi_peaks, num_absop_peaks); 
@@ -606,7 +614,7 @@ for(trialidx = 0; trialidx < 3; trialidx++)
 	/// Eliminate Bounce.
 	old_num_of_emi_peaks = num_emi_peaks;
 ///	avg_x_rng = avg_x_rng/3; // might be changed to depend on the last HR * some multipl
-	avg_x_rng = current_hrm / 10;   // 60hbpm @ 20sps => 10 for half cycle. 6 * 10 * 2 = 120.  60/10=6  = quarter cycle
+	avg_x_rng = current_hrm / 8;   // 60hbpm @ 20sps => 10 for half cycle. 6 * 10 * 2 = 120.  60/10=6  = quarter cycle
 	for(i=0; i<num_emi_peaks; i++)
 	{
 		if((emi_peaks_xpos[i + 1] - emi_peaks_xpos[i]) < avg_x_rng)

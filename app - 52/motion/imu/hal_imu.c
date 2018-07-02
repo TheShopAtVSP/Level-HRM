@@ -32,7 +32,7 @@ typedef enum {
 
 bool imu_debug = true;
 
-#define ACCEL_PD_TO		18000		//motion timeout in milliseconds to wait before going into low power mode
+#define ACCEL_PD_TO		60000		//motion timeout in milliseconds to wait before going into low power mode
 #define GYRO_PD_TO		1500
 #define MAG_PD_TO		4000
 

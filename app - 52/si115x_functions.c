@@ -27,6 +27,7 @@ extern uint8_t current_hrm;
 extern uint16_t hrm_ch1_avg, hrm_ch2_avg;
 extern int16_t hrm_chan1_raw[], hrm_chan2_raw[], hrm_chan3_raw[], hrm_raw_index;
 extern int16_t 	pd_emi_delta;
+extern float silly_ratio;
 /// extern uint16_t second_counter;
 static const nrf_drv_twi_t m_twi_Si1153 = NRF_DRV_TWI_INSTANCE(0);
 uint8_t 	reg[2], timer_count_out = 0;
@@ -811,50 +812,57 @@ void Get_HRMs(void)
 		if(trialidx == 2) // do this one last so that we can skip it if trialerrorcnt(0 or 1) is low.
 		{
 			/// Auto Subtract ///
-			phase2sfcof = 0.5;
-			pvariance = PeakDiff1D(hrm_chan1_raw, ser_input_size);
-			justanextraint16 = PeakDiff1D(hrm_chan2_raw, ser_input_size);
-			phase2sf = fabs((double)justanextraint16 / phase2sf);
 			
-			last_pvariance = 30000;
-			/// printf("%f\n",phase2sf);
-			for(int ol=0;  ol < 1; ol++)  /// 3
-			{
-				if(ol==0) /// 1
-					phase2sfcof = 0.05; /// 0.05
-				if(ol==1) /// 2
-					phase2sfcof = 0.001; /// 0.005
-					
-				last_pvariance = 30000;	 
-
-				while(abs(last_pvariance) > abs(pvariance))
-				{
-					last_pvariance = pvariance;
-					phase2sf += phase2sfcof;
-					for(i = 0; i < ser_input_size; i++)
-					{
-						hrm_chan3_raw[i] = (int16_t)((double)hrm_chan1_raw[i] - ((double)hrm_chan2_raw[i] * phase2sf));
-					}
-					pvariance = PeakDiff1D(hrm_chan3_raw, ser_input_size);
-				}
-				
-				last_pvariance = 30000;
-			
-				while(abs(last_pvariance) > abs(pvariance))
-				{
-					last_pvariance = pvariance;
-					phase2sf -= phase2sfcof;
-					for(i = 0; i < ser_input_size; i++)
-					{
-						hrm_chan3_raw[i] = (int16_t)((double)hrm_chan1_raw[i] - ((double)hrm_chan2_raw[i] * phase2sf));
-					}
-					pvariance = PeakDiff1D(hrm_chan3_raw, ser_input_size);
-				}
-			}
 			for(i = 0; i < ser_input_size; i++)
 			{
-				hrm_chan3_raw[i] = (int16_t)((double)hrm_chan1_raw[i] - ((double)hrm_chan2_raw[i] * (phase2sf + phase2sfcof)));
+				hrm_chan3_raw[i] = (int16_t)((double)hrm_chan1_raw[i] - ((double)hrm_chan2_raw[i] * (silly_ratio)));
 			}
+			
+			
+//			phase2sfcof = 0.5;
+//			pvariance = PeakDiff1D(hrm_chan1_raw, ser_input_size);
+//			justanextraint16 = PeakDiff1D(hrm_chan2_raw, ser_input_size);
+//			phase2sf = fabs((double)justanextraint16 / phase2sf);
+//			
+//			last_pvariance = 30000;
+//			/// printf("%f\n",phase2sf);
+//			for(int ol=0;  ol < 1; ol++)  /// 3
+//			{
+//				if(ol==0) /// 1
+//					phase2sfcof = 0.05; /// 0.05
+//				if(ol==1) /// 2
+//					phase2sfcof = 0.001; /// 0.005
+//					
+//				last_pvariance = 30000;	 
+
+//				while(abs(last_pvariance) > abs(pvariance))
+//				{
+//					last_pvariance = pvariance;
+//					phase2sf += phase2sfcof;
+//					for(i = 0; i < ser_input_size; i++)
+//					{
+//						hrm_chan3_raw[i] = (int16_t)((double)hrm_chan1_raw[i] - ((double)hrm_chan2_raw[i] * phase2sf));
+//					}
+//					pvariance = PeakDiff1D(hrm_chan3_raw, ser_input_size);
+//				}
+//				
+//				last_pvariance = 30000;
+//			
+//				while(abs(last_pvariance) > abs(pvariance))
+//				{
+//					last_pvariance = pvariance;
+//					phase2sf -= phase2sfcof;
+//					for(i = 0; i < ser_input_size; i++)
+//					{
+//						hrm_chan3_raw[i] = (int16_t)((double)hrm_chan1_raw[i] - ((double)hrm_chan2_raw[i] * phase2sf));
+//					}
+//					pvariance = PeakDiff1D(hrm_chan3_raw, ser_input_size);
+//				}
+//			}
+//			for(i = 0; i < ser_input_size; i++)
+//			{
+//				hrm_chan3_raw[i] = (int16_t)((double)hrm_chan1_raw[i] - ((double)hrm_chan2_raw[i] * (phase2sf + phase2sfcof)));
+//			}
 		}
 		else  // do not do subtract and load chan 3 for next step. trialidx=0 will be chan1 and trialidx=1 will be chan2.
 		{	 	
@@ -881,7 +889,7 @@ void Get_HRMs(void)
 		{	
 			detect_peak(hrm_chan3_raw, hrm_raw_index, pd_emi_delta, 1);
 			pd_emi_delta -= 2;
-		}while((num_emi_peaks < 5) || (num_absop_peaks < 5));
+		}while((num_emi_peaks < 4) || (num_absop_peaks < 4));
 		pd_emi_delta -= 2; // means delta - 2. should be porpotional...
 		if(pd_emi_delta < 4)
 			pd_emi_delta = 4;
@@ -1086,7 +1094,7 @@ void Get_HRMs(void)
 		/// Eliminate Bounce.
 		old_num_of_emi_peaks = num_emi_peaks;
 		///	avg_x_rng = avg_x_rng/3; // might be changed to depend on the last HR * some multipl
-		avg_x_rng = current_hrm / 10;   // 60hbpm @ 20sps => 10 for half cycle. 6 * 10 * 2 = 120.  60/10=6  = quarter cycle
+		avg_x_rng = current_hrm / 8;   // 60hbpm @ 20sps => 10 for half cycle. 6 * 10 * 2 = 120.  60/10=6  = quarter cycle
 		for(i=0; i<num_emi_peaks; i++)
 		{
 			if((emi_peaks_xpos[i + 1] - emi_peaks_xpos[i]) < avg_x_rng)
