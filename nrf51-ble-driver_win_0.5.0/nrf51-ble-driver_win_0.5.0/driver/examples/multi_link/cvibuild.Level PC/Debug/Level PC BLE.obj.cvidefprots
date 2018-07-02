@@ -1,0 +1,16 @@
+[log_handler]
+Class="Function"
+Prototype="void log_handler(sd_rpc_log_severity_t severity, const char *message);"
+
+[ble_evt_dispatch]
+Class="Function"
+Prototype="void ble_evt_dispatch(ble_evt_t *p_ble_evt);"
+
+[ble_stack_init]
+Class="Function"
+Prototype="unsigned int ble_stack_init();"
+
+[scan_start]
+Class="Function"
+Prototype="void scan_start();"
+

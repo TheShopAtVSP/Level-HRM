@@ -1,0 +1,8 @@
+cvi.lib
+cvirte.dll
+s130_nrf51_ble_driver.lib
+s130_nrf51_ble_driver.dll
+kernel32.lib
+KERNEL32.dll
+user32.lib
+USER32.dll

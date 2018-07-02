@@ -1,0 +1,41 @@
+-nologo
+-out:c:\Users\Mitch_Mason\Desktop\nrf51-ble-driver_win_0.5.0\nrf51-ble-driver_win_0.5.0\driver\examples\multi_link\cvibuild.Level PC\Debug\Level PC.exe
+-arch:x86
+-timestamp
+-debug:2
+-res:c:\Users\Mitch_Mason\Desktop\nrf51-ble-driver_win_0.5.0\nrf51-ble-driver_win_0.5.0\driver\examples\multi_link\cvibuild.Level PC\Debug\resources.res
+-entry:_CVIWinMainStartupCodeForDebugging@0
+-base:0x400000
+-linked:c:\Users\Mitch_Mason\Desktop\nrf51-ble-driver_win_0.5.0\nrf51-ble-driver_win_0.5.0\driver\examples\multi_link\cvibuild.Level PC\Debug\linkersummary.txt
+-dlldeps:c:\Users\Mitch_Mason\Desktop\nrf51-ble-driver_win_0.5.0\nrf51-ble-driver_win_0.5.0\driver\examples\multi_link\cvibuild.Level PC\Debug\dlldependencies.txt
+-licensing:c:\Users\Mitch_Mason\Desktop\nrf51-ble-driver_win_0.5.0\nrf51-ble-driver_win_0.5.0\driver\examples\multi_link\cvibuild.Level PC\Debug\linkerlicensing.txt
+-browsedeps:c:\Users\Mitch_Mason\Desktop\nrf51-ble-driver_win_0.5.0\nrf51-ble-driver_win_0.5.0\driver\examples\multi_link\cvibuild.Level PC\Debug\moduledependencies.txt
+-stackreserve:1048576
+-stackcommit:4096
+-in:c:\Users\Mitch_Mason\Desktop\nrf51-ble-driver_win_0.5.0\nrf51-ble-driver_win_0.5.0\driver\examples\multi_link\cvibuild.Level PC\Debug\Level PC BLE.obj
+-in:c:\Users\Mitch_Mason\Desktop\nrf51-ble-driver_win_0.5.0\nrf51-ble-driver_win_0.5.0\driver\examples\multi_link\cvibuild.Level PC\Debug\Level_PC_GUI.obj
+-in:c:\Users\Mitch_Mason\Desktop\nrf51-ble-driver_win_0.5.0\nrf51-ble-driver_win_0.5.0\driver\examples\multi_link\cvibuild.Level PC\Debug\Level_PC_Main.obj
+-more:c:\program files (x86)\national instruments\cvi2013\bin\msvc\cvistart.lib
+-more:c:\program files (x86)\national instruments\cvi2013\bin\msvc\cvi.lib
+-more:c:\program files (x86)\national instruments\cvi2013\sdk\lib\msvc\advapi32.lib
+-more:c:\ProgramData\National Instruments\CVI2013\bin\msvc\analysis.lib
+-more:c:\Program Files (x86)\National Instruments\CVI2013\bin\msvc\cviauto.lib
+-more:c:\Program Files (x86)\National Instruments\CVI2013\bin\msvc\cviddc.lib
+-more:c:\Program Files (x86)\National Instruments\CVI2013\bin\msvc\cvidotnet.lib
+-more:c:\Program Files (x86)\National Instruments\CVI2013\bin\msvc\cvinetstreams.lib
+-more:c:\Program Files (x86)\National Instruments\CVI2013\bin\msvc\cvinetv.lib
+-more:c:\Program Files (x86)\National Instruments\CVI2013\bin\msvc\cvintwrk.lib
+-more:c:\Program Files (x86)\National Instruments\CVI2013\bin\msvc\cvitdms.lib
+-more:c:\program files (x86)\national instruments\cvi2013\sdk\lib\msvc\gdi32.lib
+-more:c:\Program Files (x86)\National Instruments\CVI2013\bin\msvc\gpib.lib
+-more:c:\program files (x86)\national instruments\cvi2013\sdk\lib\msvc\kernel32.lib
+-more:c:\Program Files (x86)\National Instruments\Shared\CVI\Bin\msvc\niBTAnalysis.lib
+-more:c:\Program Files (x86)\National Instruments\Shared\CVI\Bin\msvc\niBTGeneration.lib
+-more:c:\Program Files (x86)\National Instruments\CVI2013\bin\msvc\nivxi.lib
+-more:c:\Program Files (x86)\National Instruments\CVI2013\bin\msvc\omp.lib
+-more:c:\Users\Mitch_Mason\Desktop\nrf51-ble-driver_win_0.5.0\nrf51-ble-driver_win_0.5.0\driver\lib\s130_nrf51_ble_driver.lib
+-more:c:\Program Files (x86)\National Instruments\CVI2013\toolslib\toolbox\msvc\toolbox.obj
+-more:c:\program files (x86)\national instruments\cvi2013\sdk\lib\msvc\user32.lib
+-more:c:\program files (x86)\national instruments\cvi2013\sdk\lib\msvc\uuid.lib
+-more:c:\Program Files (x86)\National Instruments\Shared\CVI\Bin\msvc\visa.lib
+-more:c:\program files (x86)\national instruments\cvi2013\sdk\lib\msvc\winmm.lib

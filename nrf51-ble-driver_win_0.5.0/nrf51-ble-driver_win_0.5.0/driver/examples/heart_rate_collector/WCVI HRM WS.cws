@@ -1,0 +1,397 @@
+[Workspace Header]
+Version = 1302
+Pathname Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Pathname Line0002 = ".0/driver/examples/heart_rate_collector/WCVI HRM WS.cws"
+CVI Dir = "/c/program files (x86)/national instruments/cvi2013"
+CVI Shared Dir = "/C/Program Files (x86)/National Instruments/Shared/CVI"
+CVI Pub Local Dir = "/C/ProgramData/National Instruments/CVI2013"
+CVI Pub Global Dir = "/C/ProgramData/National Instruments/CVI"
+IVI Standard Root Dir = "/C/Program Files (x86)/IVI Foundation/IVI"
+IVI Standard Root 64-bit Dir = "/C/Program Files/IVI Foundation/IVI"
+VXIplug&play Framework Dir = "/C/Program Files (x86)/IVI Foundation/VISA/winnt"
+VXIplug&play Framework 64-bit Dir = "/C/Program Files/IVI Foundation/VISA/win64"
+Number of Projects = 1
+Active Project = 1
+Project 0001 = "HRM PROJ.prj"
+Drag Bar Left = 147
+Window Top = 39
+Window Left = 611
+Window Bottom = 1074
+Window Right = 1912
+Maximized = False
+Maximized Children = True
+Max32 Number Of Errors = 20
+Track Include File Dependencies = True
+Prompt For Missing Includes = True
+Stop On First Error File = False
+Bring Up Err Win At Start = True
+Bring Up Err Win For Errors = False
+Save Changes Before Running = "Always"
+Save Changes Before Compiling = "Always"
+Hide Windows = False
+Break At First Statement = False
+Sort Type = "File Name"
+Number of Opened Files = 13
+Window Confinement Region Enabled = True
+MainColumnWidth = 130
+FileDateColumnWidth = 70
+FileSizeColumnWidth = 70
+
+[Project Header 0001]
+Version = 1302
+Don't Update DistKit = False
+Platform Code = 4
+Build Configuration = "Debug"
+Warn User If Debugging Release = 1
+Batch Build Release = False
+Batch Build Debug = False
+
+[File 0001]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Path Line0002 = ".0/driver/include/ble_gap.h"
+File Type = "Include"
+Disk Date = 3551180608
+In Projects = "1,"
+Window Top = 182
+Window Left = 87
+Window Z-Order = 12
+Source Window State = "1,305,305,305,8,34,34,0,3,80,0,0,0,0,0,25,293,0,305,8,479,893,1,0,"
+
+[File 0002]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Path Line0002 = ".0/driver/include/ble_types.h"
+File Type = "Include"
+Disk Date = 3516297812
+In Projects = "1,"
+Window Top = 182
+Window Left = 87
+Window Z-Order = 2
+Source Window State = "1,90,90,90,8,25,25,0,3,80,0,0,0,0,0,25,78,0,90,8,479,893,1,0,"
+
+[File 0003]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Path Line0002 = ".0/driver/examples/heart_rate_collector/main.c"
+File Type = "CSource"
+Disk Date = 3553781453
+In Projects = "1,"
+Window Top = 290
+Window Left = 144
+Window Z-Order = 1
+Source Window State = "1,795,795,795,16,42,16,0,0,107,0,0,0,0,0,42,768,0,791,39,479,893,1,0,"
+Line Tags = "161,458,508,607,679,"
+
+[File 0004]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Path Line0002 = ".0/driver/examples/multi_link/EXAMPLE_CODE.c"
+File Type = "CSource"
+Disk Date = 3551119693
+In Projects = ""
+Window Top = 362
+Window Left = 182
+Window Z-Order = 11
+Source Window State = "1,90,90,90,12,24,12,0,0,80,0,0,0,0,0,25,102,0,123,12,479,893,1,0,"
+
+[File 0005]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Path Line0002 = ".0/driver/include/ble_gattc.h"
+File Type = "Include"
+Disk Date = 3516297812
+In Projects = "1,"
+Window Top = 38
+Window Left = 11
+Window Z-Order = 3
+Source Window State = "1,323,323,323,56,93,93,0,3,80,0,0,0,0,0,25,401,0,323,56,479,893,1,0,"
+
+[File 0006]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Path Line0002 = ".0/driver/include/nrf_error.h"
+File Type = "Include"
+Disk Date = 3516297812
+In Projects = "1,"
+Window Top = 146
+Window Left = 68
+Window Z-Order = 13
+Source Window State = "1,64,64,64,8,31,31,0,3,80,0,0,0,0,0,25,37,0,64,8,479,893,1,0,"
+
+[File 0007]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Path Line0002 = ".0/driver/examples/heart_rate_collector/NUS_MAIN.c"
+File Type = "CSource"
+Disk Date = 3553686450
+In Projects = "1,"
+Window Top = 218
+Window Left = 106
+Window Z-Order = 4
+Source Window State = "1,124,124,124,28,50,50,0,3,80,0,0,0,0,0,25,103,0,124,28,479,893,1,0,"
+
+[File 0008]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/VSPSWDEV/nRF5_SDK_11.0.0_89a8197/examples/periphera"
+Path Line0002 = "l/low_power_pwm/pca10028/arm5_no_packs/RTE/Device/nRF51422_xxAC/system_nrf51.c"
+File Type = "CSource"
+Disk Date = 3543579978
+In Projects = ""
+Window Top = 182
+Window Left = 87
+Window Z-Order = 10
+Source Window State = "1,0,0,0,0,0,0,0,0,80,0,0,0,0,0,25,0,0,35,10,479,893,1,0,"
+
+[File 0009]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Path Line0002 = ".0/driver/examples/heart_rate_collector/WCVI_NUS_MAIN.c"
+File Type = "CSource"
+Disk Date = 3553690186
+In Projects = "1,"
+Window Top = 254
+Window Left = 125
+Window Z-Order = 5
+Source Window State = "1,151,151,151,4,28,28,0,3,80,0,0,0,0,0,25,139,0,151,4,479,893,1,0,"
+
+[File 0010]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/VSPSWDEV/nRF5_SDK_11.0.0_89a8197/components/device/"
+Path Line0002 = "compiler_abstraction.h"
+File Type = "Include"
+Disk Date = 3543579917
+In Projects = ""
+Window Top = 182
+Window Left = 87
+Window Z-Order = 6
+Source Window State = "1,0,0,0,0,0,0,0,0,80,0,0,0,0,0,25,86,0,97,28,479,893,1,0,"
+
+[File 0011]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/VSPSWDEV/nRF5_SDK_11.0.0_89a8197/components/ble/ble"
+Path Line0002 = "_db_discovery/ble_db_discovery.h"
+File Type = "Include"
+Disk Date = 3543579916
+In Projects = ""
+Window Top = 74
+Window Left = 30
+Window Z-Order = 9
+Source Window State = "1,0,0,0,0,0,0,0,0,80,0,0,0,0,0,25,35,0,47,0,479,893,1,0,"
+
+[File 0012]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/VSPSWDEV/nRF5_SDK_11.0.0_89a8197/components/ble/com"
+Path Line0002 = "mon/ble_srv_common.h"
+File Type = "Include"
+Disk Date = 3543579916
+In Projects = ""
+Window Top = 110
+Window Left = 49
+Window Z-Order = 8
+Source Window State = "1,0,0,0,0,0,0,0,0,80,0,0,0,0,0,25,14,0,26,0,479,893,1,0,"
+
+[File 0013]
+Path = "/c/Users/Mitch_Mason/Desktop/components/libraries/util/app_util.h"
+File Type = "Include"
+Disk Date = 3553165180
+In Projects = ""
+Window Top = 146
+Window Left = 68
+Window Z-Order = 7
+Source Window State = "1,0,0,0,0,0,0,0,0,80,0,0,0,0,0,25,17,0,26,0,479,893,1,0,"
+
+[File 0014]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Path Line0002 = ".0/driver/include/ble.h"
+File Type = "Include"
+Disk Date = 3516297812
+In Projects = "1,"
+Window Top = 36
+Source Window State = "1,253,253,253,32,45,45,0,3,0,0,0,0,0,0,0,0,0,253,32,479,893,1,0,"
+
+[File 0015]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Path Line0002 = ".0/driver/include/ble_err.h"
+File Type = "Include"
+Disk Date = 3516297812
+In Projects = "1,"
+Source Window State = "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"
+
+[File 0016]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Path Line0002 = ".0/driver/include/ble_gatt.h"
+File Type = "Include"
+Disk Date = 3516297812
+In Projects = "1,"
+Window Top = 398
+Window Left = 201
+Source Window State = "1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,479,893,1,0,"
+
+[File 0017]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Path Line0002 = ".0/driver/include/ble_gatts.h"
+File Type = "Include"
+Disk Date = 3516297812
+In Projects = "1,"
+Window Top = 74
+Window Left = 30
+Source Window State = "1,573,573,573,77,81,81,0,3,0,0,0,0,0,0,0,394,0,573,77,479,893,1,0,"
+
+[File 0018]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Path Line0002 = ".0/driver/include/ble_hci.h"
+File Type = "Include"
+Disk Date = 3516297812
+In Projects = "1,"
+Source Window State = "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"
+
+[File 0019]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Path Line0002 = ".0/driver/include/ble_l2cap.h"
+File Type = "Include"
+Disk Date = 3516297812
+In Projects = "1,"
+Source Window State = "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"
+
+[File 0020]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Path Line0002 = ".0/driver/include/ble_ranges.h"
+File Type = "Include"
+Disk Date = 3516297812
+In Projects = "1,"
+Source Window State = "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"
+
+[File 0021]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Path Line0002 = ".0/driver/include/nrf_svc.h"
+File Type = "Include"
+Disk Date = 3516297802
+In Projects = "1,"
+Source Window State = "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"
+
+[File 0022]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Path Line0002 = ".0/driver/include/sd_rpc.h"
+File Type = "Include"
+Disk Date = 3516297802
+In Projects = "1,"
+Source Window State = "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"
+
+[File 0023]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Path Line0002 = ".0/driver/lib/s130_nrf51_ble_driver.lib"
+File Type = "Library"
+Disk Date = 3516297980
+In Projects = "1,"
+
+[File 0024]
+Path Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Path Line0002 = ".0/driver/lib/s130_nrf51_ble_driver.dll"
+File Type = "DLL"
+Disk Date = 3516297980
+In Projects = "1,"
+
+[Tab Order]
+Tab 0001 Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Tab 0001 Line0002 = ".0/driver/examples/heart_rate_collector/main.c"
+Tab 0002 Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Tab 0002 Line0002 = ".0/driver/examples/multi_link/EXAMPLE_CODE.c"
+Tab 0003 Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Tab 0003 Line0002 = ".0/driver/include/ble_gap.h"
+Tab 0004 Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Tab 0004 Line0002 = ".0/driver/include/ble_gattc.h"
+Tab 0005 Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Tab 0005 Line0002 = ".0/driver/include/nrf_error.h"
+Tab 0006 Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Tab 0006 Line0002 = ".0/driver/include/ble_types.h"
+Tab 0007 Line0001 = "/c/Users/Mitch_Mason/Desktop/VSPSWDEV/nRF5_SDK_11.0.0_89a8197/examples/periphera"
+Tab 0007 Line0002 = "l/low_power_pwm/pca10028/arm5_no_packs/RTE/Device/nRF51422_xxAC/system_nrf51.c"
+Tab 0008 Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Tab 0008 Line0002 = ".0/driver/examples/heart_rate_collector/NUS_MAIN.c"
+Tab 0009 Line0001 = "/c/Users/Mitch_Mason/Desktop/nrf51-ble-driver_win_0.5.0/nrf51-ble-driver_win_0.5"
+Tab 0009 Line0002 = ".0/driver/examples/heart_rate_collector/WCVI_NUS_MAIN.c"
+Tab 0010 Line0001 = "/c/Users/Mitch_Mason/Desktop/VSPSWDEV/nRF5_SDK_11.0.0_89a8197/components/ble/ble"
+Tab 0010 Line0002 = "_db_discovery/ble_db_discovery.h"
+Tab 0011 Line0001 = "/c/Users/Mitch_Mason/Desktop/VSPSWDEV/nRF5_SDK_11.0.0_89a8197/components/ble/com"
+Tab 0011 Line0002 = "mon/ble_srv_common.h"
+Tab 0012 = "/c/Users/Mitch_Mason/Desktop/components/libraries/util/app_util.h"
+Tab 0013 Line0001 = "/c/Users/Mitch_Mason/Desktop/VSPSWDEV/nRF5_SDK_11.0.0_89a8197/components/device/"
+Tab 0013 Line0002 = "compiler_abstraction.h"
+
+[Default Build Config 0001 Debug]
+Generate Browse Info = True
+Enable Uninitialized Locals Runtime Warning = True
+Batch Build = False
+Profile = "Disabled"
+Debugging Level = "Standard"
+Execution Trace = "Disabled"
+Command Line Args = ""
+Working Directory = ""
+Environment Options = ""
+External Process Path = ""
+
+[Default Build Config 0001 Release]
+Generate Browse Info = True
+Enable Uninitialized Locals Runtime Warning = True
+Batch Build = False
+Profile = "Disabled"
+Debugging Level = "Standard"
+Execution Trace = "Disabled"
+Command Line Args = ""
+Working Directory = ""
+Environment Options = ""
+External Process Path = ""
+
+[Default Build Config 0001 Debug64]
+Generate Browse Info = True
+Enable Uninitialized Locals Runtime Warning = True
+Batch Build = False
+Profile = "Disabled"
+Debugging Level = "Standard"
+Execution Trace = "Disabled"
+Command Line Args = ""
+Working Directory = ""
+Environment Options = ""
+External Process Path = ""
+
+[Default Build Config 0001 Release64]
+Generate Browse Info = True
+Enable Uninitialized Locals Runtime Warning = True
+Batch Build = False
+Profile = "Disabled"
+Debugging Level = "Standard"
+Execution Trace = "Disabled"
+Command Line Args = ""
+Working Directory = ""
+Environment Options = ""
+External Process Path = ""
+
+[Build Dependencies 0001]
+Number of Dependencies = 0
+
+[Build Options 0001]
+Generate Browse Info = True
+Enable Uninitialized Locals Runtime Warning = True
+Execution Trace = "Disabled"
+Profile = "Disabled"
+Debugging Level = "Standard"
+Break On Library Errors = True
+Break On First Chance Exceptions = False
+
+[Execution Target 0001]
+Execution Target Address = "Local desktop computer"
+Execution Target Port = 0
+Execution Target Type = 0
+
+[SCC Options 0001]
+Use global settings = True
+SCC Provider = ""
+SCC Project = ""
+Local Path = ""
+Auxiliary Path = ""
+Perform Same Action For .h File As For .uir File = "Ask"
+Perform Same Action For .cds File As For .prj File = "Ask"
+Username = ""
+Comment = ""
+Use Default Username = False
+Use Default Comment = False
+Suppress CVI Error Messages = False
+Always show confirmation dialog = True
+
+[DLL Debugging Support 0001]
+External Process Path = ""
+
+[Command Line Args 0001]
+Command Line Args = ""
+Working Directory = ""
+Environment Options = ""
+

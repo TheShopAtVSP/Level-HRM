@@ -1,0 +1,16 @@
+[RedButton]
+Class="Function"
+Prototype="int RedButton(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[GreenButton]
+Class="Function"
+Prototype="int GreenButton(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[WhiteButton]
+Class="Function"
+Prototype="int WhiteButton(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[PurpleButton]
+Class="Function"
+Prototype="int PurpleButton(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+

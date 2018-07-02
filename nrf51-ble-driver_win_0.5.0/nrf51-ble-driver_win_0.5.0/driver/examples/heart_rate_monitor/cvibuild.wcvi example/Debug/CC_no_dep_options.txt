@@ -1,0 +1,1 @@
+-force-include-file "main.c";"c:\Users\Mitch_Mason\Desktop\nrf51-ble-driver_win_0.5.0\nrf51-ble-driver_win_0.5.0\driver\examples\heart_rate_monitor\main.c" 

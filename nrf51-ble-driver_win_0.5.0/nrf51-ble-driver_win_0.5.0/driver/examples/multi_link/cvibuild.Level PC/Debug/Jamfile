@@ -1,0 +1,70 @@
+CCFLAGS = -g ;
+HDRS = 	"c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\include"
+	"c:\\program files (x86)\\national instruments\\cvi2013\\toolslib\\activex\\word"
+	"c:\\program files (x86)\\national instruments\\cvi2013\\toolslib\\activex\\excel"
+	"c:\\program files (x86)\\national instruments\\cvi2013\\toolslib\\custctrl"
+	"c:\\program files (x86)\\national instruments\\cvi2013\\toolslib\\custctrl\\custsupp"
+	"c:\\program files (x86)\\national instruments\\cvi2013\\toolslib\\cvirtsup"
+	"c:\\program files (x86)\\national instruments\\cvi2013\\toolslib\\datasock"
+	"c:\\program files (x86)\\national instruments\\cvi2013\\toolslib\\daqUtil"
+	"c:\\program files (x86)\\national instruments\\cvi2013\\toolslib\\printing"
+	"c:\\program files (x86)\\national instruments\\cvi2013\\toolslib\\toolbox"
+	"c:\\program files (x86)\\national instruments\\cvi2013\\toolslib\\reportgen"
+	"c:\\program files (x86)\\national instruments\\cvi2013\\toolslib\\localui"
+	"c:\\program files (x86)\\national instruments\\cvi2013\\instr"
+	"C:\\Program Files (x86)\\National Instruments\\Shared\\CVI\\toolslib\\custctrl"
+	"C:\\Program Files (x86)\\National Instruments\\Shared\\CVI\\toolslib\\custctrl\\custsupp"
+	"C:\\Program Files (x86)\\National Instruments\\Shared\\CVI\\instr"
+	"C:\\ProgramData\\National Instruments\\CVI2013\\instr"
+	"c:\\program files (x86)\\national instruments\\cvi2013\\include"
+	"C:\\Program Files (x86)\\National Instruments\\Shared\\CVI\\include"
+	"C:\\ProgramData\\National Instruments\\CVI2013\\include"
+	"C:\\ProgramData\\National Instruments\\CVI\\include"
+	"c:\\program files (x86)\\national instruments\\cvi2013\\include\\ansi"
+	"c:\\program files (x86)\\national instruments\\cvi2013\\include\\clang\\2.9"
+	"C:\\Program Files (x86)\\IVI Foundation\\IVI\\Include"
+	"C:\\Program Files (x86)\\IVI Foundation\\VISA\\winnt\\include"
+	"c:\\program files (x86)\\national instruments\\cvi2013\\sdk\\include"
+	"c:\\Program Files (x86)\\National Instruments\\CVI2013\\bin"
+	"c:\\ProgramData\\National Instruments\\CVI2013\\bin"
+	"c:\\Program Files (x86)\\National Instruments\\Shared\\CVI\\Bin"
+	;
+include Jamfile_instr ;
+LOCATE on "ble.h" = "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\include" ;
+LOCATE on "ble_err.h" = "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\include" ;
+LOCATE on "ble_gap.h" = "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\include" ;
+LOCATE on "ble_gatt.h" = "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\include" ;
+LOCATE on "ble_gattc.h" = "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\include" ;
+LOCATE on "ble_gatts.h" = "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\include" ;
+LOCATE on "ble_hci.h" = "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\include" ;
+LOCATE on "ble_l2cap.h" = "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\include" ;
+LOCATE on "ble_ranges.h" = "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\include" ;
+LOCATE on "ble_types.h" = "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\include" ;
+LOCATE on "Level PC BLE.c" = "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link" ;
+LOCATE on "Level PC Includes.h" = "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link" ;
+LOCATE on "Level_PC.h" = "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link" ;
+LOCATE on "Level_PC_GUI.c" = "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link" ;
+LOCATE on "Level_PC_Main.c" = "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link" ;
+LOCATE on "nrf_error.h" = "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\include" ;
+LOCATE on "nrf_svc.h" = "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\include" ;
+LOCATE on "sd_rpc.h" = "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\include" ;
+Object "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\Level PC BLE.obj" : "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\Level PC BLE.c" ;
+FILENUM on "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\Level PC BLE.obj" = 1 ;
+DEFPROTS on "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\Level PC BLE.obj" = "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\Level PC BLE.obj.cvidefprots" ;
+OUTFILE on "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\Level PC BLE.obj" = "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\Level PC BLE.obj.out" ;
+PrjObjects += "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\Level PC BLE.obj" ;
+Object "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\Level_PC_GUI.obj" : "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\Level_PC_GUI.c" ;
+FILENUM on "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\Level_PC_GUI.obj" = 2 ;
+DEFPROTS on "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\Level_PC_GUI.obj" = "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\Level_PC_GUI.obj.cvidefprots" ;
+OUTFILE on "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\Level_PC_GUI.obj" = "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\Level_PC_GUI.obj.out" ;
+PrjObjects += "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\Level_PC_GUI.obj" ;
+Object "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\Level_PC_Main.obj" : "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\Level_PC_Main.c" ;
+FILENUM on "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\Level_PC_Main.obj" = 3 ;
+DEFPROTS on "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\Level_PC_Main.obj" = "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\Level_PC_Main.obj.cvidefprots" ;
+OUTFILE on "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\Level_PC_Main.obj" = "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\Level_PC_Main.obj.out" ;
+PrjObjects += "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\Level_PC_Main.obj" ;
+Object "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\resources.res" : "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\resources.in.rc" ;
+MainFromObjects "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\Level PC.exe" : $(PrjObjects) $(InstrObjects) ;
+Depends "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\Level PC.exe" : "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\link_options.txt" ;
+Depends "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\Level PC.exe" : "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\resources.res" ;
+Depends all : "c:\\Users\\Mitch_Mason\\Desktop\\nrf51-ble-driver_win_0.5.0\\nrf51-ble-driver_win_0.5.0\\driver\\examples\\multi_link\\cvibuild.Level PC\\Debug\\Level PC.exe" ;
