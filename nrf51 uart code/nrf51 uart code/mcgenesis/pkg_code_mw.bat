@@ -1,3 +1,0 @@
-C:\Keil_v5\ARM\ARMCC\bin\fromelf.exe --bin --output C:\Users\matt\Documents\workspace\theshop-genesis\code\nRF52\mcgenesis\_build\mcgenesis.bin C:\Users\matt\Documents\workspace\theshop-genesis\code\nRF52\mcgenesis\_build\mcgenesis.axf
-"C:\Program Files (x86)\Nordic Semiconductor\Master Control Panel\3.9.0.6\nrf\nrf.exe" dfu genpkg mcgenesis.zip --application C:\Users\matt\Documents\workspace\theshop-genesis\code\nRF52\mcgenesis\_build\mcgenesis.bin --application-version 0xff --dev-revision 0xffff --dev-type 0xffff --sd-req 0xFFFE
-copy mcgenesis.zip "C:\Users\matt\Google Drive\THE SHOP\Wearables\genesis\Firmware_Update\App\"
