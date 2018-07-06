@@ -1,0 +1,361 @@
+Component: ARM Compiler 5.06 update 4 (build 422) Tool: armlink [4d35d2]
+
+==============================================================================
+
+Section Cross References
+
+    main.o(i.main) refers to nrf_drv_clock.o(i.nrf_drv_clock_init) for nrf_drv_clock_init
+    main.o(i.main) refers to app_error.o(i.app_error_handler_bare) for app_error_handler_bare
+    main.o(i.main) refers to nrf_drv_clock.o(i.nrf_drv_clock_lfclk_request) for nrf_drv_clock_lfclk_request
+    main.o(i.main) refers to app_timer.o(i.app_timer_init) for app_timer_init
+    main.o(i.main) refers to led_softblink.o(i.led_softblink_init) for led_softblink_init
+    main.o(i.main) refers to led_softblink.o(i.led_softblink_start) for led_softblink_start
+    main.o(i.main) refers to main.o(.bss) for .bss
+    main.o(i.main) refers to main.o(.constdata) for .constdata
+    ble_advdata.o(i.adv_data_encode) refers to ble_advdata.o(i.le_role_encode) for le_role_encode
+    ble_advdata.o(i.adv_data_encode) refers to ble_advdata.o(i.ble_device_addr_encode) for ble_device_addr_encode
+    ble_advdata.o(i.adv_data_encode) refers to ble_advdata.o(i.uint16_encode) for uint16_encode
+    ble_advdata.o(i.adv_data_encode) refers to ble_advdata.o(i.uuid_list_encode) for uuid_list_encode
+    ble_advdata.o(i.adv_data_encode) refers to ble_advdata.o(i.conn_int_encode) for conn_int_encode
+    ble_advdata.o(i.adv_data_encode) refers to ble_advdata.o(i.manuf_specific_data_encode) for manuf_specific_data_encode
+    ble_advdata.o(i.adv_data_encode) refers to ble_advdata.o(i.service_data_encode) for service_data_encode
+    ble_advdata.o(i.adv_data_encode) refers to ble_advdata.o(i.name_encode) for name_encode
+    ble_advdata.o(i.ble_advdata_set) refers to ble_advdata.o(i.adv_data_encode) for adv_data_encode
+    ble_advdata.o(i.ble_device_addr_encode) refers to memcpya.o(.text) for __aeabi_memcpy
+    ble_advdata.o(i.conn_int_encode) refers to ble_advdata.o(i.uint16_encode) for uint16_encode
+    ble_advdata.o(i.manuf_specific_data_encode) refers to ble_advdata.o(i.uint16_encode) for uint16_encode
+    ble_advdata.o(i.manuf_specific_data_encode) refers to memcpya.o(.text) for __aeabi_memcpy
+    ble_advdata.o(i.service_data_encode) refers to ble_advdata.o(i.uint16_encode) for uint16_encode
+    ble_advdata.o(i.service_data_encode) refers to memcpya.o(.text) for __aeabi_memcpy
+    ble_advdata.o(i.uuid_list_encode) refers to ble_advdata.o(i.uuid_list_sized_encode) for uuid_list_sized_encode
+    ble_conn_params.o(i.ble_conn_params_change_conn_params) refers to memcpya.o(.text) for __aeabi_memcpy
+    ble_conn_params.o(i.ble_conn_params_change_conn_params) refers to ble_conn_params.o(i.is_conn_params_ok) for is_conn_params_ok
+    ble_conn_params.o(i.ble_conn_params_change_conn_params) refers to ble_conn_params.o(.data) for .data
+    ble_conn_params.o(i.ble_conn_params_change_conn_params) refers to ble_conn_params.o(.bss) for .bss
+    ble_conn_params.o(i.ble_conn_params_init) refers to memcpya.o(.text) for __aeabi_memcpy4
+    ble_conn_params.o(i.ble_conn_params_init) refers to app_timer.o(i.app_timer_create) for app_timer_create
+    ble_conn_params.o(i.ble_conn_params_init) refers to ble_conn_params.o(.bss) for .bss
+    ble_conn_params.o(i.ble_conn_params_init) refers to ble_conn_params.o(.data) for .data
+    ble_conn_params.o(i.ble_conn_params_init) refers to ble_conn_params.o(i.update_timeout_handler) for update_timeout_handler
+    ble_conn_params.o(i.ble_conn_params_init) refers to ble_conn_params.o(.constdata) for .constdata
+    ble_conn_params.o(i.ble_conn_params_on_ble_evt) refers to memcpya.o(.text) for __aeabi_memcpy
+    ble_conn_params.o(i.ble_conn_params_on_ble_evt) refers to ble_conn_params.o(i.conn_params_negotiation) for conn_params_negotiation
+    ble_conn_params.o(i.ble_conn_params_on_ble_evt) refers to app_timer.o(i.app_timer_stop) for app_timer_stop
+    ble_conn_params.o(i.ble_conn_params_on_ble_evt) refers to ble_conn_params.o(.data) for .data
+    ble_conn_params.o(i.ble_conn_params_on_ble_evt) refers to ble_conn_params.o(.bss) for .bss
+    ble_conn_params.o(i.ble_conn_params_on_ble_evt) refers to ble_conn_params.o(.constdata) for .constdata
+    ble_conn_params.o(i.ble_conn_params_stop) refers to app_timer.o(i.app_timer_stop) for app_timer_stop
+    ble_conn_params.o(i.ble_conn_params_stop) refers to ble_conn_params.o(.constdata) for .constdata
+    ble_conn_params.o(i.conn_params_negotiation) refers to ble_conn_params.o(i.is_conn_params_ok) for is_conn_params_ok
+    ble_conn_params.o(i.conn_params_negotiation) refers to app_timer.o(i.app_timer_start) for app_timer_start
+    ble_conn_params.o(i.conn_params_negotiation) refers to ble_conn_params.o(.data) for .data
+    ble_conn_params.o(i.conn_params_negotiation) refers to ble_conn_params.o(.bss) for .bss
+    ble_conn_params.o(i.conn_params_negotiation) refers to ble_conn_params.o(.constdata) for .constdata
+    ble_conn_params.o(i.is_conn_params_ok) refers to ble_conn_params.o(.data) for .data
+    ble_conn_params.o(i.update_timeout_handler) refers to ble_conn_params.o(.data) for .data
+    ble_conn_params.o(i.update_timeout_handler) refers to ble_conn_params.o(.bss) for .bss
+    ble_conn_params.o(.constdata) refers to ble_conn_params.o(.bss) for m_conn_params_timer_id_data
+    ble_srv_common.o(i.ble_srv_ascii_to_utf8) refers to strlen.o(.text) for strlen
+    ble_srv_common.o(i.characteristic_add) refers to ble_srv_common.o(i.set_security_req) for set_security_req
+    ble_srv_common.o(i.characteristic_add) refers to memseta.o(.text) for __aeabi_memclr4
+    ble_srv_common.o(i.descriptor_add) refers to memseta.o(.text) for __aeabi_memclr4
+    ble_srv_common.o(i.descriptor_add) refers to ble_srv_common.o(i.set_security_req) for set_security_req
+    ble_srv_common.o(i.set_security_req) refers to ble_srv_common.o(i.__ARM_common_switch8) for __ARM_common_switch8
+    nrf_delay.o(i.nrf_delay_ms) refers to nrf_delay.o(.emb_text) for __asm___11_nrf_delay_c_532987f3__nrf_delay_us
+    nrf_drv_clock.o(i.nrf_drv_clock_hfclk_release) refers to nrf_drv_clock.o(.bss) for .bss
+    nrf_drv_clock.o(i.nrf_drv_clock_hfclk_request) refers to nrf_drv_clock.o(.bss) for .bss
+    nrf_drv_clock.o(i.nrf_drv_clock_init) refers to nrf_drv_clock.o(.bss) for .bss
+    nrf_drv_clock.o(i.nrf_drv_clock_on_soc_event) refers to nrf_drv_clock.o(.bss) for .bss
+    nrf_drv_clock.o(i.nrf_drv_clock_uninit) refers to nrf_drv_clock.o(.bss) for .bss
+    app_error.o(i.app_error_save_and_stop) refers to app_error.o(.bss) for .bss
+    app_timer.o(i.RTC1_IRQHandler) refers to app_timer.o(i.timer_timeouts_check) for timer_timeouts_check
+    app_timer.o(i.SWI0_IRQHandler) refers to app_timer.o(i.timer_list_handler) for timer_list_handler
+    app_timer.o(i.app_timer_create) refers to app_timer.o(.data) for .data
+    app_timer.o(i.app_timer_init) refers to app_timer.o(i.rtc1_stop) for rtc1_stop
+    app_timer.o(i.app_timer_init) refers to app_timer.o(i.NVIC_SetPriority) for NVIC_SetPriority
+    app_timer.o(i.app_timer_init) refers to app_timer.o(.data) for .data
+    app_timer.o(i.app_timer_start) refers to app_timer.o(i.user_id_get) for user_id_get
+    app_timer.o(i.app_timer_start) refers to app_timer.o(i.user_op_alloc) for user_op_alloc
+    app_timer.o(i.app_timer_start) refers to app_timer.o(i.timer_list_handler_sched) for timer_list_handler_sched
+    app_timer.o(i.app_timer_start) refers to app_timer.o(.data) for .data
+    app_timer.o(i.app_timer_stop) refers to app_timer.o(i.user_id_get) for user_id_get
+    app_timer.o(i.app_timer_stop) refers to app_timer.o(i.user_op_alloc) for user_op_alloc
+    app_timer.o(i.app_timer_stop) refers to app_timer.o(i.timer_list_handler_sched) for timer_list_handler_sched
+    app_timer.o(i.app_timer_stop) refers to app_timer.o(.data) for .data
+    app_timer.o(i.app_timer_stop_all) refers to app_timer.o(i.user_id_get) for user_id_get
+    app_timer.o(i.app_timer_stop_all) refers to app_timer.o(i.user_op_alloc) for user_op_alloc
+    app_timer.o(i.app_timer_stop_all) refers to app_timer.o(i.timer_list_handler_sched) for timer_list_handler_sched
+    app_timer.o(i.app_timer_stop_all) refers to app_timer.o(.data) for .data
+    app_timer.o(i.compare_reg_update) refers to app_timer.o(.emb_text) for __asm___11_app_timer_c_cd27f9c3__nrf_delay_us
+    app_timer.o(i.compare_reg_update) refers to app_timer.o(i.rtc1_stop) for rtc1_stop
+    app_timer.o(i.compare_reg_update) refers to app_timer.o(.data) for .data
+    app_timer.o(i.elapsed_ticks_acquire) refers to app_timer.o(.data) for .data
+    app_timer.o(i.list_deletions_handler) refers to app_timer.o(.data) for .data
+    app_timer.o(i.list_insertions_handler) refers to app_timer.o(i.timer_list_insert) for timer_list_insert
+    app_timer.o(i.list_insertions_handler) refers to app_timer.o(.data) for .data
+    app_timer.o(i.rtc1_stop) refers to app_timer.o(.emb_text) for __asm___11_app_timer_c_cd27f9c3__nrf_delay_us
+    app_timer.o(i.rtc1_stop) refers to app_timer.o(.data) for .data
+    app_timer.o(i.timer_list_handler) refers to app_timer.o(i.elapsed_ticks_acquire) for elapsed_ticks_acquire
+    app_timer.o(i.timer_list_handler) refers to app_timer.o(i.list_deletions_handler) for list_deletions_handler
+    app_timer.o(i.timer_list_handler) refers to app_timer.o(i.list_insertions_handler) for list_insertions_handler
+    app_timer.o(i.timer_list_handler) refers to app_timer.o(i.compare_reg_update) for compare_reg_update
+    app_timer.o(i.timer_list_handler) refers to app_timer.o(.data) for .data
+    app_timer.o(i.timer_list_insert) refers to app_timer.o(.data) for .data
+    app_timer.o(i.timer_timeouts_check) refers to app_error.o(i.app_error_handler_bare) for app_error_handler_bare
+    app_timer.o(i.timer_timeouts_check) refers to app_timer.o(i.timer_list_handler_sched) for timer_list_handler_sched
+    app_timer.o(i.timer_timeouts_check) refers to app_timer.o(.data) for .data
+    led_softblink.o(i.led_softblink_init) refers to memseta.o(.text) for __aeabi_memclr4
+    led_softblink.o(i.led_softblink_init) refers to low_power_pwm.o(i.low_power_pwm_init) for low_power_pwm_init
+    led_softblink.o(i.led_softblink_init) refers to low_power_pwm.o(i.low_power_pwm_duty_set) for low_power_pwm_duty_set
+    led_softblink.o(i.led_softblink_init) refers to led_softblink.o(.bss) for .bss
+    led_softblink.o(i.led_softblink_init) refers to led_softblink.o(.constdata) for .constdata
+    led_softblink.o(i.led_softblink_init) refers to led_softblink.o(i.led_softblink_on_timeout) for led_softblink_on_timeout
+    led_softblink.o(i.led_softblink_off_time_set) refers to led_softblink.o(.bss) for .bss
+    led_softblink.o(i.led_softblink_on_time_set) refers to led_softblink.o(.bss) for .bss
+    led_softblink.o(i.led_softblink_on_timeout) refers to low_power_pwm.o(i.low_power_pwm_duty_set) for low_power_pwm_duty_set
+    led_softblink.o(i.led_softblink_on_timeout) refers to app_error.o(i.app_error_handler_bare) for app_error_handler_bare
+    led_softblink.o(i.led_softblink_on_timeout) refers to led_softblink.o(.data) for .data
+    led_softblink.o(i.led_softblink_on_timeout) refers to led_softblink.o(.bss) for .bss
+    led_softblink.o(i.led_softblink_start) refers to low_power_pwm.o(i.low_power_pwm_start) for low_power_pwm_start
+    led_softblink.o(i.led_softblink_start) refers to led_softblink.o(.bss) for .bss
+    led_softblink.o(i.led_softblink_stop) refers to low_power_pwm.o(i.low_power_pwm_stop) for low_power_pwm_stop
+    led_softblink.o(i.led_softblink_stop) refers to led_softblink.o(.bss) for .bss
+    led_softblink.o(i.led_softblink_uninit) refers to led_softblink.o(i.led_softblink_stop) for led_softblink_stop
+    led_softblink.o(i.led_softblink_uninit) refers to memseta.o(.text) for __aeabi_memclr4
+    led_softblink.o(i.led_softblink_uninit) refers to led_softblink.o(.bss) for .bss
+    led_softblink.o(.constdata) refers to led_softblink.o(.bss) for led_softblink_timer_data
+    low_power_pwm.o(i.low_power_pwm_init) refers to app_timer.o(i.app_timer_create) for app_timer_create
+    low_power_pwm.o(i.low_power_pwm_init) refers to low_power_pwm.o(i.led_off) for led_off
+    low_power_pwm.o(i.low_power_pwm_init) refers to low_power_pwm.o(i.pwm_timeout_handler) for pwm_timeout_handler
+    low_power_pwm.o(i.low_power_pwm_start) refers to low_power_pwm.o(i.led_off) for led_off
+    low_power_pwm.o(i.low_power_pwm_start) refers to low_power_pwm.o(i.pwm_timeout_handler) for pwm_timeout_handler
+    low_power_pwm.o(i.low_power_pwm_stop) refers to app_timer.o(i.app_timer_stop) for app_timer_stop
+    low_power_pwm.o(i.low_power_pwm_stop) refers to low_power_pwm.o(i.led_off) for led_off
+    low_power_pwm.o(i.pwm_timeout_handler) refers to low_power_pwm.o(i.led_off) for led_off
+    low_power_pwm.o(i.pwm_timeout_handler) refers to low_power_pwm.o(i.led_on) for led_on
+    low_power_pwm.o(i.pwm_timeout_handler) refers to app_timer.o(i.app_timer_start) for app_timer_start
+    low_power_pwm.o(i.pwm_timeout_handler) refers to app_error.o(i.app_error_handler_bare) for app_error_handler_bare
+    softdevice_handler.o(i.SWI2_IRQHandler) refers to app_error.o(i.app_error_handler_bare) for app_error_handler_bare
+    softdevice_handler.o(i.SWI2_IRQHandler) refers to softdevice_handler.o(i.intern_softdevice_events_execute) for intern_softdevice_events_execute
+    softdevice_handler.o(i.SWI2_IRQHandler) refers to softdevice_handler.o(.data) for .data
+    softdevice_handler.o(i.intern_softdevice_events_execute) refers to app_error.o(i.app_error_handler_bare) for app_error_handler_bare
+    softdevice_handler.o(i.intern_softdevice_events_execute) refers to nrf_drv_clock.o(i.nrf_drv_clock_on_soc_event) for nrf_drv_clock_on_soc_event
+    softdevice_handler.o(i.intern_softdevice_events_execute) refers to softdevice_handler.o(.data) for .data
+    softdevice_handler.o(i.sd_nvic_EnableIRQ) refers to softdevice_handler.o(.data) for .data
+    softdevice_handler.o(i.softdevice_ble_evt_handler_set) refers to softdevice_handler.o(.data) for .data
+    softdevice_handler.o(i.softdevice_enable_get_default_config) refers to memseta.o(.text) for __aeabi_memclr4
+    softdevice_handler.o(i.softdevice_handler_init) refers to softdevice_handler.o(i.sd_nvic_EnableIRQ) for sd_nvic_EnableIRQ
+    softdevice_handler.o(i.softdevice_handler_init) refers to softdevice_handler.o(.data) for .data
+    softdevice_handler.o(i.softdevice_handler_init) refers to softdevice_handler.o(i.softdevice_fault_handler) for softdevice_fault_handler
+    softdevice_handler.o(i.softdevice_handler_isEnabled) refers to softdevice_handler.o(.data) for .data
+    softdevice_handler.o(i.softdevice_handler_sd_disable) refers to softdevice_handler.o(.data) for .data
+    softdevice_handler.o(i.softdevice_sys_evt_handler_set) refers to softdevice_handler.o(.data) for .data
+    arm_startup_nrf51.o(RESET) refers to arm_startup_nrf51.o(STACK) for __initial_sp
+    arm_startup_nrf51.o(RESET) refers to arm_startup_nrf51.o(.text) for Reset_Handler
+    arm_startup_nrf51.o(RESET) refers to app_timer.o(i.RTC1_IRQHandler) for RTC1_IRQHandler
+    arm_startup_nrf51.o(RESET) refers to app_timer.o(i.SWI0_IRQHandler) for SWI0_IRQHandler
+    arm_startup_nrf51.o(RESET) refers to softdevice_handler.o(i.SWI2_IRQHandler) for SWI2_IRQHandler
+    arm_startup_nrf51.o(.text) refers to system_nrf51.o(i.SystemInit) for SystemInit
+    arm_startup_nrf51.o(.text) refers to entry.o(.ARM.Collect$$$$00000000) for __main
+    system_nrf51.o(i.SystemCoreClockUpdate) refers to system_nrf51.o(.data) for .data
+    system_nrf51.o(i.SystemInit) refers to system_nrf51.o(i.is_manual_peripheral_setup_needed) for is_manual_peripheral_setup_needed
+    entry.o(.ARM.Collect$$$$00000000) refers (Special) to entry10a.o(.ARM.Collect$$$$0000000D) for __rt_final_cpp
+    entry.o(.ARM.Collect$$$$00000000) refers (Special) to entry11a.o(.ARM.Collect$$$$0000000F) for __rt_final_exit
+    entry.o(.ARM.Collect$$$$00000000) refers (Special) to entry7b.o(.ARM.Collect$$$$00000008) for _main_clock
+    entry.o(.ARM.Collect$$$$00000000) refers (Special) to entry8b.o(.ARM.Collect$$$$0000000A) for _main_cpp_init
+    entry.o(.ARM.Collect$$$$00000000) refers (Special) to entry9a.o(.ARM.Collect$$$$0000000B) for _main_init
+    entry.o(.ARM.Collect$$$$00000000) refers (Special) to entry5.o(.ARM.Collect$$$$00000004) for _main_scatterload
+    entry.o(.ARM.Collect$$$$00000000) refers (Special) to entry2.o(.ARM.Collect$$$$00000001) for _main_stk
+    entry2.o(.ARM.Collect$$$$00000001) refers to entry2.o(.ARM.Collect$$$$00002712) for __lit__00000000
+    entry2.o(.ARM.Collect$$$$00002712) refers to arm_startup_nrf51.o(STACK) for __initial_sp
+    entry2.o(__vectab_stack_and_reset_area) refers to arm_startup_nrf51.o(STACK) for __initial_sp
+    entry2.o(__vectab_stack_and_reset_area) refers to entry.o(.ARM.Collect$$$$00000000) for __main
+    entry5.o(.ARM.Collect$$$$00000004) refers to init.o(.text) for __scatterload
+    entry9a.o(.ARM.Collect$$$$0000000B) refers to main.o(i.main) for main
+    entry9b.o(.ARM.Collect$$$$0000000C) refers to main.o(i.main) for main
+    init.o(.text) refers to entry5.o(.ARM.Collect$$$$00000004) for __main_after_scatterload
+
+
+==============================================================================
+
+Removing Unused input sections from the image.
+
+    Removing main.o(.rev16_text), (4 bytes).
+    Removing main.o(.revsh_text), (4 bytes).
+    Removing main.o(.emb_text), (30 bytes).
+    Removing ble_advdata.o(.rev16_text), (4 bytes).
+    Removing ble_advdata.o(.revsh_text), (4 bytes).
+    Removing ble_advdata.o(i.adv_data_encode), (534 bytes).
+    Removing ble_advdata.o(i.ble_advdata_set), (104 bytes).
+    Removing ble_advdata.o(i.ble_device_addr_encode), (94 bytes).
+    Removing ble_advdata.o(i.conn_int_encode), (136 bytes).
+    Removing ble_advdata.o(i.le_role_encode), (84 bytes).
+    Removing ble_advdata.o(i.manuf_specific_data_encode), (104 bytes).
+    Removing ble_advdata.o(i.name_encode), (158 bytes).
+    Removing ble_advdata.o(i.service_data_encode), (142 bytes).
+    Removing ble_advdata.o(i.uint16_encode), (10 bytes).
+    Removing ble_advdata.o(i.uuid_list_encode), (48 bytes).
+    Removing ble_advdata.o(i.uuid_list_sized_encode), (174 bytes).
+    Removing ble_conn_params.o(.rev16_text), (4 bytes).
+    Removing ble_conn_params.o(.revsh_text), (4 bytes).
+    Removing ble_conn_params.o(i.ble_conn_params_change_conn_params), (80 bytes).
+    Removing ble_conn_params.o(i.ble_conn_params_init), (84 bytes).
+    Removing ble_conn_params.o(i.ble_conn_params_on_ble_evt), (144 bytes).
+    Removing ble_conn_params.o(i.ble_conn_params_stop), (16 bytes).
+    Removing ble_conn_params.o(i.conn_params_negotiation), (104 bytes).
+    Removing ble_conn_params.o(i.is_conn_params_ok), (28 bytes).
+    Removing ble_conn_params.o(i.update_timeout_handler), (100 bytes).
+    Removing ble_conn_params.o(.bss), (32 bytes).
+    Removing ble_conn_params.o(.bss), (28 bytes).
+    Removing ble_conn_params.o(.constdata), (4 bytes).
+    Removing ble_conn_params.o(.data), (20 bytes).
+    Removing ble_srv_common.o(.rev16_text), (4 bytes).
+    Removing ble_srv_common.o(.revsh_text), (4 bytes).
+    Removing ble_srv_common.o(i.ble_srv_ascii_to_utf8), (18 bytes).
+    Removing ble_srv_common.o(i.ble_srv_report_ref_encode), (12 bytes).
+    Removing ble_srv_common.o(i.characteristic_add), (400 bytes).
+    Removing ble_srv_common.o(i.descriptor_add), (176 bytes).
+    Removing ble_srv_common.o(i.set_security_req), (46 bytes).
+    Removing nrf_delay.o(.rev16_text), (4 bytes).
+    Removing nrf_delay.o(.revsh_text), (4 bytes).
+    Removing nrf_delay.o(.emb_text), (30 bytes).
+    Removing nrf_delay.o(i.nrf_delay_ms), (28 bytes).
+    Removing nrf_drv_clock.o(.rev16_text), (4 bytes).
+    Removing nrf_drv_clock.o(.revsh_text), (4 bytes).
+    Removing nrf_drv_clock.o(i.nrf_drv_clock_calibration_abort), (4 bytes).
+    Removing nrf_drv_clock.o(i.nrf_drv_clock_calibration_start), (4 bytes).
+    Removing nrf_drv_clock.o(i.nrf_drv_clock_hfclk_is_running), (16 bytes).
+    Removing nrf_drv_clock.o(i.nrf_drv_clock_hfclk_release), (48 bytes).
+    Removing nrf_drv_clock.o(i.nrf_drv_clock_hfclk_request), (84 bytes).
+    Removing nrf_drv_clock.o(i.nrf_drv_clock_is_calibrating), (4 bytes).
+    Removing nrf_drv_clock.o(i.nrf_drv_clock_lfclk_is_running), (4 bytes).
+    Removing nrf_drv_clock.o(i.nrf_drv_clock_lfclk_release), (2 bytes).
+    Removing nrf_drv_clock.o(i.nrf_drv_clock_uninit), (16 bytes).
+    Removing nrf_drv_common.o(.rev16_text), (4 bytes).
+    Removing nrf_drv_common.o(.revsh_text), (4 bytes).
+    Removing nrf_drv_common.o(i.nrf_drv_common_irq_enable), (96 bytes).
+    Removing app_error.o(.rev16_text), (4 bytes).
+    Removing app_error.o(.revsh_text), (4 bytes).
+    Removing app_error.o(i.app_error_handler), (28 bytes).
+    Removing app_error.o(i.app_error_save_and_stop), (100 bytes).
+    Removing app_error.o(.bss), (32 bytes).
+    Removing app_timer.o(.rev16_text), (4 bytes).
+    Removing app_timer.o(.revsh_text), (4 bytes).
+    Removing app_timer.o(i.app_timer_cnt_diff_compute), (12 bytes).
+    Removing app_timer.o(i.app_timer_cnt_get), (16 bytes).
+    Removing app_timer.o(i.app_timer_stop), (84 bytes).
+    Removing app_timer.o(i.app_timer_stop_all), (68 bytes).
+    Removing led_softblink.o(.rev16_text), (4 bytes).
+    Removing led_softblink.o(.revsh_text), (4 bytes).
+    Removing led_softblink.o(i.led_softblink_off_time_set), (12 bytes).
+    Removing led_softblink.o(i.led_softblink_on_time_set), (12 bytes).
+    Removing led_softblink.o(i.led_softblink_stop), (16 bytes).
+    Removing led_softblink.o(i.led_softblink_uninit), (32 bytes).
+    Removing low_power_pwm.o(.rev16_text), (4 bytes).
+    Removing low_power_pwm.o(.revsh_text), (4 bytes).
+    Removing low_power_pwm.o(i.low_power_pwm_stop), (36 bytes).
+    Removing nrf_assert.o(.rev16_text), (4 bytes).
+    Removing nrf_assert.o(.revsh_text), (4 bytes).
+    Removing softdevice_handler.o(.rev16_text), (4 bytes).
+    Removing softdevice_handler.o(.revsh_text), (4 bytes).
+    Removing softdevice_handler.o(i.sd_check_ram_start), (16 bytes).
+    Removing softdevice_handler.o(i.sd_nvic_EnableIRQ), (140 bytes).
+    Removing softdevice_handler.o(i.softdevice_ble_evt_handler_set), (20 bytes).
+    Removing softdevice_handler.o(i.softdevice_enable), (20 bytes).
+    Removing softdevice_handler.o(i.softdevice_enable_get_default_config), (40 bytes).
+    Removing softdevice_handler.o(i.softdevice_fault_handler), (8 bytes).
+    Removing softdevice_handler.o(i.softdevice_handler_init), (52 bytes).
+    Removing softdevice_handler.o(i.softdevice_handler_isEnabled), (12 bytes).
+    Removing softdevice_handler.o(i.softdevice_handler_sd_disable), (24 bytes).
+    Removing softdevice_handler.o(i.softdevice_sys_evt_handler_set), (20 bytes).
+    Removing arm_startup_nrf51.o(HEAP), (2048 bytes).
+    Removing system_nrf51.o(.rev16_text), (4 bytes).
+    Removing system_nrf51.o(.revsh_text), (4 bytes).
+    Removing system_nrf51.o(i.SystemCoreClockUpdate), (16 bytes).
+    Removing ble_srv_common.o(i.__ARM_common_switch8), (26 bytes).
+
+93 unused section(s) (total 6248 bytes) removed from the image.
+
+==============================================================================
+
+Memory Map of the image
+
+  Image Entry point : 0x00000000
+
+  Load Region LR_IROM1 (Base: 0x0001b000, Size: 0x00000c44, Max: 0x00025000, ABSOLUTE)
+
+    Execution Region ER_IROM1 (Base: 0x0001b000, Size: 0x00000c00, Max: 0x00025000, ABSOLUTE)
+
+    Base Addr    Size         Type   Attr      Idx    E Section Name        Object
+
+    0x0001b000   0x000000c0   Data   RO          986    RESET               arm_startup_nrf51.o
+    0x0001b0c0   0x00000000   Code   RO         1028  * .ARM.Collect$$$$00000000  mc_p.l(entry.o)
+    0x0001b0c0   0x00000004   Code   RO         1039    .ARM.Collect$$$$00000001  mc_p.l(entry2.o)
+    0x0001b0c4   0x00000004   Code   RO         1042    .ARM.Collect$$$$00000004  mc_p.l(entry5.o)
+    0x0001b0c8   0x00000000   Code   RO         1044    .ARM.Collect$$$$00000008  mc_p.l(entry7b.o)
+    0x0001b0c8   0x00000000   Code   RO         1046    .ARM.Collect$$$$0000000A  mc_p.l(entry8b.o)
+    0x0001b0c8   0x00000008   Code   RO         1047    .ARM.Collect$$$$0000000B  mc_p.l(entry9a.o)
+    0x0001b0d0   0x00000000   Code   RO         1049    .ARM.Collect$$$$0000000D  mc_p.l(entry10a.o)
+    0x0001b0d0   0x00000000   Code   RO         1051    .ARM.Collect$$$$0000000F  mc_p.l(entry11a.o)
+    0x0001b0d0   0x00000004   Code   RO         1040    .ARM.Collect$$$$00002712  mc_p.l(entry2.o)
+    0x0001b0d4   0x0000001e   Code   RO          584    .emb_text           app_timer.o
+    0x0001b0f2   0x00000002   PAD
+    0x0001b0f4   0x00000038   Code   RO          987    .text               arm_startup_nrf51.o
+    0x0001b12c   0x00000024   Code   RO         1033    .text               mc_p.l(memseta.o)
+    0x0001b150   0x00000024   Code   RO         1053    .text               mc_p.l(init.o)
+    0x0001b174   0x00000044   Code   RO          585    i.NVIC_SetPriority  app_timer.o
+    0x0001b1b8   0x00000020   Code   RO          586    i.RTC1_IRQHandler   app_timer.o
+    0x0001b1d8   0x00000008   Code   RO          587    i.SWI0_IRQHandler   app_timer.o
+    0x0001b1e0   0x00000020   Code   RO          873    i.SWI2_IRQHandler   softdevice_handler.o
+    0x0001b200   0x00000054   Code   RO          994    i.SystemInit        system_nrf51.o
+    0x0001b254   0x00000018   Code   RO          549    i.app_error_handler_bare  app_error.o
+    0x0001b26c   0x0000002c   Code   RO          590    i.app_timer_create  app_timer.o
+    0x0001b298   0x00000090   Code   RO          591    i.app_timer_init    app_timer.o
+    0x0001b328   0x0000007c   Code   RO          592    i.app_timer_start   app_timer.o
+    0x0001b3a4   0x000000a8   Code   RO          595    i.compare_reg_update  app_timer.o
+    0x0001b44c   0x00000040   Code   RO          596    i.elapsed_ticks_acquire  app_timer.o
+    0x0001b48c   0x00000074   Code   RO          874    i.intern_softdevice_events_execute  softdevice_handler.o
+    0x0001b500   0x00000048   Code   RO          995    i.is_manual_peripheral_setup_needed  system_nrf51.o
+    0x0001b548   0x0000001c   Code   RO          803    i.led_off           low_power_pwm.o
+    0x0001b564   0x0000001c   Code   RO          804    i.led_on            low_power_pwm.o
+    0x0001b580   0x00000088   Code   RO          740    i.led_softblink_init  led_softblink.o
+    0x0001b608   0x00000070   Code   RO          743    i.led_softblink_on_timeout  led_softblink.o
+    0x0001b678   0x00000010   Code   RO          744    i.led_softblink_start  led_softblink.o
+    0x0001b688   0x000000bc   Code   RO          597    i.list_deletions_handler  app_timer.o
+    0x0001b744   0x000000d4   Code   RO          598    i.list_insertions_handler  app_timer.o
+    0x0001b818   0x00000010   Code   RO          805    i.low_power_pwm_duty_set  low_power_pwm.o
+    0x0001b828   0x00000058   Code   RO          806    i.low_power_pwm_init  low_power_pwm.o
+    0x0001b880   0x00000022   Code   RO          807    i.low_power_pwm_start  low_power_pwm.o
+    0x0001b8a2   0x00000002   PAD
+    0x0001b8a4   0x0000005c   Code   RO            4    i.main              main.o
+    0x0001b900   0x0000002c   Code   RO          429    i.nrf_drv_clock_init  nrf_drv_clock.o
+    0x0001b92c   0x0000000c   Code   RO          433    i.nrf_drv_clock_lfclk_request  nrf_drv_clock.o
+    0x0001b938   0x00000024   Code   RO          434    i.nrf_drv_clock_on_soc_event  nrf_drv_clock.o
+    0x0001b95c   0x0000007c   Code   RO          809    i.pwm_timeout_handler  low_power_pwm.o
+    0x0001b9d8   0x00000044   Code   RO          599    i.rtc1_stop         app_timer.o
+    0x0001ba1c   0x00000084   Code   RO          600    i.timer_list_handler  app_timer.o
+    0x0001baa0   0x00000010   Code   RO          601    i.timer_list_handler_sched  app_timer.o
+    0x0001bab0   0x00000040   Code   RO          602    i.timer_list_insert  app_timer.o
+    0x0001baf0   0x00000080   Code   RO          603    i.timer_timeouts_check  app_timer.o
+    0x0001bb70   0x00000054   Code   RO          604    i.user_id_get       app_timer.o
+    0x0001bbc4   0x00000026   Code   RO          605    i.user_op_alloc     app_timer.o
+    0x0001bbea   0x00000002   PAD
+    0x0001bbec   0x00000010   Data   RO            6    .constdata          main.o
+    0x0001bbfc   0x00000004   Data   RO          749    .constdata          led_softblink.o
+    0x0001bc00   0x00000000   Data   RO         1055    Region$$Table       anon$$obj.o
+
+
+    Execution Region RW_IRAM1 (Base: 0x20004300, Size: 0x00000a38, Max: 0x00003d00, ABSOLUTE)
+
+    Base Addr    Size         Type   Attr      Idx    E Section Name        Object
+
+    0x20004300   0x00000020   Data   RW          606    .data               app_timer.o
+    0x20004320   0x00000004   Data   RW          750    .data               led_softblink.o
+    0x20004324   0x0000001c   Data   RW          885    .data               softdevice_handler.o
+    0x20004340   0x00000004   Data   RW          996    .data               system_nrf51.o
+    0x20004344   0x00000180   Zero   RW            5    .bss                main.o
+    0x200044c4   0x0000000c   Zero   RW          436    .bss                nrf_drv_clock.o
+    0x200044d0   0x00000048   Zero   RW          747    .bss                led_softblink.o
+    0x20004518   0x00000020   Zero   RW          748    .bss                led_softblink.o
+    0x20004538   0x00000800   Zero   RW          984    STACK               arm_startup_nrf51.o
+
