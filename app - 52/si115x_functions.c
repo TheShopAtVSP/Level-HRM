@@ -72,11 +72,11 @@ int16_t Si1153_Init(void)
 #else
 retval += Si115xParamSet( PARAM_CH_LIST, 0x03); // Enable chan 1 and 2
 	
-	retval += Si115xParamSet(PARAM_LED1_A, 0x00);
-	retval += Si115xParamSet(PARAM_LED2_A, 0x00);
+	retval += Si115xParamSet(PARAM_LED1_A, 0x18);
+	retval += Si115xParamSet(PARAM_LED2_A, 0x18);
 	///retval += Si115xParamSet(PARAM_LED3_A, 0x3f);
-	retval += Si115xParamSet(PARAM_LED1_B, 0x00);
-	retval += Si115xParamSet(PARAM_LED2_B, 0x00);
+	retval += Si115xParamSet(PARAM_LED1_B, 0x18);
+	retval += Si115xParamSet(PARAM_LED2_B, 0x18);
 	///retval += Si115xParamSet(PARAM_LED3_B, 0x3f);
 	
 	retval += Si115xParamSet(PARAM_ADCCONFIG0, 0x62);	// mux 4xd 24.4 uSec

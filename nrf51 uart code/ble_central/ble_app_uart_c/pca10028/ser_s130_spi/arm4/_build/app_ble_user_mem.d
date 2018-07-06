@@ -1,0 +1,17 @@
+.\_build\app_ble_user_mem.o: ..\..\..\..\..\..\components\serialization\application\codecs\s130\serializers\app_ble_user_mem.c
+.\_build\app_ble_user_mem.o: ..\..\..\..\..\..\components\serialization\application\codecs\s130\serializers\app_ble_user_mem.h
+.\_build\app_ble_user_mem.o: ..\..\..\..\..\..\components\softdevice\s130\headers\ble.h
+.\_build\app_ble_user_mem.o: ..\..\..\..\..\..\components\softdevice\s130\headers\ble_ranges.h
+.\_build\app_ble_user_mem.o: ..\..\..\..\..\..\components\softdevice\s130\headers\ble_types.h
+.\_build\app_ble_user_mem.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\_build\app_ble_user_mem.o: ..\..\..\..\..\..\components\softdevice\s130\headers\ble_gap.h
+.\_build\app_ble_user_mem.o: ..\..\..\..\..\..\components\softdevice\s130\headers\nrf_svc.h
+.\_build\app_ble_user_mem.o: ..\..\..\..\..\..\components\softdevice\s130\headers\ble_l2cap.h
+.\_build\app_ble_user_mem.o: ..\..\..\..\..\..\components\softdevice\s130\headers\ble_err.h
+.\_build\app_ble_user_mem.o: ..\..\..\..\..\..\components\softdevice\s130\headers\nrf_error.h
+.\_build\app_ble_user_mem.o: ..\..\..\..\..\..\components\softdevice\s130\headers\ble_gatt.h
+.\_build\app_ble_user_mem.o: ..\..\..\..\..\..\components\softdevice\s130\headers\ble_gattc.h
+.\_build\app_ble_user_mem.o: ..\..\..\..\..\..\components\softdevice\s130\headers\ble_gatts.h
+.\_build\app_ble_user_mem.o: ..\..\..\..\..\..\components\serialization\common\ser_config.h
+.\_build\app_ble_user_mem.o: ..\..\..\..\..\..\components\device\nrf.h
+.\_build\app_ble_user_mem.o: ..\..\..\..\..\..\components\device\nrf51.h
