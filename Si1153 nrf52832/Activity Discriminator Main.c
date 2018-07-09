@@ -40,8 +40,10 @@ int main (int argc, char *argv[])
 /*****************************************************************/	
 	
 	CheckListItem (mainpnl, MAINPNL_PD_PLOT, 3, 1);
-	ser_com_port =6;
-	OpenComConfig (ser_com_port, "COM6", 115200, 0, 8, 1, 16, 16);
+	ser_com_port =5;
+	OpenComConfig (ser_com_port, "COM5", 115200, 0, 8, 1, 16, 16);
+	//ser_com_port =6;
+	//OpenComConfig (ser_com_port, "COM6", 115200, 0, 8, 1, 16, 16);
 	//ser_com_port =3;
 	//OpenComConfig (ser_com_port, "COM3", 115200, 0, 8, 1, 16, 16);
 	//ser_com_port =7;

@@ -70,24 +70,24 @@ int16_t Si1153_Init(void)
     retval += Si115xParamSet( PARAM_ADCSENS1, 0x20); // HW/SW Gain deflt 0x20
 	retval += Si115xParamSet( PARAM_ADCPOST1, 0x40);	// 24 bit
 #else
-retval += Si115xParamSet( PARAM_CH_LIST, 0x03); // Enable chan 1 and 2
-	
-	retval += Si115xParamSet(PARAM_LED1_A, 0x18);
-	retval += Si115xParamSet(PARAM_LED2_A, 0x18);
-	///retval += Si115xParamSet(PARAM_LED3_A, 0x3f);
-	retval += Si115xParamSet(PARAM_LED1_B, 0x18);
-	retval += Si115xParamSet(PARAM_LED2_B, 0x18);
-	///retval += Si115xParamSet(PARAM_LED3_B, 0x3f);
-	
-	retval += Si115xParamSet(PARAM_ADCCONFIG0, 0x62);	// mux 4xd 24.4 uSec
-	retval += Si115xParamSet(PARAM_MEASCONFIG0, 0x01);//1
-	retval += Si115xParamSet( PARAM_ADCSENS0, 0x20);
-    retval += Si115xParamSet( PARAM_ADCPOST0, 0x40);
-	
-	retval += Si115xParamSet(PARAM_ADCCONFIG1, 0x62);	// mux 4xd 24.4 uSec
-	retval += Si115xParamSet(PARAM_MEASCONFIG1, 0x06); 	// bank B led 2 (data sheet wong)  //6
-//    retval += Si115xParamSet( PARAM_ADCSENS1, 0x52);
-	retval += Si115xParamSet( PARAM_ADCPOST1, 0x40);	// 24 bit
+	retval += Si115xParamSet( PARAM_CH_LIST, 0x03); // Enable chan 1 and 2
+    
+    retval += Si115xParamSet(PARAM_LED1_A, 0x12);
+    retval += Si115xParamSet(PARAM_LED2_A, 0x2A);
+    ///retval += Si115xParamSet(PARAM_LED3_A, 0x3f);
+    retval += Si115xParamSet(PARAM_LED1_B, 0x12);
+    retval += Si115xParamSet(PARAM_LED2_B, 0x2A); // 200mA is the max that Jason's LED B can take.
+    ///retval += Si115xParamSet(PARAM_LED3_B, 0x3f);
+    
+    retval += Si115xParamSet(PARAM_ADCCONFIG0, 0x62);    // mux 4xd 24.4 uSec
+    retval += Si115xParamSet(PARAM_MEASCONFIG0, 0x01);//1
+    retval += Si115xParamSet( PARAM_ADCSENS0, 0x20);
+	retval += Si115xParamSet( PARAM_ADCPOST0, 0x40);
+    
+    retval += Si115xParamSet(PARAM_ADCCONFIG1, 0x62);    // mux 4xd 24.4 uSec
+    retval += Si115xParamSet(PARAM_MEASCONFIG1, 0x06);     // bank B led 2 (data sheet wong)  //6
+	retval += Si115xParamSet( PARAM_ADCSENS1, 0x20);
+    retval += Si115xParamSet( PARAM_ADCPOST1, 0x40);    // 24 bit
 #endif
 
     return retval;	

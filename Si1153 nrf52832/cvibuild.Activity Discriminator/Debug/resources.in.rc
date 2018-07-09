@@ -1,7 +1,7 @@
 #include "C:\Program Files (x86)\National Instruments\Shared\MSDTRedistributables\SDKHeaderFiles\8.1\winver.h"
 
 2 ICON "c:\\program files (x86)\\national instruments\\cvi2017\\bin\\default.ico"
-1 24 "c:\\Users\\Mitch_Mason\\Desktop\\HRM 1153 level_1_1\\Level-HRM\\Si1153 nrf52832\\cvibuild.Activity Discriminator\\Debug\\manifest.xml"
+1 24 "c:\\Users\\matt\\Documents\\workspace\\theshop-level_HRM\\Si1153 nrf52832\\cvibuild.Activity Discriminator\\Debug\\manifest.xml"
 
 
 STRINGTABLE DISCARDABLE
@@ -22,13 +22,13 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "CompanyName", "VSP\0"
+            VALUE "CompanyName", "The Shop @ VSP Global\0"
             VALUE "FileDescription", "Activity Discriminator (Debug x86)\0"
             VALUE "FileVersion", "1.0\0"
             VALUE "InternalName", "Activity Discriminator\0"
-            VALUE "LegalCopyright", "Copyright © VSP 2018\0"
+            VALUE "LegalCopyright", "Copyright © The Shop @ VSP Global 2018\0"
             VALUE "OriginalFilename", "Activity Discriminator.exe\0"
-            VALUE "ProductName", "VSP Activity Discriminator\0"
+            VALUE "ProductName", "The Shop @ VSP Global Activity Discriminator\0"
             VALUE "ProductVersion", "1.0\0"
         END
     END

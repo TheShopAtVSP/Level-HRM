@@ -609,49 +609,135 @@ for(trialidx = 0; trialidx < 3; trialidx++)
 		SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
 	}
 #endif
-
-#if 1	
-	/// Eliminate Bounce.
-	old_num_of_emi_peaks = num_emi_peaks;
-///	avg_x_rng = avg_x_rng/3; // might be changed to depend on the last HR * some multipl
-	avg_x_rng = current_hrm / 8;   // 60hbpm @ 20sps => 10 for half cycle. 6 * 10 * 2 = 120.  60/10=6  = quarter cycle
-	for(i=0; i<num_emi_peaks; i++)
-	{
-		if((emi_peaks_xpos[i + 1] - emi_peaks_xpos[i]) < avg_x_rng)
-		{
-			old_num_of_emi_peaks--;
-			i=i+1;
-			trialerrorcnt[trialidx]++;
-			sprintf(out_str, "Found extra emi: emi_peaks_xpos[i] %d\n", emi_peaks_xpos[i]);
-			SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
-		}
-	}
-	num_emi_peaks = old_num_of_emi_peaks;
 	
-	old_num_of_absop_peaks = num_absop_peaks;
-	for(i=0; i<num_absop_peaks; i++)
-	{
-		if((absop_peaks_xpos[i + 1] - absop_peaks_xpos[i]) < avg_x_rng)
-		{
-			old_num_of_absop_peaks--;
-			i=i+1;
-			trialerrorcnt[trialidx]++;
-			sprintf(out_str, "Found extra absop: absop_peaks_xpos[i] %d\n", absop_peaks_xpos[i]);
-			SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
-		}
-	}
-	num_absop_peaks = old_num_of_absop_peaks;
-	
- 	sprintf(out_str, "Eliminate bounce final: Dh = %d, avg_x_rng = %d, emip = %d, absopp = %d\n", pd_emi_delta, avg_x_rng, num_emi_peaks, num_absop_peaks); 
- 	SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
-
-///	detect_peak(hrm_chan3_raw, hrm_raw_index, 8, 1);
-#endif	
+ #if 1
+    /// Plot peaks
+//      printf("===================================\n");  
+    for(i=0; i<num_emi_peaks; i++)
+    {
+        emi_peaks_dfp[i] = (double)emi_peaks[i]; 
+        emi_peaks_xpos_dfp[i] = (double)emi_peaks_xpos[i]; 
+//          printf("\nindx %d, expos = %d, ey= %d\n", i, emi_peaks_xpos[i], emi_peaks[i]);
+    }
+//      printf("ABSORPSION\n");
+    for(i=0; i<num_absop_peaks; i++)
+    {                                            
+        absop_peaks_dfp[i] = (double)absop_peaks[i];
+        absop_peaks_xpos_dfp[i] = (double)absop_peaks_xpos[i];
+//          printf("indx %d, axpos = %d, ay= %d\n", i, absop_peaks_xpos[i], absop_peaks[i]);
+    }
+    if(trialidx == 2)
+    {
+        DeleteGraphPlot (mainpnl, MAINPNL_SIG4GRAPH, -1, VAL_IMMEDIATE_DRAW);
+        /// Plot subtract
+        GetCtrlVal(mainpnl, MAINPNL_PHASE2SF, &phase2sf);
+        if(phase2sf)
+        {
+            for(i = 0; i < hrm_raw_index; i++)
+            {
+                raw_hart[i] = (double)(hrm_chan3_raw[i]);
+            }
+        //  DeleteGraphPlot (mainpnl, MAINPNL_SIG4GRAPH, -1, VAL_IMMEDIATE_DRAW);
+            PlotY (mainpnl, MAINPNL_SIG4GRAPH, raw_hart, hrm_raw_index, VAL_DOUBLE,VAL_THIN_LINE, VAL_EMPTY_SQUARE, VAL_SOLID, 1, VAL_BLUE);
+            GetAxisScalingMode (mainpnl, MAINPNL_SIG4GRAPH, VAL_LEFT_YAXIS, NULL, &ymin, &ymax);
+            sprintf(scaledeltastr, "%f", ymax - ymin);
+            PlotText (mainpnl, MAINPNL_SIG4GRAPH, 0.0, raw_hart[2], scaledeltastr, VAL_APP_META_FONT, VAL_BLACK, VAL_TRANSPARENT);
+        }
+        if(num_emi_peaks >= 1)
+            PlotXY (mainpnl, MAINPNL_SIG4GRAPH, emi_peaks_xpos_dfp, emi_peaks_dfp, num_emi_peaks, VAL_DOUBLE, VAL_DOUBLE, VAL_SCATTER, VAL_SOLID_CIRCLE, VAL_SOLID, 1, VAL_GREEN);
+        if(num_absop_peaks >= 1)
+            PlotXY (mainpnl, MAINPNL_SIG4GRAPH, absop_peaks_xpos_dfp, absop_peaks_dfp, num_absop_peaks, VAL_DOUBLE, VAL_DOUBLE, VAL_SCATTER, VAL_SOLID_CIRCLE, VAL_SOLID, 1, VAL_BLUE);
+    }
+    if(trialidx == 1)
+    {
+        DeleteGraphPlot (mainpnl, MAINPNL_SIG3GRAPH, -1, VAL_IMMEDIATE_DRAW);
+        for(i = 0; i < hrm_raw_index; i++)
+        {
+            raw_hart[i] = (double)hrm_chan3_raw[i];
+        }
+        //DeleteGraphPlot (mainpnl, MAINPNL_SIG3GRAPH, -1, VAL_IMMEDIATE_DRAW);
+        PlotY (mainpnl, MAINPNL_SIG3GRAPH, raw_hart, hrm_raw_index, VAL_DOUBLE,VAL_THIN_LINE, VAL_EMPTY_SQUARE, VAL_SOLID, 1, VAL_GREEN);
+        GetAxisScalingMode (mainpnl, MAINPNL_SIG3GRAPH, VAL_LEFT_YAXIS, NULL, &ymin, &ymax);
+        sprintf(scaledeltastr, "%f", ymax - ymin);
+        PlotText (mainpnl, MAINPNL_SIG3GRAPH, 0.0, raw_hart[2], scaledeltastr, VAL_APP_META_FONT, VAL_BLACK, VAL_TRANSPARENT);
+        if(num_emi_peaks >= 1)
+            PlotXY (mainpnl, MAINPNL_SIG3GRAPH, emi_peaks_xpos_dfp, emi_peaks_dfp, num_emi_peaks, VAL_DOUBLE, VAL_DOUBLE, VAL_SCATTER, VAL_SOLID_CIRCLE, VAL_SOLID, 1, VAL_GREEN);
+        if(num_absop_peaks >= 1)
+            PlotXY (mainpnl, MAINPNL_SIG3GRAPH, absop_peaks_xpos_dfp, absop_peaks_dfp, num_absop_peaks, VAL_DOUBLE, VAL_DOUBLE, VAL_SCATTER, VAL_SOLID_CIRCLE, VAL_SOLID, 1, VAL_BLUE);
+    }
+    if(trialidx == 0)
+    {
+        DeleteGraphPlot (mainpnl, MAINPNL_SIG2GRAPH, -1, VAL_IMMEDIATE_DRAW);
+        for(i = 0; i < hrm_raw_index; i++)
+        {
+            raw_hart[i] = (double)hrm_chan3_raw[i];
+        }
+        //DeleteGraphPlot (mainpnl, MAINPNL_SIG2GRAPH, -1, VAL_IMMEDIATE_DRAW);
+        PlotY (mainpnl, MAINPNL_SIG2GRAPH, raw_hart, hrm_raw_index, VAL_DOUBLE,VAL_THIN_LINE, VAL_EMPTY_SQUARE, VAL_SOLID, 1, VAL_RED);
+        GetAxisScalingMode (mainpnl, MAINPNL_SIG2GRAPH, VAL_LEFT_YAXIS, NULL, &ymin, &ymax);
+        sprintf(scaledeltastr, "%f", ymax - ymin);
+        PlotText (mainpnl, MAINPNL_SIG2GRAPH, 0.0, raw_hart[2], scaledeltastr, VAL_APP_META_FONT, VAL_BLACK, VAL_TRANSPARENT);
+        if(num_emi_peaks >= 1)
+            PlotXY (mainpnl, MAINPNL_SIG2GRAPH, emi_peaks_xpos_dfp, emi_peaks_dfp, num_emi_peaks, VAL_DOUBLE, VAL_DOUBLE, VAL_SCATTER, VAL_SOLID_CIRCLE, VAL_SOLID, 1, VAL_GREEN);
+        if(num_absop_peaks >= 1)
+            PlotXY (mainpnl, MAINPNL_SIG2GRAPH, absop_peaks_xpos_dfp, absop_peaks_dfp, num_absop_peaks, VAL_DOUBLE, VAL_DOUBLE, VAL_SCATTER, VAL_SOLID_CIRCLE, VAL_SOLID, 1, VAL_BLUE);
+    }
+#endif
+    
+    
+#if 1   
+    /// Eliminate Bounce.
+    old_num_of_emi_peaks = num_emi_peaks;
+/// avg_x_rng = avg_x_rng/3; // might be changed to depend on the last HR * some multipl
+    avg_x_rng = current_hrm / 8;   // 60hbpm @ 20sps => 10 for half cycle. 6 * 10 * 2 = 120.  60/10=6  = quarter cycle
+    for(i=0; i<num_emi_peaks; i++)
+    {
+        if((emi_peaks_xpos[i + 1] - emi_peaks_xpos[i]) < avg_x_rng)
+        {
+            old_num_of_emi_peaks--;
+            i=i+1;
+            trialerrorcnt[trialidx]++;
+            sprintf(out_str, "Found extra emi: emi_peaks_xpos[i] %d\n", emi_peaks_xpos[i]);
+            SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
+            if(trialidx == 2)
+                PlotPoint (mainpnl, MAINPNL_SIG4GRAPH, emi_peaks_xpos[i], 0, VAL_SOLID_SQUARE, VAL_RED);
+            if(trialidx == 1)
+                PlotPoint (mainpnl, MAINPNL_SIG3GRAPH, emi_peaks_xpos[i], 0, VAL_SOLID_SQUARE, VAL_RED);
+            if(trialidx == 0)
+                PlotPoint (mainpnl, MAINPNL_SIG2GRAPH, emi_peaks_xpos[i], 0, VAL_SOLID_SQUARE, VAL_RED);
+        }
+    }
+    num_emi_peaks = old_num_of_emi_peaks;
+    
+    old_num_of_absop_peaks = num_absop_peaks;
+    for(i=0; i<num_absop_peaks; i++)
+    {
+        if((absop_peaks_xpos[i + 1] - absop_peaks_xpos[i]) < avg_x_rng)
+        {
+            old_num_of_absop_peaks--;
+            i=i+1;
+            trialerrorcnt[trialidx]++;
+            sprintf(out_str, "Found extra absop: absop_peaks_xpos[i] %d\n", absop_peaks_xpos[i]);
+            SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
+            if(trialidx == 2)  
+                PlotPoint (mainpnl, MAINPNL_SIG4GRAPH, absop_peaks_xpos[i], 0, VAL_BOLD_X, VAL_RED);
+            if(trialidx == 1)
+                PlotPoint (mainpnl, MAINPNL_SIG3GRAPH, absop_peaks_xpos[i], 0, VAL_BOLD_X, VAL_RED);
+            if(trialidx == 0)
+                PlotPoint (mainpnl, MAINPNL_SIG2GRAPH, absop_peaks_xpos[i], 0, VAL_BOLD_X, VAL_RED);
+        }
+    }
+    num_absop_peaks = old_num_of_absop_peaks;
+    
+    sprintf(out_str, "Eliminate bounce final: Dh = %d, avg_x_rng = %d, emip = %d, absopp = %d\n", pd_emi_delta, avg_x_rng, num_emi_peaks, num_absop_peaks); 
+    SetCtrlVal(mainpnl, MAINPNL_TEXTBOX, out_str);
+/// detect_peak(hrm_chan3_raw, hrm_raw_index, 8, 1);
+#endif
 
 //	trialerrorcnt[trialidx] = abs(oldemiandabsoppd[trialidx] - (num_emi_peaks + num_absop_peaks));
 	emiandabsoppd[trialidx] = num_emi_peaks + num_absop_peaks;
 	
-#if 1
+#if 0
 	/// Plot peaks
 //		printf("===================================\n");	
 	for(i=0; i<num_emi_peaks; i++)
