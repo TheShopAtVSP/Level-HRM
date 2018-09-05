@@ -36,7 +36,7 @@ int CVICALLBACK Save_Data (int panel, int control, int event, void *callbackData
                       int eventData1, int eventData2)
 {
     int 	i;
-	char 	index_fn[64], tmp_str[128];
+	char 	index_fn[256], tmp_str[128];
 
     if (event == EVENT_COMMIT)
     {
@@ -52,7 +52,7 @@ int CVICALLBACK Save_Data (int panel, int control, int event, void *callbackData
 			 
 		}  */
 		
-		if (FileSelectPopupEx ("c:\\Act_Dis_Data_1", "*.dat", "*.dat",
+		if (FileSelectPopupEx (".\\Act_Dis_Data_1", "*.dat", "*.dat",
 		"Name of File to Save", VAL_OK_BUTTON, 1, 1, file_name) > 0)
     	{
             ArrayToFile (file_name, fio_array, VAL_DOUBLE, (ser_input_size + 64)*6, 6,
@@ -68,11 +68,11 @@ int CVICALLBACK Save_Data (int panel, int control, int event, void *callbackData
 			CloseFile (handle);
 		
 			// store a copy into Last_One for fast load.
-			ArrayToFile ("c:\\Act_Dis_Data_1\\Last_One_Data.dat", fio_array, VAL_DOUBLE, (ser_input_size + 64)*6, 6,
+			ArrayToFile (".\\Act_Dis_Data_1\\Last_One_Data.dat", fio_array, VAL_DOUBLE, (ser_input_size + 64)*6, 6,
                          VAL_GROUPS_TOGETHER, VAL_GROUPS_AS_ROWS,
                          VAL_CONST_WIDTH, 16, VAL_ASCII, VAL_TRUNCATE);
 			
-			handle = OpenFile ("c:\\Act_Dis_Data_1\\Last_One_Index.dat.nos", VAL_READ_WRITE, VAL_TRUNCATE, VAL_ASCII);
+			handle = OpenFile (".\\Act_Dis_Data_1\\Last_One_Index.dat.nos", VAL_READ_WRITE, VAL_TRUNCATE, VAL_ASCII);
 			sprintf(tmp_str, "%d", ser_input_size);
 			WriteFile (handle, tmp_str , strlen(tmp_str));
 			CloseFile (handle);
@@ -93,7 +93,7 @@ int CVICALLBACK Load_Data (int panel, int control, int event, void *callbackData
 	
     if (event == EVENT_COMMIT)
     {
-    	if (FileSelectPopupEx ("c:\\Act_Dis_Data_1", "*.dat", "*.dat", "Name of File to Read", VAL_OK_BUTTON, 0, 1, file_name) > 0)
+    	if (FileSelectPopupEx (".\\Act_Dis_Data_1", "*.dat", "*.dat", "Name of File to Read", VAL_OK_BUTTON, 0, 1, file_name) > 0)
         {
 			strcpy(nosfn, file_name);
 			strcat(nosfn, ".nos");
@@ -117,9 +117,9 @@ int CVICALLBACK Load_Data (int panel, int control, int event, void *callbackData
 			 raw_acl_z[i/6] = fio_array[i+2];
 			 raw_gyr_p[i/6] = fio_array[i+3];
 			 hrm_chan1_raw[i/6] = (int16_t)raw_gyr_p[i/6];
-		 	raw_gyr_y[i/6] = fio_array[i+4];
-		 	hrm_chan2_raw[i/6] = (int16_t)raw_gyr_y[i/6]; 
-			 raw_gyr_r[i/6] = fio_array[i+5];
+		 	 raw_gyr_y[i/6] = fio_array[i+4];
+		 	 hrm_chan2_raw[i/6] = (int16_t)raw_gyr_y[i/6]; 
+			 silly_ratio = (float)fio_array[i+5];
             }
 		}
 		
@@ -142,7 +142,7 @@ int CVICALLBACK Load_Last_Data (int panel, int control, int event,
 	
 	if (event == EVENT_COMMIT)
     {
-		handle = OpenFile ("c:\\Act_Dis_Data_1\\Last_One_Index.dat.nos", VAL_READ_ONLY, VAL_TRUNCATE, VAL_ASCII);
+		handle = OpenFile (".\\Act_Dis_Data_1\\Last_One_Index.dat.nos", VAL_READ_ONLY, VAL_TRUNCATE, VAL_ASCII);
 		ReadFile (handle, tmp_str , 10);
 		CloseFile (handle);
 		ser_input_size = atoi(tmp_str);
@@ -150,7 +150,7 @@ int CVICALLBACK Load_Last_Data (int panel, int control, int event,
 		//SetCtrlVal(mainpnl, MAINPNL_NRTS, ser_input_size);
 		
 		memset(fio_array, 0, sizeof(fio_array));
-        FileToArray ("c:\\Act_Dis_Data_1\\Last_One_Data.dat", fio_array, VAL_DOUBLE, (ser_input_size + 64)*6, 6,
+        FileToArray (".\\Act_Dis_Data_1\\Last_One_Data.dat", fio_array, VAL_DOUBLE, (ser_input_size + 64)*6, 6,
                      VAL_GROUPS_TOGETHER, VAL_GROUPS_AS_ROWS, VAL_ASCII);
 	
 		// Demux the data.

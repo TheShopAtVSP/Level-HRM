@@ -64,7 +64,7 @@ int8_t detect_peak(
 #define HELP_MSG 		"This program: Activity Discriminator"
 // #define RAW_DATA_SIZE 	2102	= 2048 + 64, 4160 = 4096 + 64
 #define RAW_DATA_SIZE 	4160
-#define DATA_DIR		"c:\Act_Dis_Data_1"
+#define DATA_DIR		".\\Act_Dis_Data_1"
 #define ON 1
 #define OFF 0
 #define HRM_DP_DATA_SIZE 64

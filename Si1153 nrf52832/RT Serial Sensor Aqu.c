@@ -107,9 +107,9 @@ void RT_Scan_Loop(void)
 			 fio_array[i*6+0] = raw_acl_x[i];
 			 fio_array[i*6+1] = raw_acl_y[i];
 			 fio_array[i*6+2] = raw_acl_z[i];
-			 fio_array[i*6+3] = raw_gyr_p[i];
-			 fio_array[i*6+4] = raw_gyr_y[i];
-			 fio_array[i*6+5] = raw_gyr_r[i];
+			 fio_array[i*6+3] = hrm_chan1_raw[i];
+			 fio_array[i*6+4] = hrm_chan2_raw[i];
+			 fio_array[i*6+5] = silly_ratio;
 		}
 		Apply_Peak_Detector();
 		/// Apply_Peak_Detector();

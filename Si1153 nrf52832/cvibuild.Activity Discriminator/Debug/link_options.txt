@@ -11,8 +11,8 @@
 -dlldeps:c:\Users\matt\Documents\workspace\theshop-level_HRM\Si1153 nrf52832\cvibuild.Activity Discriminator\Debug\dlldependencies.txt
 -licensing:c:\Users\matt\Documents\workspace\theshop-level_HRM\Si1153 nrf52832\cvibuild.Activity Discriminator\Debug\linkerlicensing.txt
 -browsedeps:c:\Users\matt\Documents\workspace\theshop-level_HRM\Si1153 nrf52832\cvibuild.Activity Discriminator\Debug\moduledependencies.txt
--stackreserve:131072
--stackcommit:4096
+-stackreserve:256000
+-stackcommit:256000
 -in:c:\Users\matt\Documents\workspace\theshop-level_HRM\Si1153 nrf52832\cvibuild.Activity Discriminator\Debug\Activity Discriminator Main.obj
 -in:c:\Users\matt\Documents\workspace\theshop-level_HRM\Si1153 nrf52832\cvibuild.Activity Discriminator\Debug\Activity_Procedural.obj
 -in:c:\Users\matt\Documents\workspace\theshop-level_HRM\Si1153 nrf52832\cvibuild.Activity Discriminator\Debug\Blood Hart.obj
