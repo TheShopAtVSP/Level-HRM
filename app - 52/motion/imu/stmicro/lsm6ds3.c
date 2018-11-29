@@ -211,11 +211,11 @@ ret_code_t lsm6ds3_init_sensors( void )
 	
 	//Check Hardware Who Am I Register. Expected Return: LSM6DS3_DEVICE_ID
 	err = lsm6ds3_read( LSM6DS3_WHO_AM_I_REG, 1, &temp_reg_val );
-	if (imu_debug) app_trace_log(DEBUG_MED, "[INIT_XL]: Who: 0x%02X\r", temp_reg_val);
+	if (imu_debug) app_trace_log(DEBUG_MED, "[INIT_XL]: Who: 0x%02X\r\n", temp_reg_val);
 	
 	//Read and Print Control Register to check default state
 	//err = lsm6ds3_read( LSM6DS3_CTRL8_XL_ADDR, 1, &temp_reg_val);
-	//if( imu_debug ) app_trace_log(DEBUG_LOW, "Ctrl 8: 0x%02X\r", temp_reg_val);
+	//if( imu_debug ) app_trace_log(DEBUG_LOW, "Ctrl 8: 0x%02X\r\n", temp_reg_val);
 	
 	//Set Up Accelerometer
 	err = lsm6ds3_set_fs( LSM6DS3_ACCEL, DEF_ACCEL_FSR );
@@ -257,7 +257,7 @@ ret_code_t lsm6ds3_init_sensors( void )
 
 #if defined( LIS3MDL )	
 	if( lsm6ds3_init_lis3mdl( false ) == false ) {
-		if (imu_debug) app_trace_log(DEBUG_MED, "Compass Init fail\r");
+		if (imu_debug) app_trace_log(DEBUG_MED, "Compass Init fail\r\n");
 	}
 #endif
 
@@ -289,13 +289,13 @@ static ret_code_t lsm6ds3_self_test( void )
 	int32_t accum_nost[3];
 	int32_t accum_st[3];
 	int32_t res[3];
-	TTASK_TIMER to;
+	expire_timer_t to;
 	
 	//Accel Self Test: Enable Ax/Ay/Az, Set BDU = 1, ODR = 52Hz, FS = +-2G
 	err = lsm6ds3_write( LSM6DS3_CTRL1_XL, 10, xl_test_setting );
 	if( err != NRF_SUCCESS )
 	{
-		app_trace_log(DEBUG_HIGH, "[ST]: XL Test failed 0x%02X\r", err);
+		app_trace_log(DEBUG_HIGH, "[ST]: XL Test failed 0x%02X\r\n", err);
 		return err;
 	}
 	
@@ -311,8 +311,8 @@ static ret_code_t lsm6ds3_self_test( void )
 	
 	//Acumulate next 5 readings of Ax, Ay, Az
 	accum_nost[0] = accum_nost[1] = accum_nost[2] = 0;
-	read_cnt = 0;
-	start_task_timer( to, 250);		//wait upto 250 ms for transfer to complete
+	read_cnt = 0;	
+	get_expire_time( (250*1000UL), &to );	//wait upto 250 ms for transfer to complete	
 	while( read_cnt < AVE_CNT )
 	{
 		if( nrf_gpio_pin_read(AXIS_INT1) == LSM6DS3_INT_ACTIVE )
@@ -321,18 +321,18 @@ static ret_code_t lsm6ds3_self_test( void )
 			accum_nost[0] += data[0];
 			accum_nost[1] += data[1];
 			accum_nost[2] += data[2];
-			//app_trace_log(DEBUG_MED, "[ST]: Rd%01u X:%01d Y:%01d Z:%01d @%01u\r", read_cnt, data[0], data[1], data[2], getSystemTimeMs());
+			//app_trace_log(DEBUG_MED, "[ST]: Rd%01u X:%01d Y:%01d Z:%01d @%01u\r\n", read_cnt, data[0], data[1], data[2], getSystemTimeMs());
 			read_cnt++;	
 			
 			if( nrf_gpio_pin_read(AXIS_INT1) == LSM6DS3_INT_ACTIVE )
 			{	//Should be inactive after reading
-				app_trace_log(DEBUG_HIGH, "[ST]:  XL_NOST INT1 ERR\r");
+				app_trace_log(DEBUG_HIGH, "[ST]:  XL_NOST INT1 ERR\r\n");
 				return NRF_ERROR_INVALID_STATE;
 			}
 		}
 		
-		if( task_time(to) ) {
-			app_trace_log(DEBUG_HIGH, "[ST]: XL_NOST Timeout\r");
+		if( check_expiration( &to ) ) {
+			app_trace_log(DEBUG_HIGH, "[ST]: XL_NOST Timeout\r\n");
 			return NRF_ERROR_TIMEOUT;
 		}
 	}	
@@ -350,7 +350,7 @@ static ret_code_t lsm6ds3_self_test( void )
 	//Acumulate next 5 readings of Ax, Ay, Az
 	accum_st[0] = accum_st[1] = accum_st[2] = 0;
 	read_cnt = 0;
-	start_task_timer( to, 250);		//wait upto 250 ms for transfer to complete
+	get_expire_time( (250*1000UL), &to );	//wait upto 250 ms for transfer to complete	
 	while( read_cnt < AVE_CNT )
 	{
 		if( nrf_gpio_pin_read(AXIS_INT1) == LSM6DS3_INT_ACTIVE )
@@ -359,18 +359,18 @@ static ret_code_t lsm6ds3_self_test( void )
 			accum_st[0] += data[0];
 			accum_st[1] += data[1];
 			accum_st[2] += data[2];
-			//app_trace_log(DEBUG_MED, "[ST]: Rd%01u X:%01d Y:%01d Z:%01d @%01u\r", read_cnt, data[0], data[1], data[2], getSystemTimeMs());
+			//app_trace_log(DEBUG_MED, "[ST]: Rd%01u X:%01d Y:%01d Z:%01d @%01u\r\n", read_cnt, data[0], data[1], data[2], getSystemTimeMs());
 			read_cnt++;	
 			
 			if( nrf_gpio_pin_read(AXIS_INT1) == LSM6DS3_INT_ACTIVE )
 			{	//Should be inactive after reading
-				app_trace_log(DEBUG_HIGH, "[ST]: XL_ST INT1 ERR\r");
+				app_trace_log(DEBUG_HIGH, "[ST]: XL_ST INT1 ERR\r\n");
 				return NRF_ERROR_INVALID_STATE;
 			}
 		}
 		
-		if( task_time(to) ) {
-			app_trace_log(DEBUG_HIGH, "[ST]: XL_ST Timeout\r");
+		if( check_expiration( &to ) ) {
+			app_trace_log(DEBUG_HIGH, "[ST]: XL_ST Timeout\r\n");
 			return NRF_ERROR_TIMEOUT;
 		}
 	}	
@@ -393,25 +393,25 @@ static ret_code_t lsm6ds3_self_test( void )
 	if( res[0] < MIN_ST_A || res[0] > MAX_ST_A )
 	{
 		//Fail
-		app_trace_log(DEBUG_HIGH, "[ST_A X]: 0x%04X\r", res[0]);
+		app_trace_log(DEBUG_HIGH, "[ST_A X]: 0x%04X\r\n", res[0]);
 		return NRF_ERROR_INVALID_DATA;
 	}
 	else if( res[1] < MIN_ST_A || res[1] > MAX_ST_A )
 	{
 		//Fail
-		app_trace_log(DEBUG_HIGH, "[ST_A Y]: 0x%04X\r", res[1]);
+		app_trace_log(DEBUG_HIGH, "[ST_A Y]: 0x%04X\r\n", res[1]);
 		return NRF_ERROR_INVALID_DATA;
 	}
 	else if( res[2] < MIN_ST_A || res[2] > MAX_ST_A )
 	{
 		//Fail
-		app_trace_log(DEBUG_HIGH, "[ST_A Z]: 0x%04X\r", res[2]);
+		app_trace_log(DEBUG_HIGH, "[ST_A Z]: 0x%04X\r\n", res[2]);
 		return NRF_ERROR_INVALID_DATA;
 	}
 	else
 	{
 		//Accel Pass
-		app_trace_log(DEBUG_MED, "[ST]: A Pass: %01d, %01d, %01d\r", res[0], res[1], res[2]);
+		app_trace_log(DEBUG_MED, "[ST]: A Pass: %01d, %01d, %01d\r\n", res[0], res[1], res[2]);
 	}
 		
 	//GYRO Self Test: Enable Gx/Gy/Gz, Set BDU = 1, ODR = 208Hz, FS = +-2000dps
@@ -430,7 +430,7 @@ static ret_code_t lsm6ds3_self_test( void )
 	//Acumulate next 5 readings of Gx, Gy, Gz
 	accum_nost[0] = accum_nost[1] = accum_nost[2] = 0;
 	read_cnt = 0;
-	start_task_timer( to, 250);		//wait upto 250 ms for transfer to complete
+	get_expire_time( (250*1000UL), &to );	//wait upto 250 ms for transfer to complete	
 	while( read_cnt < AVE_CNT )
 	{
 		if( nrf_gpio_pin_read(AXIS_INT2) == LSM6DS3_INT_ACTIVE )
@@ -439,18 +439,18 @@ static ret_code_t lsm6ds3_self_test( void )
 			accum_nost[0] += data[0];
 			accum_nost[1] += data[1];
 			accum_nost[2] += data[2];
-			//app_trace_log(DEBUG_MED, "[ST]: Rd%01u X:%01d Y:%01d Z:%01d @%01u\r", read_cnt, data[0], data[1], data[2], getSystemTimeMs());
+			//app_trace_log(DEBUG_MED, "[ST]: Rd%01u X:%01d Y:%01d Z:%01d @%01u\r\n", read_cnt, data[0], data[1], data[2], getSystemTimeMs());
 			read_cnt++;	
 			
 			if( nrf_gpio_pin_read(AXIS_INT2) == LSM6DS3_INT_ACTIVE )
 			{	//Should be inactive after reading
-				app_trace_log(DEBUG_HIGH, "[ST]: G_NOST INT1 ERR\r");
+				app_trace_log(DEBUG_HIGH, "[ST]: G_NOST INT1 ERR\r\n");
 				return NRF_ERROR_INVALID_STATE;
 			}
 		}
 		
-		if( task_time(to) ) {
-			app_trace_log(DEBUG_HIGH, "[ST]: G_NOST Timeout\r");
+		if( check_expiration( &to ) ) {
+			app_trace_log(DEBUG_HIGH, "[ST]: G_NOST Timeout\r\n");
 			return NRF_ERROR_TIMEOUT;
 		}
 	}	
@@ -468,7 +468,7 @@ static ret_code_t lsm6ds3_self_test( void )
 	//Acumulate next 5 readings of Gx, Gy, Gz
 	accum_st[0] = accum_st[1] = accum_st[2] = 0;
 	read_cnt = 0;
-	start_task_timer( to, 250);		//wait upto 250 ms for transfer to complete
+	get_expire_time( (250*1000UL), &to );	//wait upto 250 ms for transfer to complete	
 	while( read_cnt < AVE_CNT )
 	{
 		if( nrf_gpio_pin_read(AXIS_INT2) == LSM6DS3_INT_ACTIVE )
@@ -477,18 +477,18 @@ static ret_code_t lsm6ds3_self_test( void )
 			accum_st[0] += data[0];
 			accum_st[1] += data[1];
 			accum_st[2] += data[2];
-			//app_trace_log(DEBUG_MED, "[ST]: Rd%01u X:%01d Y:%01d Z:%01d @%01u\r", read_cnt, data[0], data[1], data[2], getSystemTimeMs());
+			//app_trace_log(DEBUG_MED, "[ST]: Rd%01u X:%01d Y:%01d Z:%01d @%01u\r\n", read_cnt, data[0], data[1], data[2], getSystemTimeMs());
 			read_cnt++;	
 			
 			if( nrf_gpio_pin_read(AXIS_INT2) == LSM6DS3_INT_ACTIVE )
 			{	//Should be inactive after reading
-				app_trace_log(DEBUG_HIGH, "[ST]: G_ST INT1 ERR\r");
+				app_trace_log(DEBUG_HIGH, "[ST]: G_ST INT1 ERR\r\n");
 				return NRF_ERROR_INVALID_STATE;
 			}
 		}
 		
-		if( task_time(to) ) {
-			app_trace_log(DEBUG_HIGH, "[ST]: G_ST Timeout\r");
+		if( check_expiration( &to ) ) {
+			app_trace_log(DEBUG_HIGH, "[ST]: G_ST Timeout\r\n");
 			return NRF_ERROR_TIMEOUT;
 		}
 	}
@@ -511,25 +511,25 @@ static ret_code_t lsm6ds3_self_test( void )
 	if( res[0] < MIN_ST_G_2000DPS || res[0] > MAX_ST_G_2000DPS )
 	{
 		//Fail
-		app_trace_log(DEBUG_HIGH, "[ST_G X]: 0x%04X\r", res[0]);
+		app_trace_log(DEBUG_HIGH, "[ST_G X]: 0x%04X\r\n", res[0]);
 		return NRF_ERROR_INVALID_DATA;
 	}
 	else if( res[1] < MIN_ST_G_2000DPS || res[1] > MAX_ST_G_2000DPS )
 	{
 		//Fail
-		app_trace_log(DEBUG_HIGH, "[ST_G Y]: 0x%04X\r", res[1]);
+		app_trace_log(DEBUG_HIGH, "[ST_G Y]: 0x%04X\r\n", res[1]);
 		return NRF_ERROR_INVALID_DATA;
 	}
 	else if( res[2] < MIN_ST_G_2000DPS || res[2] > MAX_ST_G_2000DPS )
 	{
 		//Fail
-		app_trace_log(DEBUG_HIGH, "[ST_G Z]: 0x%04X\r", res[2]);
+		app_trace_log(DEBUG_HIGH, "[ST_G Z]: 0x%04X\r\n", res[2]);
 		return NRF_ERROR_INVALID_DATA;
 	}
 	else
 	{
 		//Gyro Pass
-		app_trace_log(DEBUG_MED, "[ST]: G Pass: %01d, %01d, %01d\r", res[0], res[1], res[2]);
+		app_trace_log(DEBUG_MED, "[ST]: G Pass: %01d, %01d, %01d\r\n", res[0], res[1], res[2]);
 	}
 	
 	return err;
@@ -550,7 +550,7 @@ ret_code_t lsm6ds3_run_self_test( void )
 	err |= lsm6ds3_read( LSM6DS3_CTRL1_XL, 10, cntrl_copy );
 	if( err != NRF_SUCCESS )
 	{
-		app_trace_log(DEBUG_HIGH, "[ST]: Copy failed 0x%02X\r", err);
+		app_trace_log(DEBUG_HIGH, "[ST]: Copy failed 0x%02X\r\n", err);
 		return err;
 	}
 	lsm6ds3_write( LSM6DS3_MD1_CFG, 2, clear );		//turn off wake on motion Interrupt
@@ -564,7 +564,7 @@ ret_code_t lsm6ds3_run_self_test( void )
 	err |= lsm6ds3_write( LSM6DS3_INT1_CTRL, 2, int_copy );
 	if( err != NRF_SUCCESS )
 	{
-		app_trace_log(DEBUG_HIGH, "[ST]: Restore failed 0x%02X\r", err);
+		app_trace_log(DEBUG_HIGH, "[ST]: Restore failed 0x%02X\r\n", err);
 		return err;
 	}
 	
@@ -706,7 +706,7 @@ ret_code_t lsm6ds3_wake_on_motion( bool en_wom )
 		//Indicate that WOM running
 		imu_cfg.sensor_en |= MOTION_WAKE_EN_MASK;		
 
-		//app_trace_log(DEBUG_LOW, "Wake On Motion Enabled\r");
+		//app_trace_log(DEBUG_LOW, "Wake On Motion Enabled\r\n");
 	}
 	else {
 		//turn Off Wake on Motion Int
@@ -735,23 +735,23 @@ ret_code_t lsm6ds3_check_wom( void )
 	//Reading the master config seems to keep the device from getting permaneantly lost on FIFO overflows
 	err = lsm6ds3_read( LSM6DS3_MASTER_CFG, 1, read_val);
 	if (err != NRF_SUCCESS) return err;	
-	//app_trace_log(DEBUG_LOW, "Master Config: 0x%02X\r", read_val[0] );
+	//app_trace_log(DEBUG_LOW, "Master Config: 0x%02X\r\n", read_val[0] );
 	
 	err = lsm6ds3_read( LSM6DS3_CTRL1_XL, 2, read_val);		//Read Accel and Gyro Control Registers
 	if (err != NRF_SUCCESS) return err;
 	if( (read_val[0]&CTRL1_XL_ODR_MASK) != (ODR_13HZ_VAL<<ODR_REG_OFFSET) ) {
-		app_trace_log(DEBUG_MED, "Accel ODR: 0x%02X, Not 0x%02X\r", (read_val[0]&CTRL1_XL_ODR_MASK), (ODR_13HZ_VAL<<ODR_REG_OFFSET) );
+		app_trace_log(DEBUG_MED, "Accel ODR: 0x%02X, Not 0x%02X\r\n", (read_val[0]&CTRL1_XL_ODR_MASK), (ODR_13HZ_VAL<<ODR_REG_OFFSET) );
 		return NRF_ERROR_INVALID_STATE;
 	}
 	if( (read_val[1]&CTRL2_GYRO_ODR_MASK) != (ODR_POWER_OFF_VAL<<ODR_REG_OFFSET) ) {
-		app_trace_log(DEBUG_MED, "Gyro ODR: 0x%02X, Not 0\r", (read_val[1]&CTRL2_GYRO_ODR_MASK) );
+		app_trace_log(DEBUG_MED, "Gyro ODR: 0x%02X, Not 0\r\n", (read_val[1]&CTRL2_GYRO_ODR_MASK) );
 		return NRF_ERROR_INVALID_STATE;
 	}
 	
 	err = lsm6ds3_read( LSM6DS3_MD1_CFG, 1, read_val);	
 	if (err != NRF_SUCCESS) return err;
 	if( (read_val[0]&MD1_CFG_INT1_WAKE_UP) != MD1_CFG_INT1_WAKE_UP ) {
-		app_trace_log(DEBUG_MED, "WOM not Enabled\r");
+		app_trace_log(DEBUG_MED, "WOM not Enabled\r\n");
 		
 		imu_cfg.sensor_en &= ~MOTION_WAKE_EN_MASK;
 		
@@ -772,10 +772,10 @@ bool lsm6ds3_check_wakeup_evt( void )
 		app_trace_log(DEBUG_LOW, "[WAKE_SRC]: retry");
 		err = lsm6ds3_read(LSM6DS3_WAKE_UP_SRC, 1, &read_val);
 		if( err == NRF_SUCCESS ) {
-			app_trace_log(DEBUG_LOW, "\r");
+			app_trace_log(DEBUG_LOW, "\r\n");
 		}
 		else {
-			app_trace_log(DEBUG_LOW, " failed\r");
+			app_trace_log(DEBUG_LOW, " failed\r\n");
 			return false;
 		}
 	}
@@ -951,7 +951,7 @@ ret_code_t lsm6ds3_enable_sensors( T_LSM6DS3_SENSOR_TYPE s_type )
 			err = lsm6ds3_set_odr( LSM6DS3_ACCEL, &temp_odr );
 			if( temp_odr != imu_cfg.accel.odr_hz ) {
 				//different sampling rate assigned
-				if (imu_debug) app_trace_log(DEBUG_LOW, "Accel ODR Off: %0u Hz\r", temp_odr);
+				if (imu_debug) app_trace_log(DEBUG_LOW, "Accel ODR Off: %0u Hz\r\n", temp_odr);
 			}
 			if (err != NRF_SUCCESS) return err;
 			
@@ -968,7 +968,7 @@ ret_code_t lsm6ds3_enable_sensors( T_LSM6DS3_SENSOR_TYPE s_type )
 			err = lsm6ds3_set_odr( LSM6DS3_GYRO, &temp_odr );	
 			if( temp_odr != imu_cfg.gyro.odr_hz ) {
 				//different sampling rate assigned
-				if (imu_debug) app_trace_log(DEBUG_LOW, "Gyro ODR Off: %0u Hz\r", temp_odr);
+				if (imu_debug) app_trace_log(DEBUG_LOW, "Gyro ODR Off: %0u Hz\r\n", temp_odr);
 			}
 			if (err != NRF_SUCCESS) return err;
 			
@@ -1030,7 +1030,7 @@ ret_code_t lsm6ds3_enable_sensors( T_LSM6DS3_SENSOR_TYPE s_type )
 
 	//uint8_t stat_reg;
 	//err = lsm6ds3_read( LSM6DS3_STATUS_ADDR, 1, &stat_reg);
-	//if (imu_debug) app_trace_log(DEBUG_LOW, "Stat Register: 0x%02X\r", stat_reg);
+	//if (imu_debug) app_trace_log(DEBUG_LOW, "Stat Register: 0x%02X\r\n", stat_reg);
 
 	return err;
 }
@@ -1144,7 +1144,7 @@ ret_code_t lsm6ds3_disable_all( void )
 				err = lsm6ds3_disable_sensors( s_type );
 				if( err != NRF_SUCCESS ) {
 					//failed again, issue Error
-					if( prv_err != err) app_trace_log(DEBUG_MED, "Stop IMU Sensor %01u Failed: %02i\r", s_type, err);
+					if( prv_err != err) app_trace_log(DEBUG_MED, "Stop IMU Sensor %01u Failed: %02i\r\n", s_type, err);
 				}
 			}
 			prv_err = err;
@@ -1298,7 +1298,7 @@ ret_code_t lsm6ds3_fifo_management( void )
 				lsm6ds3_set_fifo_mode(FIFO_BYPASS);		//Setting to BYPASS flushes buffer
 				delay_us(30);							//After setting BYPASS, have to wait at least 30us before a new mode
 				err = lsm6ds3_set_fifo_mode(FIFO_CONTINUOUS);
-				app_trace_log(DEBUG_MED, "Data FIFO overrun!\r");
+				app_trace_log(DEBUG_MED, "Data FIFO overrun!\r\n");
 			}
 			else {
 				err = lsm6ds3_read_fifo(true);
@@ -1325,12 +1325,12 @@ static ret_code_t lsm6ds3_read_fifo( bool check_fifo_len )
 	if( check_fifo_len ) {
 		err = lsm6ds3_read( LSM6DS3_FIFO_STATUS1, 4, &fifo_stat.u8[0] );	//Read the 4 FIFO Status Registers
 		if( err != NRF_SUCCESS ) {
-			app_trace_log(DEBUG_MED, "FIFO - Status Read Error\r");
+			app_trace_log(DEBUG_MED, "FIFO - Status Read Error\r\n");
 			return err;
 		}
 			
 		if( fifo_stat.u8[1]&FIFO_STATUS2_OVR_MASK ) {
-			app_trace_log(DEBUG_MED, "FIFO - Overrun\r");
+			app_trace_log(DEBUG_MED, "FIFO - Overrun\r\n");
 		}
 
 		//The next axis of sensor data is specified in Status Registers 3&4 (bits 9:0)
@@ -1341,7 +1341,7 @@ static ret_code_t lsm6ds3_read_fifo( bool check_fifo_len )
 		fifo_len = fifo_stat.u16[0];
 		fifo_len &= LSM6DS3_FIFO_LENGTH_MASK;
 		fifo_len *= LSM6DS3_FIFO_BYTES_PER_SAMPLE;
-		if( FIFO_DEBUG ) app_trace_log(DEBUG_LOW, "FIFO Byte Count: %02u DataSet: %02u\r", fifo_len, next_data_set);
+		if( FIFO_DEBUG ) app_trace_log(DEBUG_LOW, "FIFO Byte Count: %02u DataSet: %02u\r\n", fifo_len, next_data_set);
 		
 		if (fifo_len == 0)	{
 			//Fifo Empty
@@ -1373,7 +1373,7 @@ static ret_code_t lsm6ds3_read_fifo( bool check_fifo_len )
 		}
 		
 		if (err != NRF_SUCCESS) {
-			app_trace_log(DEBUG_LOW, "FIFO - Buffer Read Error\r");
+			app_trace_log(DEBUG_LOW, "FIFO - Buffer Read Error\r\n");
 			return err;
 		}
 		
@@ -1425,7 +1425,7 @@ static void lsm6ds3_parse_fifo_data( uint8_t * data_buffer, uint16_t read_len, u
 		}
 	}
 	
-	if( FIFO_DEBUG ) app_trace_puts(DEBUG_LOW, "\r");
+	if( FIFO_DEBUG ) app_trace_puts(DEBUG_LOW, "\r\n");
 
 	return;
 }
@@ -1492,7 +1492,7 @@ static ret_code_t lsm6ds3_reconfigure_fifo( void )
 			if( err != NRF_SUCCESS ) return err;
 			
 			imu_cfg.fifo.odr_hz = lsm6ds3_odr_table.odr[i].hz;
-			//app_trace_log(DEBUG_LOW, "FIFO Rate: %01u\r", imu_cfg.fifo.odr_hz );
+			//app_trace_log(DEBUG_LOW, "FIFO Rate: %01u\r\n", imu_cfg.fifo.odr_hz );
 			
 			//Turn FIFO On
 			err = lsm6ds3_set_fifo_mode(FIFO_CONTINUOUS);
@@ -1500,7 +1500,7 @@ static ret_code_t lsm6ds3_reconfigure_fifo( void )
 			
 			if( fifo == OFF ) {
 				fifo = ON;
-				if( FIFO_DEBUG ) app_trace_log(DEBUG_LOW, "FIFO On\r");
+				if( FIFO_DEBUG ) app_trace_log(DEBUG_LOW, "FIFO On\r\n");
 			}
 		}
 		else {
@@ -1509,11 +1509,11 @@ static ret_code_t lsm6ds3_reconfigure_fifo( void )
 			if( err != NRF_SUCCESS ) return err;
 			
 			imu_cfg.fifo.odr_hz = 0;
-			//app_trace_log(DEBUG_LOW, "FIFO Rate: %01u\r", imu_cfg.fifo.odr_hz );
+			//app_trace_log(DEBUG_LOW, "FIFO Rate: %01u\r\n", imu_cfg.fifo.odr_hz );
 			
 			if( fifo == ON ) {
 				fifo = OFF;
-				if( FIFO_DEBUG ) app_trace_log(DEBUG_LOW, "FIFO Off\r");
+				if( FIFO_DEBUG ) app_trace_log(DEBUG_LOW, "FIFO Off\r\n");
 			}
 		}
 	}
@@ -1574,7 +1574,7 @@ static ret_code_t lsm6ds3_set_fifo_decimators_and_threshold( uint16_t * fifo_len
 	if( (imu_cfg.sensor_en&ACCEL_EN_MASK) ) {
 		fifo_pattern.samps_pat[FIFO_ACCEL] = ( imu_cfg.accel.odr_hz/min_odr_hz );	//result will be 1 or greater
 		if( fifo_pattern.samps_pat[FIFO_ACCEL] == 0 ){
-			if( imu_debug ) app_trace_puts(DEBUG_MED, "FIFO: Not Possible\r");
+			if( imu_debug ) app_trace_puts(DEBUG_MED, "FIFO: Not Possible\r\n");
 			fifo_pattern.samps_pat[FIFO_ACCEL] = 1;
 		}
 		pattern_len += fifo_pattern.samps_pat[FIFO_ACCEL];
@@ -1593,7 +1593,7 @@ static ret_code_t lsm6ds3_set_fifo_decimators_and_threshold( uint16_t * fifo_len
 	if( (imu_cfg.sensor_en&GYRO_EN_MASK) ) {
 		fifo_pattern.samps_pat[FIFO_GYRO] = ( imu_cfg.gyro.odr_hz/min_odr_hz );
 		if( fifo_pattern.samps_pat[FIFO_GYRO] == 0 ){
-			if( imu_debug ) app_trace_puts(DEBUG_MED, "FIFO: Not Possible\r");
+			if( imu_debug ) app_trace_puts(DEBUG_MED, "FIFO: Not Possible\r\n");
 			fifo_pattern.samps_pat[FIFO_GYRO] = 1;
 		}
 		pattern_len += fifo_pattern.samps_pat[FIFO_GYRO];
@@ -1640,7 +1640,7 @@ static ret_code_t lsm6ds3_set_fifo_decimators_and_threshold( uint16_t * fifo_len
 	
 	if( pattern_len > FIFO_MAX_PATTERN ) {
 		//Not enough memory reserved for FIFO pattern
-		if( imu_debug ) app_trace_puts(DEBUG_MED, "FIFO Pattern Too Long\r");
+		if( imu_debug ) app_trace_puts(DEBUG_MED, "FIFO Pattern Too Long\r\n");
 		return NRF_ERROR_NO_MEM;
 	}
 	
@@ -1672,7 +1672,7 @@ static ret_code_t lsm6ds3_set_fifo_decimators_and_threshold( uint16_t * fifo_len
 			for( pat_id=0 ; pat_id<(pattern_len-1); pat_id++ ) {
 				app_trace_log(DEBUG_LOW, "%02u, ", fifo_pattern.list[pat_id]);
 			}
-			app_trace_log(DEBUG_LOW, "%02u\r", fifo_pattern.list[pat_id]);
+			app_trace_log(DEBUG_LOW, "%02u\r\n", fifo_pattern.list[pat_id]);
 		}
 	}
 
@@ -1681,7 +1681,7 @@ static ret_code_t lsm6ds3_set_fifo_decimators_and_threshold( uint16_t * fifo_len
 	imu_cfg.fifo.odr_hz = max_odr_hz;
 	*fifo_len = fifo_byte_len;
 	
-	//if(imu_debug) app_trace_log(DEBUG_LOW, "FIFO Thr: %02u, Acc Pat: %02u, Gyr Pat: %02u\r", imu_cfg.fifo.buf_byte_thres, imu_cfg.fifo.samps_in_pattern[FIFO_ACCEL], imu_cfg.fifo.samps_in_pattern[FIFO_GYRO]);
+	//if(imu_debug) app_trace_log(DEBUG_LOW, "FIFO Thr: %02u, Acc Pat: %02u, Gyr Pat: %02u\r\n", imu_cfg.fifo.buf_byte_thres, imu_cfg.fifo.samps_in_pattern[FIFO_ACCEL], imu_cfg.fifo.samps_in_pattern[FIFO_GYRO]);
 	
 	return NRF_SUCCESS;
 }

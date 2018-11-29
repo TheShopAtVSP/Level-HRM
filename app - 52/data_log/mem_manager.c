@@ -18,7 +18,7 @@ T_CONFIG g_config;
 
 //locals
 static bool debug = false;
-//static TTASK_TIMER to;	
+//static expire_timer_t to;	
 static bool update_requested = false;
 static bool manufact_mode = false;	//once enabled, only a reset can disable
 
@@ -122,7 +122,7 @@ static void manufacture_connection_settings( void )
 	//allow connecting without encryption to make manufacture testing simpler	
 	manufact_mode = true;		
 	
-	app_trace_log(DEBUG_MED, "[MANU_SETTING] Manufacture Mode EN\r");
+	app_trace_log(DEBUG_MED, "[MANU_SETTING] Manufacture Mode EN\r\n");
 }
 
 /***************************************************************************//**
@@ -173,7 +173,7 @@ bool update_config( void )
 	bool res = false;
 	ret_code_t ret;
 	
-	if (debug) app_trace_log(DEBUG_MED, "[CFG_UPDATE] @ %01u\r", getSystemTimeMs());	
+	if (debug) app_trace_log(DEBUG_MED, "[CFG_UPDATE] @ %01u\r\n", getSystemTimeMs());	
 	
 	update_requested = false;	//clear request
 	
@@ -184,7 +184,7 @@ bool update_config( void )
 	}
 	else
 	{
-		app_trace_log(DEBUG_HIGH, "[CFG_UPDATE] Err: 0x%02X\r", ret);	
+		app_trace_log(DEBUG_HIGH, "[CFG_UPDATE] Err: 0x%02X\r\n", ret);	
 	}
 		
 	return res;
@@ -205,23 +205,23 @@ static void config_sanity_check(void)
 	
 	if( false )
 	{	//Print Out Config Memory Contents
-		app_trace_log(DEBUG_MED, "[CONFIG_CHK]:\r");
+		app_trace_log(DEBUG_MED, "[CONFIG_CHK]:\r\n");
 		for( int i=0; i<T_CONFIG_LEN; i++ )
 		{	//Why the difference
 			app_trace_log(DEBUG_HIGH, "%02X ", *((uint8_t *)&g_config+i));
 		}
-		app_trace_log(DEBUG_MED, "\r");
+		app_trace_log(DEBUG_MED, "\r\n");
 	}
 		
 	#ifdef INIT_FLASH	// force config memory to reset to default values
-		if(debug) app_trace_log(DEBUG_HIGH, "[CONFIG_CHK] Forced Init\r");
+		if(debug) app_trace_log(DEBUG_HIGH, "[CONFIG_CHK] Forced Init\r\n");
 		g_config.rev = 0;
 	#endif
 	
 	// Need to update Config region if last saved Rev != latest loaded in flash
 	if ( fw_rev != g_config.rev ) 
 	{
-		app_trace_log(DEBUG_MED, "[CONFIG_CHK] New Rev Update\r");
+		app_trace_log(DEBUG_MED, "[CONFIG_CHK] New Rev Update\r\n");
 		
 		//There has been a firware update.
 		//If a variable needs to be added for older revs, do it here:
@@ -230,8 +230,8 @@ static void config_sanity_check(void)
 			if ( g_config.rev > 0x0999 || g_config.rev == 0x0000 ) 
 			{
 				//Config memory is not valid ( version number should not be > 9.xx or = 0.00 )
-				app_trace_log(DEBUG_HIGH, "[CONFIG_CHK] Reset Variables\r");
-				app_trace_log(DEBUG_MED, "[CONFIG_CHK] %03X != %03X\r", g_config.rev, fw_rev);
+				app_trace_log(DEBUG_HIGH, "[CONFIG_CHK] Reset Variables\r\n");
+				app_trace_log(DEBUG_MED, "[CONFIG_CHK] %03X != %03X\r\n", g_config.rev, fw_rev);
 
 				g_config.totalsteps = 0;	// Start Steps at 0
 				for (i = 0; i < sizeof(g_config.user_UUID); i++) 
@@ -263,7 +263,7 @@ static void config_sanity_check(void)
 		//Store Updates into Nonvolatile Memory:
 		if( hal_update_config() != NRF_SUCCESS )		
 		{
-			app_trace_log(DEBUG_HIGH, "[CONFIG_CHK] Update Failed\r");
+			app_trace_log(DEBUG_HIGH, "[CONFIG_CHK] Update Failed\r\n");
 		}
 	}
 
@@ -284,7 +284,7 @@ static void config_sanity_check(void)
 //		{
 //			app_trace_log(DEBUG_MED, " 0x%02X,", g_config.security_key[i]);
 //		}
-//		app_trace_puts(DEBUG_MED, "\r");	
+//		app_trace_puts(DEBUG_MED, "\r\n");	
 	#endif
 	
 	//Make Copy of Security Key
@@ -301,7 +301,7 @@ static void config_sanity_check(void)
 		
 		if( g_config.ship_mode > 0 )
 		{	//Radio acess is protected, but ship mode is still enabled
-			app_trace_log(DEBUG_MED, "[CONFIG_CHK] Ship Mode EN\r");
+			app_trace_log(DEBUG_MED, "[CONFIG_CHK] Ship Mode EN\r\n");
 		}
 		else
 		{
@@ -325,7 +325,7 @@ ret_code_t init_mem_manager( bool debug_mem )
 		
 	debug = debug_mem;
 	
-	if (debug) app_trace_log(DEBUG_LOW, "[INIT_MEM_MGR] start\r");	
+	if (debug) app_trace_log(DEBUG_LOW, "[INIT_MEM_MGR] start\r\n");	
 	
 	ret = hal_init_non_volatile_mem( debug );
 	
@@ -341,11 +341,11 @@ ret_code_t init_mem_manager( bool debug_mem )
 		head_id = hal_log_memory_check();
 		//update config???
 		
-		if(debug) app_trace_log(DEBUG_MED, "[INIT_MEM_MGR] Record Count: %03u\r", get_total_record_cnt());
+		if(debug) app_trace_log(DEBUG_MED, "[INIT_MEM_MGR] Record Count: %03u\r\n", get_total_record_cnt());
 	}
 	else
 	{
-		if(debug) app_trace_log(DEBUG_HIGH, "[INIT_MEM_MGR] Failed %01u, Reporters Invalid!\r", ret);
+		if(debug) app_trace_log(DEBUG_HIGH, "[INIT_MEM_MGR] Failed %01u, Reporters Invalid!\r\n", ret);
 		manufacture_connection_settings();	//Access Key is unknown. Allow open radio access to debug
 	}
 	
@@ -390,17 +390,17 @@ bool add_record( T_RECORD * rec )
 	
 	if( full_len > REC_MAX_MEM )
 	{
-		app_trace_log(DEBUG_MED, "[ADD_REC] Rec Too Big!\r");
+		app_trace_log(DEBUG_MED, "[ADD_REC] Rec Too Big!\r\n");
 		return false;	//record is bigger than holding structure, can't save this...
 	}
 	else if( rec->hdr.rec_len < REC_HEADER_LEN )
 	{
-		app_trace_log(DEBUG_MED, "[ADD_REC] Rec Length Too Short!\r");
+		app_trace_log(DEBUG_MED, "[ADD_REC] Rec Length Too Short!\r\n");
 		return false;	//record len is impossibly short, don't save this...
 	}	
 	else if( (in_buf.len + full_len + REC_FOOTER_LEN) >= IN_BUF_SIZE )
 	{
-		app_trace_log(DEBUG_MED, "[ADD_REC] Not enough room in RAM buffer!\r");
+		app_trace_log(DEBUG_MED, "[ADD_REC] Not enough room in RAM buffer!\r\n");
 		if( !save_buffered_recs() )
 		{
 			return false;	//RAM failed to back up in NVM, if we continue, RAM will corrupt
@@ -408,7 +408,7 @@ bool add_record( T_RECORD * rec )
 	}
 
 	// Add header Info and put into Input Buffer
-	//app_trace_log(DEBUG_MED, "[REC_BUF] Add Record 0x%04X\r", head_id);
+	//app_trace_log(DEBUG_MED, "[REC_BUF] Add Record 0x%04X\r\n", head_id);
 	rec->preamble = NEW_REC_PREAMBLE;		
 	rec->hdr.id = head_id;					//Next Record ID
 	memcpy( &in_buf.data[in_buf.len], (uint8_t *)rec, full_len );
@@ -468,7 +468,7 @@ bool save_buffered_recs( void )
 	}
 	else if( total_wr_len > IN_BUF_SIZE )
 	{	//Input Buffer can't hold this much data
-		app_trace_log(DEBUG_MED, "[SAVE_BUF] In Buf Len Error!\r");
+		app_trace_log(DEBUG_MED, "[SAVE_BUF] In Buf Len Error!\r\n");
 		return false;
 	}
 	
@@ -484,7 +484,7 @@ bool save_buffered_recs( void )
 	res = hal_store_data( in_buf.data, total_wr_len, footer_offset, in_buf.rd_tail );
 	if( res != true )
 	{
-		app_trace_log(DEBUG_MED, "[SAVE_BUF] Failed!\r");
+		app_trace_log(DEBUG_MED, "[SAVE_BUF] Failed!\r\n");
 	}
 	
 	//there should be nothing left in the Input Buffer. Make Sure both tails are equal.
@@ -530,7 +530,7 @@ bool get_next_record( T_RECORD *rec )
 	{	//no record loaded, clear Out buffer and get next record
 		rec->hdr.rec_len = 0;
 		out_buf.len = 0;	//clear output buffer
-		app_trace_log(DEBUG_MED, "Discarding Output\r");
+		app_trace_log(DEBUG_MED, "Discarding Output\r\n");
 		load_output_buffer();	//get next record
 	}
 	
@@ -554,7 +554,7 @@ static bool load_output_buffer( void )
 	//output buffer already has a record, only 1 at a time allowed
 	if( out_buf.len > 0 ) 
 	{
-		app_trace_log(DEBUG_MED, "[LOAD_OUT] Already Loaded\r");
+		app_trace_log(DEBUG_MED, "[LOAD_OUT] Already Loaded\r\n");
 		return false;
 	}
 	
@@ -601,7 +601,7 @@ static bool load_output_buffer( void )
 					memcpy( &out_buf.data[0], (uint8_t *)&in_buf.data[in_buf.rd_tail], (rec->hdr.rec_len + REC_PREAMBLE_LEN) );
 					out_buf.len = (rec->hdr.rec_len + REC_PREAMBLE_LEN);
 					res = true;
-					app_trace_log(DEBUG_MED, "[LOAD_OUT] ID:%01u RP:%01u TS:0x%02X LN:0x%02X @%01u\r", 
+					app_trace_log(DEBUG_MED, "[LOAD_OUT] ID:%01u RP:%01u TS:0x%02X LN:0x%02X @%01u\r\n", 
 						rec->hdr.id, rec->hdr.report_inst, rec->hdr.time, rec->hdr.rec_len, getSystemTimeMs());
 					
 					break;		//stop executing while loop, next Record Verified
@@ -614,7 +614,7 @@ static bool load_output_buffer( void )
 			}
 			else
 			{
-				app_trace_log(DEBUG_MED, "[LOAD_OUT] In Tail Err: h-0x%04X, t-0x%04X\r", in_buf.len, in_buf.rd_tail);
+				app_trace_log(DEBUG_MED, "[LOAD_OUT] In Tail Err: h-0x%04X, t-0x%04X\r\n", in_buf.len, in_buf.rd_tail);
 			}
 			
 			//if code reaches this loop, the NEW_RECORD_PREAMBLE was not found, force tail to increment for search
@@ -628,7 +628,7 @@ static bool load_output_buffer( void )
 			}
 			else
 			{	//nothing in Input buffer... make sure it gets zeroed out.
-				app_trace_log(DEBUG_MED, "[LOAD_OUT] In Buf Cleared\r");
+				app_trace_log(DEBUG_MED, "[LOAD_OUT] In Buf Cleared\r\n");
 				in_buf.rd_tail = in_buf.len = 0;
 			}
 				
@@ -657,7 +657,7 @@ bool inform_rec_tranceived( void )
 	
 	if( out_buf.len < sizeof(T_REC_START) ) 
 	{
-		app_trace_log(DEBUG_MED, "[TRX] Nothing in Out Buffer!\r");
+		app_trace_log(DEBUG_MED, "[TRX] Nothing in Out Buffer!\r\n");
 		return false;
 	}
 
@@ -688,7 +688,7 @@ bool inform_rec_tranceived( void )
 			}
 			else
 			{	//There is not enough data in the Input buffer to account for this length???
-				app_trace_log(DEBUG_MED, "[TRX] Tail Length Mismatch!\r");	
+				app_trace_log(DEBUG_MED, "[TRX] Tail Length Mismatch!\r\n");	
 				res = NRF_ERROR_INVALID_LENGTH;
 			}
 		}
@@ -706,19 +706,19 @@ bool inform_rec_tranceived( void )
 	}
 	else
 	{	//Don't see any records that need marking as sent??? 
-		app_trace_log(DEBUG_MED, "[TRX] No Unsent Records to Mark!\r");
+		app_trace_log(DEBUG_MED, "[TRX] No Unsent Records to Mark!\r\n");
 		res = NRF_ERROR_NO_MEM;
 	}
 		
 	if( res == NRF_SUCCESS ) 
 	{
-		if(debug) app_trace_log(DEBUG_LOW, "[TRX] Tail Updated\r");
+		if(debug) app_trace_log(DEBUG_LOW, "[TRX] Tail Updated\r\n");
 		
 		//inform reporter manager that a record has been removed
 		record_removed( rep_inst );
 	}
 	else {
-		app_trace_log(DEBUG_MED, "[TRX] Mark Failed: 0x%04X\r", res);
+		app_trace_log(DEBUG_MED, "[TRX] Mark Failed: 0x%04X\r\n", res);
 		return false;
 	}
 	
@@ -788,7 +788,7 @@ static bool nv_storage_empty( void )
 	
 	saved_size = hal_unsent_log_len();
 	
-	//app_trace_log(DEBUG_MED, "[NVM_STORE_SIZE] %01u\r", saved_size);
+	//app_trace_log(DEBUG_MED, "[NVM_STORE_SIZE] %01u\r\n", saved_size);
 	
 	if( saved_size == 0 )
 	{

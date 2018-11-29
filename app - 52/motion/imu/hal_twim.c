@@ -9,6 +9,7 @@
 #include <string.h>
 #include "hal_twim.h"
 #include "app_util_platform.h"
+#include "timing.h"
 
 #define RX 	0
 #define TX 	1
@@ -21,7 +22,7 @@
 static bool twim_debug = false;
 static bool xfer_done = true;
 static ret_code_t transfer_res;
-static TTASK_TIMER to;
+static expire_timer_t to;
 
 static const nrf_drv_twi_t m_twim_master = NRF_DRV_TWI_INSTANCE(0);
 void twim_handler(nrf_drv_twi_evt_t const * p_event, void * p_context);
@@ -35,7 +36,7 @@ ret_code_t hal_twim_init( bool debug_twim )
 	
 	twim_debug = debug_twim;
 	
-	if (twim_debug) app_trace_log(DEBUG_LOW, "hal_twim_init: start\r");	
+	if (twim_debug) app_trace_log(DEBUG_LOW, "hal_twim_init: start\r\n");	
 	
 	const nrf_drv_twi_config_t config =
 	{
@@ -48,10 +49,10 @@ ret_code_t hal_twim_init( bool debug_twim )
 	ret = nrf_drv_twi_init(&m_twim_master, &config, twim_handler, NULL);
 	if( ret == NRF_SUCCESS) {		
 		nrf_drv_twi_enable(&m_twim_master);
-		if (twim_debug) app_trace_log(DEBUG_LOW, "hal_twim_init: done\r");
+		if (twim_debug) app_trace_log(DEBUG_LOW, "hal_twim_init: done\r\n");
 	}
 	else {
-		if (twim_debug) app_trace_log(DEBUG_HIGH, "twi_master_init: failed\r");	
+		if (twim_debug) app_trace_log(DEBUG_HIGH, "twi_master_init: failed\r\n");	
 	}
 	
 	return ret;
@@ -79,12 +80,12 @@ void twim_handler(nrf_drv_twi_evt_t const * p_event, void * p_context)
 	else if( p_event->type == NRF_DRV_TWI_EVT_ADDRESS_NACK ) {
 		//A NACK was received on the Address
 		transfer_res = NRF_ERROR_INVALID_ADDR;
-		if(twim_debug) app_trace_log(DEBUG_HIGH, "hal_twim: ERR_BAD_ADDRESS\r");
+		if(twim_debug) app_trace_log(DEBUG_HIGH, "hal_twim: ERR_BAD_ADDRESS\r\n");
 	}
 	else {
 		//A NACK was received on the data
 		transfer_res = NRF_ERROR_TIMEOUT;
-		if(twim_debug) app_trace_log(DEBUG_HIGH, "hal_twim: ERR_ABORTED\r");
+		if(twim_debug) app_trace_log(DEBUG_HIGH, "hal_twim: ERR_ABORTED\r\n");
 	} 
 	
 	xfer_done = true;
@@ -97,7 +98,7 @@ static bool twim_busy( uint8_t clr_set_get )
 	
 	if( (twim_busy_flag == true) && (getSystemTimeMs() - last_used_time_ms) > 1000 )
 	{	//twim has not been used in more than 1 second, it should be freed
-		app_trace_log(DEBUG_HIGH, "[TWIM] Block Time Out\r");
+		app_trace_log(DEBUG_HIGH, "[TWIM] Block Time Out\r\n");
 		twim_busy_flag = false;
 	}
 	
@@ -146,10 +147,10 @@ static ret_code_t hal_twim_xfer( T_TWIM_PACKET * pkt, bool rxtx )
 	if( res == NRF_SUCCESS) 
 	{
 		//wait upto 250 ms for transfer to complete
-		start_task_timer( to, 250);		
+		get_expire_time( (250*1000UL), &to );	//Max time that a routine may lock up twim	
 		while( xfer_done == false ) 
 		{
-			if( task_time(to) )
+			if( check_expiration( &to ) )
 			{
 				transfer_res = NRF_ERROR_TIMEOUT;
 				break;
@@ -177,7 +178,7 @@ ret_code_t hal_twim_write(T_TWIM_PACKET * pkt)
 	}
 	else
 	{
-		app_trace_log(DEBUG_HIGH, "[TWIM] Busy!!!\r");
+		app_trace_log(DEBUG_HIGH, "[TWIM] Busy!!!\r\n");
 		ret = NRF_ERROR_BUSY;
 	}
 
@@ -185,7 +186,7 @@ ret_code_t hal_twim_write(T_TWIM_PACKET * pkt)
 	{
 		if( prv_res != ret)
 		{
-			app_trace_log(DEBUG_HIGH, "[TWIM_WR] Err %01d @%01u\r", ret, getSystemTimeMs());	
+			app_trace_log(DEBUG_HIGH, "[TWIM_WR] Err %01d @%01u\r\n", ret, getSystemTimeMs());	
 		}
 	}
 	prv_res = ret;
@@ -206,7 +207,7 @@ ret_code_t hal_twim_read(T_TWIM_PACKET * pkt)
 	}
 	else
 	{
-		app_trace_log(DEBUG_HIGH, "[TWIM] Busy!!!\r");
+		app_trace_log(DEBUG_HIGH, "[TWIM] Busy!!!\r\n");
 		ret = NRF_ERROR_BUSY;
 	}
 	
@@ -214,7 +215,7 @@ ret_code_t hal_twim_read(T_TWIM_PACKET * pkt)
 	{
 		if( prv_res != ret)
 		{
-			app_trace_log(DEBUG_HIGH, "[TWIM_RD] Err %01d @%01u\r", ret, getSystemTimeMs());	
+			app_trace_log(DEBUG_HIGH, "[TWIM_RD] Err %01d @%01u\r\n", ret, getSystemTimeMs());	
 		}
 	}
 	prv_res = ret;

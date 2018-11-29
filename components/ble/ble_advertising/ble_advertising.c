@@ -186,7 +186,7 @@ static bool flash_access_in_progress()
     err_code = pstorage_access_status_get(&count);
     if ((err_code != NRF_ERROR_INVALID_STATE) && (err_code != NRF_SUCCESS))
     {
-        ADV_LOG("[ADV]: pstorage_access_status_get returned %d.\r", err_code);
+        ADV_LOG("[ADV]: pstorage_access_status_get returned %d.\r\n", err_code);
         return true;
     }
 
@@ -197,7 +197,7 @@ static bool flash_access_in_progress()
         {
             return false;
         }
-        ADV_LOG("[ADV]: fs_queued_op_count_get gives count %d.\r", count);
+        ADV_LOG("[ADV]: fs_queued_op_count_get gives count %d.\r\n", count);
     }
 
     if(count != 0)
@@ -221,12 +221,12 @@ uint32_t ble_advertising_start(ble_adv_mode_t advertising_mode)
     // the flash operations are complete.
     if( flash_access_in_progress() )
     {
-		ADV_LOG("\n[ADV]: BLAHHHH!!!!\r");
+		ADV_LOG("\n[ADV]: BLAHHHH!!!!\r\n");
         m_advertising_start_pending = true;
         return NRF_SUCCESS;
     }
 
-    ADV_LOG("[ADV]: no flash operations in progress, prepare advertising.\r");
+    ADV_LOG("[ADV]: no flash operations in progress, prepare advertising.\r\n");
     // Fetch the peer address.
     ble_advertising_peer_address_clear();
 
@@ -265,7 +265,7 @@ uint32_t ble_advertising_start(ble_adv_mode_t advertising_mode)
     {
         m_adv_mode_current = BLE_ADV_MODE_IDLE;
         m_adv_evt          = BLE_ADV_EVT_IDLE;
-		app_trace_log(DEBUG_LOW, "ble_advertising_start BLE_ADV_MODE_IDLE\r");
+		app_trace_log(DEBUG_LOW, "ble_advertising_start BLE_ADV_MODE_IDLE\r\n");
     }
 
     // Fetch the whitelist.
@@ -294,7 +294,7 @@ uint32_t ble_advertising_start(ble_adv_mode_t advertising_mode)
     switch (m_adv_mode_current)
     {
         case BLE_ADV_MODE_DIRECTED:
-            ADV_LOG("[ADV]: Starting direct advertisement.\r");
+            ADV_LOG("[ADV]: Starting direct advertisement.\r\n");
             adv_params.p_peer_addr = &m_peer_address; // Directed advertising.
             adv_params.type        = BLE_GAP_ADV_TYPE_ADV_DIRECT_IND;
             adv_params.timeout     = 0;
@@ -303,7 +303,7 @@ uint32_t ble_advertising_start(ble_adv_mode_t advertising_mode)
             break;
 
         case BLE_ADV_MODE_DIRECTED_SLOW:
-            ADV_LOG("[ADV]: Starting direct advertisement.\r");
+            ADV_LOG("[ADV]: Starting direct advertisement.\r\n");
             adv_params.p_peer_addr = &m_peer_address; // Directed advertising.
             adv_params.type        = BLE_GAP_ADV_TYPE_ADV_DIRECT_IND;
             adv_params.timeout     = m_adv_modes_config.ble_adv_directed_slow_timeout;
@@ -326,12 +326,12 @@ uint32_t ble_advertising_start(ble_adv_mode_t advertising_mode)
                 VERIFY_SUCCESS(err_code);
 
                 m_adv_evt = BLE_ADV_EVT_FAST_WHITELIST;
-                ADV_LOG("[ADV]: Starting fast advertisement with whitelist.\r");
+                ADV_LOG("[ADV]: Starting fast advertisement with whitelist.\r\n");
             }
             else
             {
                 m_adv_evt = BLE_ADV_EVT_FAST;
-                ADV_LOG("[ADV]: Starting fast advertisement.\r");
+                ADV_LOG("[ADV]: Starting fast advertisement.\r\n");
             }
             break;
 
@@ -350,12 +350,12 @@ uint32_t ble_advertising_start(ble_adv_mode_t advertising_mode)
                 VERIFY_SUCCESS(err_code);
 
                 m_adv_evt = BLE_ADV_EVT_SLOW_WHITELIST;
-                ADV_LOG("[ADV]: Starting slow advertisement with whitelist.\r");
+                ADV_LOG("[ADV]: Starting slow advertisement with whitelist.\r\n");
             }
             else
             {
                 m_adv_evt = BLE_ADV_EVT_SLOW;
-                ADV_LOG("[ADV]: Starting slow advertisement.\r");
+                ADV_LOG("[ADV]: Starting slow advertisement.\r\n");
             }
             break;
 
@@ -366,11 +366,11 @@ uint32_t ble_advertising_start(ble_adv_mode_t advertising_mode)
     {
         err_code = sd_ble_gap_adv_start(&adv_params);
         VERIFY_SUCCESS(err_code);
-		app_trace_log(DEBUG_LOW, "ble_advertising_start execute\r");
+		app_trace_log(DEBUG_LOW, "ble_advertising_start execute\r\n");
     }
 	else
 	{
-		app_trace_log(DEBUG_MED, "ble_advertising_start not executed\r");
+		app_trace_log(DEBUG_MED, "ble_advertising_start not executed\r\n");
 	}
     if (m_evt_handler != NULL)
     {
@@ -388,7 +388,7 @@ void ble_advertising_on_ble_evt(ble_evt_t const * p_ble_evt)
     switch (p_ble_evt->header.evt_id)
     {
         case BLE_GAP_EVT_CONNECTED:
-			ADV_LOG("[ADV]: BLE_GAP_EVT_CONNECTED\r");
+			ADV_LOG("[ADV]: BLE_GAP_EVT_CONNECTED\r\n");
             if (p_ble_evt->evt.gap_evt.params.connected.role == BLE_GAP_ROLE_PERIPH)
             {
                 current_slave_link_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
@@ -400,11 +400,11 @@ void ble_advertising_on_ble_evt(ble_evt_t const * p_ble_evt)
         {
             uint32_t err_code;
             m_whitelist_temporarily_disabled = false;
-			ADV_LOG("[ADV]: BLE_GAP_EVT_DISCONNECTED\r");
+			ADV_LOG("[ADV]: BLE_GAP_EVT_DISCONNECTED\r\n");
             if (p_ble_evt->evt.gap_evt.conn_handle == current_slave_link_conn_handle)
             {
 				err_code = ble_advertising_start(BLE_ADV_MODE_DIRECTED);
-				//ADV_LOG("[ADV]: BLE_GAP_EVT_DISCONNECTED BLE_ADV_MODE_DIRECTED\r");
+				//ADV_LOG("[ADV]: BLE_GAP_EVT_DISCONNECTED BLE_ADV_MODE_DIRECTED\r\n");
 				if ((err_code != NRF_SUCCESS) && (m_error_handler != NULL))
 				{
 				   m_error_handler(err_code);
@@ -413,7 +413,7 @@ void ble_advertising_on_ble_evt(ble_evt_t const * p_ble_evt)
 			else
 			{
 				err_code = ble_advertising_start(BLE_ADV_MODE_SLOW);
-				//ADV_LOG("[ADV]: BLE_GAP_EVT_DISCONNECTED BLE_ADV_MODE_SLOW\r");
+				//ADV_LOG("[ADV]: BLE_GAP_EVT_DISCONNECTED BLE_ADV_MODE_SLOW\r\n");
 				if ((err_code != NRF_SUCCESS) && (m_error_handler != NULL))
 				{
 				   m_error_handler(err_code);
@@ -424,13 +424,13 @@ void ble_advertising_on_ble_evt(ble_evt_t const * p_ble_evt)
         }
         // Upon time-out, the next advertising mode is started, i.e. go from fast to slow or from slow to idle.
         case BLE_GAP_EVT_TIMEOUT:
-			ADV_LOG("[ADV]: BLE_GAP_EVT_TIMEOUT\r");
+			ADV_LOG("[ADV]: BLE_GAP_EVT_TIMEOUT\r\n");
             if (p_ble_evt->evt.gap_evt.params.timeout.src == BLE_GAP_TIMEOUT_SRC_ADVERTISING)
             {
                 switch (m_adv_mode_current)
                 {
                     case BLE_ADV_MODE_DIRECTED:
-                        ADV_LOG("[ADV]: Timed out from directed advertising.\r");
+                        ADV_LOG("[ADV]: Timed out from directed advertising.\r\n");
                         {
                             uint32_t err_code;
                             err_code = ble_advertising_start(BLE_ADV_MODE_DIRECTED_SLOW);
@@ -441,7 +441,7 @@ void ble_advertising_on_ble_evt(ble_evt_t const * p_ble_evt)
                         }
                         break;
                     case BLE_ADV_MODE_DIRECTED_SLOW:
-                        ADV_LOG("[ADV]: Timed out from directed slow advertising.\r");
+                        ADV_LOG("[ADV]: Timed out from directed slow advertising.\r\n");
                         {
                             uint32_t err_code;
                             err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
@@ -455,7 +455,7 @@ void ble_advertising_on_ble_evt(ble_evt_t const * p_ble_evt)
                     {
                         uint32_t err_code;
                         m_adv_evt = BLE_ADV_EVT_FAST;
-                        ADV_LOG("[ADV]: Timed out from fast advertising, starting slow advertising.\r");
+                        ADV_LOG("[ADV]: Timed out from fast advertising, starting slow advertising.\r\n");
                         err_code = ble_advertising_start(BLE_ADV_MODE_SLOW);
                         if ((err_code != NRF_SUCCESS) && (m_error_handler != NULL))
                         {
@@ -465,7 +465,7 @@ void ble_advertising_on_ble_evt(ble_evt_t const * p_ble_evt)
                     }
                     case BLE_ADV_MODE_SLOW:
                         m_adv_evt = BLE_ADV_EVT_IDLE;
-                        ADV_LOG("[ADV]: Timed out from slow advertising, stopping advertising.\r");
+                        ADV_LOG("[ADV]: Timed out from slow advertising, stopping advertising.\r\n");
                         if (m_evt_handler != NULL)
                         {
                             m_evt_handler(m_adv_evt);
@@ -477,12 +477,12 @@ void ble_advertising_on_ble_evt(ble_evt_t const * p_ble_evt)
                         break;
                 }
             }
-			//app_trace_log(DEBUG_LOW, "ble_advertising_on_ble_evt BLE_GAP_EVT_CONNECTED\r");
+			//app_trace_log(DEBUG_LOW, "ble_advertising_on_ble_evt BLE_GAP_EVT_CONNECTED\r\n");
             break;
 
         default:
             // No implementation needed.
-			//app_trace_log(DEBUG_LOW, "ble_advertising_on_ble_evt default\r");
+			//app_trace_log(DEBUG_LOW, "ble_advertising_on_ble_evt default\r\n");
             break;
     }
 }

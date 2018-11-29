@@ -43,7 +43,7 @@ void flag_hw_init_error( T_HW_FAILURE_FLAGS flag )
 	if( flag != NO_FAILURE )
 	{
 		test.hw_flags |= flag;
-		app_trace_log(DEBUG_MED, "[HW_ERR_FLAG] 0x%04X flagged\r", flag);
+		app_trace_log(DEBUG_MED, "[HW_ERR_FLAG] 0x%04X flagged\r\n", flag);
 	}
 }
 
@@ -71,7 +71,7 @@ void test_hardware( void )
 		test.hw_flags |= IMU_SELF_TEST;
 	}			
 
-	app_trace_log(DEBUG_MED, "[TEST_HW] Flags 0x%04X\r", test.hw_flags);
+	app_trace_log(DEBUG_MED, "[TEST_HW] Flags 0x%04X\r\n", test.hw_flags);
 
 	test_req = false;
 	

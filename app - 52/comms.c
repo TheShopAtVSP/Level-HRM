@@ -15,8 +15,9 @@
 #include "hal_nvm.h"
 #include "manufacture_test.h"
 #include "app_util_platform.h"
+#include "timing.h"
 
-#define PACKET_TIMEOUT	5000
+#define PACKET_TIMEOUT_US	(5*1000*1000UL)
 
 // Local State Variable Enums
 typedef enum {
@@ -42,8 +43,6 @@ typedef enum {
 // Local and Global Variables
 extern T_CONFIG g_config;
 extern bool gs_bdebug;
-extern uint32_t get_unix_time( void );
-extern void set_unix_time( uint32_t );
 extern bool erase_records_flag;
 extern uint8_t key_ring_index;
 extern uint8_t key_ring[7];
@@ -106,7 +105,7 @@ void detach_handler(void * p_context )
 	// If someone connects to us and does not send the Start Code within the specified time
 	// then disconnect, it's not our App!!! Also disconnect if the KEY does not come shortly
 	// after receiving the Start Code.
-	app_trace_puts(DEBUG_MED, "[DETACH] Timeout\r");
+	app_trace_puts(DEBUG_MED, "[DETACH] Timeout\r\n");
 	terminate_connection();
 }
 
@@ -151,11 +150,11 @@ void parse_msg( T_PACKET * rx_msg )
 	Union32 temp;
 
 	uart_rx_ubyte = rx_msg->id;
-	app_trace_log(DEBUG_MED, "HRM1 CMD = %01u\r", rx_msg->id);
+	app_trace_log(DEBUG_MED, "HRM1 CMD = %01u\r\n", rx_msg->id);
 	
 	if( rx_msg->pkt_len < PKT_HEADER_LEN )
 	{	//pkt length is shorter than the minimum message length: 2
-		if (gs_bdebug) app_trace_puts(DEBUG_MED, "[PARSE] Pkt Len Error\r");
+		if (gs_bdebug) app_trace_puts(DEBUG_MED, "[PARSE] Pkt Len Error\r\n");
 		tx_type = NACK;	//any undefined case will return a NACK
 		tx_payload[0] = PKT_LEN_ERROR;
 		tx_pay_len = 1;
@@ -172,7 +171,7 @@ void parse_msg( T_PACKET * rx_msg )
 		else if( rx_msg->id != ++nextID )
 		{
 			//a packet was likely dropped!!!!
-			if (gs_bdebug) app_trace_log(DEBUG_MED, "[PARSE] ID Seq Err: %01u != %01u\r", nextID, rx_msg->id );
+			if (gs_bdebug) app_trace_log(DEBUG_MED, "[PARSE] ID Seq Err: %01u != %01u\r\n", nextID, rx_msg->id );
 			
 			//tx_type = NACK;
 			//tx_payload[0] = PKT_SEQ_ERROR;
@@ -183,7 +182,7 @@ void parse_msg( T_PACKET * rx_msg )
 			nextID = rx_msg->id;
 		}
 //		uart_rx_ubyte = rx_msg->payload[0];
-//		app_trace_log(DEBUG_MED, "HRM1 CMD = %01u\r", rx_msg->payload[0]);
+//		app_trace_log(DEBUG_MED, "HRM1 CMD = %01u\r\n", rx_msg->payload[0]);
 		switch( rx_msg->type )
 		{
 			case NACK:	//Something didn't Work
@@ -198,7 +197,7 @@ void parse_msg( T_PACKET * rx_msg )
 								ret_code_t res = ble_uart_tx( (uint8_t *) &(packet[queue_index]), packet[queue_index].pkt_len );
 								if( res != NRF_SUCCESS )
 								{
-									if (gs_bdebug) app_trace_log(DEBUG_MED, ": Send Err %01u\r\r", res);
+									if (gs_bdebug) app_trace_log(DEBUG_MED, ": Send Err %01u\r\r\n", res);
 									tx_type = NACK;
 									tx_payload[0] = PKT_TX_ERR;
 									tx_payload[1] = rx_msg->id;
@@ -206,13 +205,13 @@ void parse_msg( T_PACKET * rx_msg )
 								}
 								else
 								{
-									if (gs_bdebug) app_trace_puts(DEBUG_MED, "\r\r");
+									if (gs_bdebug) app_trace_puts(DEBUG_MED, "\r\r\n");
 								}
 							}
 							else
 							{
 								//Packet number no longer exists
-								if (gs_bdebug) app_trace_puts(DEBUG_MED, ": No Longer Exists\r\r");
+								if (gs_bdebug) app_trace_puts(DEBUG_MED, ": No Longer Exists\r\r\n");
 								tx_type = NACK;
 								tx_payload[0] = PKT_SEQ_ERROR;
 								tx_payload[1] = rx_msg->id;
@@ -224,17 +223,17 @@ void parse_msg( T_PACKET * rx_msg )
 					case PKT_LEN_ERROR:
 						//Host Device believes the packet length was in error
 						//not sure what todo:
-						if (gs_bdebug) app_trace_puts(DEBUG_MED, "[NACK] Packet Length Error\r");
+						if (gs_bdebug) app_trace_puts(DEBUG_MED, "[NACK] Packet Length Error\r\n");
 						break;
 
 					case PKT_TYPE_UNRECOG:
 						//Host Device did not recognize the Packet Type
 						//not sure what todo:
-						if (gs_bdebug) app_trace_puts(DEBUG_MED, "[NACK] Packet Type Error\r");
+						if (gs_bdebug) app_trace_puts(DEBUG_MED, "[NACK] Packet Type Error\r\n");
 						break;
 
 					default:
-						if (gs_bdebug) app_trace_puts(DEBUG_MED, "[NACK] Unknown\r");
+						if (gs_bdebug) app_trace_puts(DEBUG_MED, "[NACK] Unknown\r\n");
 						break;
 				}
 
@@ -247,17 +246,17 @@ void parse_msg( T_PACKET * rx_msg )
 					{
 						//ACKing the final packet in a Record
 						rec_ack.state = RECEIVED;
-						if (gs_bdebug) app_trace_log(DEBUG_LOW, "[ACK] Record Accepted @%01u\r", getSystemTimeMs());
+						if (gs_bdebug) app_trace_log(DEBUG_LOW, "[ACK] Record Accepted @%01u\r\n", getSystemTimeMs());
 					}
 					else
 					{
 						rec_ack.state = ID_ACK_FAIL;
-						if (gs_bdebug) app_trace_log(DEBUG_MED, "[ACK] ID %01u Does Not Match %01u\r", rx_msg->payload[0], (unsigned int)rec_ack.pkt_id);
+						if (gs_bdebug) app_trace_log(DEBUG_MED, "[ACK] ID %01u Does Not Match %01u\r\n", rx_msg->payload[0], (unsigned int)rec_ack.pkt_id);
 					}
 				}
 				else
 				{
-					if (gs_bdebug) app_trace_puts(DEBUG_LOW, "[ACK] ???\r");
+					if (gs_bdebug) app_trace_puts(DEBUG_LOW, "[ACK] ???\r\n");
 				}
 
 				break;
@@ -273,15 +272,15 @@ void parse_msg( T_PACKET * rx_msg )
 					{
 						if( rx_pay_len == ATTRIBUTE_SIZE )
 						{
-							app_trace_log(DEBUG_LOW, "Reporter %01u Atts Request:\r", rx_msg->payload[0]);	// id
-							app_trace_log(DEBUG_LOW, "  Ind_Des:	%01u\r", rx_msg->payload[1]);	// T_INDEP_DESC
-							app_trace_log(DEBUG_LOW, "  Ind_Scl:	%01u\r", rx_msg->payload[2]);	// count
-							app_trace_log(DEBUG_LOW, "  Data_Des:	%01u\r", rx_msg->payload[3]);	// T_DATA_DESC
-							app_trace_log(DEBUG_LOW, "  Type: 	%01u\r", rx_msg->payload[4]);		// T_DATA_TYPE
-							app_trace_log(DEBUG_LOW, "  FSR:  	%01u\r", rx_msg->payload[5]);		// T_DATA_FSR
-							app_trace_log(DEBUG_LOW, "  Fields:	%01u\r", rx_msg->payload[6]); 	// T_DATA_FIELDS
-							app_trace_log(DEBUG_LOW, "  Samples:	%01u\r", rx_msg->payload[7]|(rx_msg->payload[8]<<8));	// count
-							app_trace_log(DEBUG_LOW, "  Recs_Rep:	%01u\r", rx_msg->payload[9]|(rx_msg->payload[10]<<8));	// count
+							app_trace_log(DEBUG_LOW, "Reporter %01u Atts Request:\r\n", rx_msg->payload[0]);	// id
+							app_trace_log(DEBUG_LOW, "  Ind_Des:	%01u\r\n", rx_msg->payload[1]);	// T_INDEP_DESC
+							app_trace_log(DEBUG_LOW, "  Ind_Scl:	%01u\r\n", rx_msg->payload[2]);	// count
+							app_trace_log(DEBUG_LOW, "  Data_Des:	%01u\r\n", rx_msg->payload[3]);	// T_DATA_DESC
+							app_trace_log(DEBUG_LOW, "  Type: 	%01u\r\n", rx_msg->payload[4]);		// T_DATA_TYPE
+							app_trace_log(DEBUG_LOW, "  FSR:  	%01u\r\n", rx_msg->payload[5]);		// T_DATA_FSR
+							app_trace_log(DEBUG_LOW, "  Fields:	%01u\r\n", rx_msg->payload[6]); 	// T_DATA_FIELDS
+							app_trace_log(DEBUG_LOW, "  Samples:	%01u\r\n", rx_msg->payload[7]|(rx_msg->payload[8]<<8));	// count
+							app_trace_log(DEBUG_LOW, "  Recs_Rep:	%01u\r\n", rx_msg->payload[9]|(rx_msg->payload[10]<<8));	// count
 						}
 					}
 					/* 		
@@ -311,7 +310,7 @@ void parse_msg( T_PACKET * rx_msg )
 							{
 								app_trace_log(DEBUG_MED, "%02u, ", rx_msg->payload[i]);
 							}
-							app_trace_puts(DEBUG_MED, "\r");
+							app_trace_puts(DEBUG_MED, "\r\n");
 						}
 
 						tx_type = REPORT_ATTRIBUTES;
@@ -323,7 +322,7 @@ void parse_msg( T_PACKET * rx_msg )
 					}
 					else
 					{
-						if (gs_bdebug) app_trace_log(DEBUG_MED, "Attribute Update Failed: %01u\r", rep_err);
+						if (gs_bdebug) app_trace_log(DEBUG_MED, "Attribute Update Failed: %01u\r\n", rep_err);
 						//Something failed, return the Error Code
 						tx_type = NACK;
 						tx_payload[0] = ATTRIBUTE_ERROR;
@@ -344,18 +343,18 @@ void parse_msg( T_PACKET * rx_msg )
 				if( rx_pay_len > 0 )
 				{
 					//turn on/off the Reporters that are indicated by data byte 0
-					if (gs_bdebug) app_trace_log(DEBUG_LOW, "0x%02X\r", rx_msg->payload[0]);
+					if (gs_bdebug) app_trace_log(DEBUG_LOW, "0x%02X\r\n", rx_msg->payload[0]);
 					enable_reporters(rx_msg->payload[0]);	//return the Active/Inactive flags
 				}
 				else
 				{
-					if(gs_bdebug) app_trace_puts(DEBUG_LOW, "\r");
+					if(gs_bdebug) app_trace_puts(DEBUG_LOW, "\r\n");
 				}
 
 				//reply with active/inactive Reporters
 				tx_type = REPORT_CONTROL;
 				tx_payload[0] = get_active_reporters();
-				if (gs_bdebug) app_trace_log(DEBUG_MED, "Reporters Active: 0x%02X\r", tx_payload[0]);
+				if (gs_bdebug) app_trace_log(DEBUG_MED, "Reporters Active: 0x%02X\r\n", tx_payload[0]);
 				tx_pay_len = 1;
 
 				break;
@@ -370,7 +369,7 @@ void parse_msg( T_PACKET * rx_msg )
 				//Only modify transmit flow control if the payload is exactly 1 byte, otherwise only return data
 				if( rx_pay_len == 1 )
 				{
-					if (gs_bdebug) app_trace_log(DEBUG_MED, "Transmit Ctrl Req: 0x%02X\r", rx_msg->payload[0]);
+					if (gs_bdebug) app_trace_log(DEBUG_MED, "Transmit Ctrl Req: 0x%02X\r\n", rx_msg->payload[0]);
 					//turn on/off the Reporters that are indicated by data byte 0
 					if(rx_msg->payload[0] == true )
 					{
@@ -386,7 +385,7 @@ void parse_msg( T_PACKET * rx_msg )
 				else 
 				{
 					//length is incorrect to adjust the Flow Control Flag. Do not touch it, just return lengths
-					if (gs_bdebug) app_trace_log(DEBUG_MED, "Transmit Ctrl Stat: %01u\r", record_queue_en);
+					if (gs_bdebug) app_trace_log(DEBUG_MED, "Transmit Ctrl Stat: %01u\r\n", record_queue_en);
 				}
 
 				//send back the total number of records used in memory
@@ -408,7 +407,7 @@ void parse_msg( T_PACKET * rx_msg )
 					{
 						app_trace_log(DEBUG_LOW, "0x%02X, ", tx_payload[i]);
 					}
-					app_trace_puts(DEBUG_LOW, "\r");
+					app_trace_puts(DEBUG_LOW, "\r\n");
 				}
 
 				//send back the individual lengths of all 8 reporters
@@ -427,7 +426,7 @@ void parse_msg( T_PACKET * rx_msg )
 					terminate_connection();
 					break;
 				}
-				if (gs_bdebug) app_trace_puts(DEBUG_MED, "Time Read\r");
+				if (gs_bdebug) app_trace_puts(DEBUG_MED, "Time Read\r\n");
 
 				//Send back current time
 				tx_type = TIMERD;
@@ -446,7 +445,7 @@ void parse_msg( T_PACKET * rx_msg )
 					terminate_connection();
 					break;
 				}
-				if (gs_bdebug) app_trace_puts(DEBUG_MED, "Time Set\r");
+				if (gs_bdebug) app_trace_puts(DEBUG_MED, "Time Set\r\n");
 
 				for (int i = 0; i<sizeof(uint32_t); i++)
 				{
@@ -473,7 +472,7 @@ void parse_msg( T_PACKET * rx_msg )
 					terminate_connection();
 					break;
 				}
-				if (gs_bdebug) app_trace_puts(DEBUG_LOW, "User UUID RD\r");
+				if (gs_bdebug) app_trace_puts(DEBUG_LOW, "User UUID RD\r\n");
 
 				// reading
 				tx_type = USERUUIDRD;
@@ -490,7 +489,7 @@ void parse_msg( T_PACKET * rx_msg )
 					terminate_connection();
 					break;
 				}
-				if (gs_bdebug) app_trace_puts(DEBUG_MED, "User UUID WR\r");
+				if (gs_bdebug) app_trace_puts(DEBUG_MED, "User UUID WR\r\n");
 
 				// writing
 				for (int i = 0; i<user_UUID_LEN; i++)
@@ -513,7 +512,7 @@ void parse_msg( T_PACKET * rx_msg )
 					terminate_connection();
 					break;
 				}
-				if (gs_bdebug) app_trace_puts(DEBUG_LOW, "Frame RD\r");
+				if (gs_bdebug) app_trace_puts(DEBUG_LOW, "Frame RD\r\n");
 
 				// reading
 				tx_type = FRAMERD;
@@ -531,7 +530,7 @@ void parse_msg( T_PACKET * rx_msg )
 					terminate_connection();
 					break;
 				}
-				if (gs_bdebug) app_trace_puts(DEBUG_MED, "Frame WR\r");
+				if (gs_bdebug) app_trace_puts(DEBUG_MED, "Frame WR\r\n");
 
 				// writing
 				for (int i = 0; i<device_FRAMEID_LEN; i++)
@@ -569,7 +568,7 @@ void parse_msg( T_PACKET * rx_msg )
 
 				sd_ble_gap_tx_power_set( temp.s8[0] );
 
-				if (gs_bdebug) app_trace_log(DEBUG_MED, "New TX Power: %01u dBm\r", temp.s8[0]);
+				if (gs_bdebug) app_trace_log(DEBUG_MED, "New TX Power: %01u dBm\r\n", temp.s8[0]);
 
 				//reply with active/inactive Reporters
 				tx_type = BLE_TX_POWER;
@@ -580,7 +579,7 @@ void parse_msg( T_PACKET * rx_msg )
 
 			case LED_ID_RX:
 
-				if (gs_bdebug) app_trace_puts(DEBUG_LOW, "LED_ID_RX\r");
+				if (gs_bdebug) app_trace_puts(DEBUG_LOW, "LED_ID_RX\r\n");
 			
 				if( rx_pay_len == (KEY_LEN+1) )
 				{	//message is from manufacturing App
@@ -591,7 +590,7 @@ void parse_msg( T_PACKET * rx_msg )
 				{	//message is from User App	
 					if( g_config.ship_mode != 0x00 )
 					{
-						app_trace_puts(DEBUG_MED, "Ship Flag Cleared\r");
+						app_trace_puts(DEBUG_MED, "Ship Flag Cleared\r\n");
 						g_config.ship_mode = 0x00;
 						set_config_update_flag();
 					}
@@ -633,7 +632,7 @@ void parse_msg( T_PACKET * rx_msg )
 					break;
 				}
 				
-				app_trace_puts(DEBUG_HIGH, "Records Nuked!!!\r");
+				app_trace_puts(DEBUG_HIGH, "Records Nuked!!!\r\n");
 				
 				if( rx_pay_len != 1 ) {
 					//payload size is not correct
@@ -663,8 +662,8 @@ void parse_msg( T_PACKET * rx_msg )
 				break;
 				
 			case CHECK_KEY:
-				if (gs_bdebug) app_trace_puts(DEBUG_LOW, "Check Key Read\r");
-				app_trace_puts(DEBUG_LOW, "LEDID State 0\r");
+				if (gs_bdebug) app_trace_puts(DEBUG_LOW, "Check Key Read\r\n");
+				app_trace_puts(DEBUG_LOW, "LEDID State 0\r\n");
 			
 				//#define JUST_CONNECT_ALREADY	//todo: remove after testing
 				#ifdef JUST_CONNECT_ALREADY
@@ -682,7 +681,7 @@ void parse_msg( T_PACKET * rx_msg )
 							tx_type = CHECK_KEY;
 							tx_payload[0] = key_ring[key_ring_index];
 							tx_pay_len = 1;
-							app_trace_log(DEBUG_MED, "[KR]: NUS Xmit key_ring[%01u] = 0x%02X @\r", key_ring_index, key_ring[key_ring_index], getSystemTimeMs() );
+							app_trace_log(DEBUG_MED, "[KR]: NUS Xmit key_ring[%01u] = 0x%02X @\r\n", key_ring_index, key_ring[key_ring_index], getSystemTimeMs() );
 						}
 						else
 						{
@@ -712,7 +711,7 @@ void parse_msg( T_PACKET * rx_msg )
 					break;
 				}
 
-				if (gs_bdebug) app_trace_log(DEBUG_LOW, "Trace Ctrl: %01u\r", rx_msg->payload[0]);
+				if (gs_bdebug) app_trace_log(DEBUG_LOW, "Trace Ctrl: %01u\r\n", rx_msg->payload[0]);
 
 				if(rx_msg->payload[0] == true )
 				{	//start sending trace logs
@@ -751,7 +750,7 @@ void parse_msg( T_PACKET * rx_msg )
 					tx_payload[2] = (uint8_t) (res.hw_flags>>8);
 					tx_pay_len = 3;
 					
-					app_trace_log(DEBUG_MED, "Manu Ctrl: St-%01u Fl-0x%02X%02X\r", tx_payload[0], tx_payload[2], tx_payload[1]);
+					app_trace_log(DEBUG_MED, "Manu Ctrl: St-%01u Fl-0x%02X%02X\r\n", tx_payload[0], tx_payload[2], tx_payload[1]);
 				}
 				break;
 				
@@ -770,7 +769,7 @@ void parse_msg( T_PACKET * rx_msg )
 					{
 						app_trace_log(DEBUG_LOW, " %01u", rx_msg->payload[i]);
 					}
-					app_trace_puts( DEBUG_LOW, "\r");
+					app_trace_puts( DEBUG_LOW, "\r\n");
 				}
 
 				if( rx_pay_len == KEY_LEN )
@@ -800,7 +799,7 @@ void parse_msg( T_PACKET * rx_msg )
 				break;
 				
 			default:    //Where's The Fun?
-				if (gs_bdebug) app_trace_puts(DEBUG_MED, "Respond: Where's The Fun?\r");
+				if (gs_bdebug) app_trace_puts(DEBUG_MED, "Respond: Where's The Fun?\r\n");
 				tx_type = NACK;
 				tx_payload[0] = PKT_TYPE_UNRECOG;
 				tx_payload[1] = rx_msg->id;
@@ -830,7 +829,7 @@ bool packetize_record( void )
 	
 	if( get_next_record( &rec ) != true )
 	{
-		if (gs_bdebug) app_trace_puts(DEBUG_MED, "[Queue] Rec Pop Fail\r");
+		if (gs_bdebug) app_trace_puts(DEBUG_MED, "[Queue] Rec Pop Fail\r\n");
 		res = false;
 	}
 	else if( rec.hdr.rec_len > 0 )
@@ -845,7 +844,7 @@ bool packetize_record( void )
 
 		if( (get_fifo_length() + num_pkts_2_add) > PKT_FIFO_MASK )
 		{
-			if (gs_bdebug) app_trace_puts(DEBUG_MED, "[Queue] Too many packets!\r");
+			if (gs_bdebug) app_trace_puts(DEBUG_MED, "[Queue] Too many packets!\r\n");
 			rec_ack.pkt_id = 0xFFFF;	//prevent an ACK from accidentally updating the Log pointers
 			return false;	//not enough space in the FIFO to add this record
 		}
@@ -877,7 +876,7 @@ bool packetize_record( void )
 
 			if( queue_packet( pkt_type, rec_ptr, payload_len) != true )
 			{
-				if (gs_bdebug) app_trace_puts(DEBUG_MED, "[Queue] Full\r");
+				if (gs_bdebug) app_trace_puts(DEBUG_MED, "[Queue] Full\r\n");
 				//no more room in queue (This is already checked for, so it shouldn't occur. But better safe than sorry)
 				rec_ack.pkt_id = 0xFFFF;	//prevent an ACK from accidentally updating the Record pointers
 				return res;
@@ -888,7 +887,7 @@ bool packetize_record( void )
 		}
 		
 		//Print the first X,Y,Z out of memory
-		//app_trace_log(DEBUG_MED, "REC %02u: 0x%04X, 0x%04X, 0x%04X\r", rec.hdr.id, *((int16_t *)rec.data), *((int16_t *)rec.data+2), *((int16_t *)rec.data+4) );
+		//app_trace_log(DEBUG_MED, "REC %02u: 0x%04X, 0x%04X, 0x%04X\r\n", rec.hdr.id, *((int16_t *)rec.data), *((int16_t *)rec.data+2), *((int16_t *)rec.data+4) );
 
 		//Check if an ACK is required for this record
 		if( rec_ack_req(rec.hdr.report_inst) ) {
@@ -905,7 +904,7 @@ bool packetize_record( void )
 	}
 	else
 	{
-		if (gs_bdebug) app_trace_puts(DEBUG_LOW, "[Queue] No Records\r");
+		if (gs_bdebug) app_trace_puts(DEBUG_LOW, "[Queue] No Records\r\n");
 	}
 
 	return res;
@@ -919,7 +918,7 @@ bool packetize_record( void )
 #define RECORD_RETRY	5
 void ble_send_nus_data( void )
 {
-	static TTASK_TIMER timeout = { 0, PACKET_TIMEOUT };
+	static expire_timer_t timeout = { 0, 0 };
 	static T_TX_STATE rec_queue_state = TX_OFF;
 	static int8_t retries = RECORD_RETRY;
 
@@ -953,12 +952,12 @@ void ble_send_nus_data( void )
 			{
 				if( packetize_record() == true )
 				{
-					if( gs_bdebug ) app_trace_puts(DEBUG_LOW, "[COMMS] Record Queued to TX\r");
+					if( gs_bdebug ) app_trace_puts(DEBUG_LOW, "[COMMS] Record Queued to TX\r\n");
 					
 					if( rec_ack.state == WAITING ) 
 					{
 						//Need to wait for an ACK from the Host
-						re_arm_task_timer( timeout );
+						get_expire_time( PACKET_TIMEOUT_US, &timeout );
 						retries = RECORD_RETRY;
 						rec_queue_state = TX_WAIT_ACK;
 					}
@@ -992,7 +991,7 @@ void ble_send_nus_data( void )
 					//if any data goes into memory before the timeout, send it
 					if( retries <= 0 )
 					{
-						if( gs_bdebug ) app_trace_puts(DEBUG_MED, "[COMMS] Lack of ACK, TC Off.\r");
+						if( gs_bdebug ) app_trace_puts(DEBUG_MED, "[COMMS] Lack of ACK, TC Off.\r\n");
 						record_queue_en = false;	//5 failures in a row. Turn off transmit control
 						rec_ack.state = ACK_IDLE;
 						rec_queue_state = TX_START;
@@ -1001,9 +1000,9 @@ void ble_send_nus_data( void )
 					{
 						if( packetize_record() == true )
 						{
-							re_arm_task_timer( timeout );
+							get_expire_time( PACKET_TIMEOUT_US, &timeout );
 							
-							if( gs_bdebug ) app_trace_log(DEBUG_LOW, "[COMMS] Record Queued @%01u\r", getSystemTimeMs());
+							if( gs_bdebug ) app_trace_log(DEBUG_LOW, "[COMMS] Record Queued @%01u\r\n", getSystemTimeMs());
 							//tx_timestamp = systime_ms;
 							
 							if( rec_ack.state != WAITING ) {
@@ -1018,13 +1017,13 @@ void ble_send_nus_data( void )
 					break;
 
 				case WAITING:
-					if( task_time( timeout ) )
+					if( check_expiration( &timeout ) )
 					{
 						//turn off TX control
 						//record_queue_en = false;
 						retries--;
 						rec_ack.state = ACK_IDLE;
-						if( gs_bdebug ) app_trace_log(DEBUG_MED, "[COMMS] No Record ACK @%01u\r", getSystemTimeMs());
+						if( gs_bdebug ) app_trace_log(DEBUG_MED, "[COMMS] No Record ACK @%01u\r\n", getSystemTimeMs());
 					}
 					break;
 
@@ -1044,9 +1043,9 @@ void ble_send_nus_data( void )
 						{
 							if( packetize_record() == true )
 							{
-								re_arm_task_timer( timeout );
+								get_expire_time( PACKET_TIMEOUT_US, &timeout );
 								
-								if( gs_bdebug ) app_trace_puts(DEBUG_LOW, "[COMMS] Next Record Queued\r");
+								if( gs_bdebug ) app_trace_puts(DEBUG_LOW, "[COMMS] Next Record Queued\r\n");
 								//tx_timestamp = systime_ms;
 								
 								if( rec_ack.state != WAITING ) {
@@ -1061,7 +1060,7 @@ void ble_send_nus_data( void )
 				case ID_ACK_FAIL:
 					retries--;
 					rec_ack.state = ACK_IDLE;
-					if( gs_bdebug ) app_trace_puts(DEBUG_MED, "[COMMS] ACK Not Valid\r");
+					if( gs_bdebug ) app_trace_puts(DEBUG_MED, "[COMMS] ACK Not Valid\r\n");
 					break;
 
 				default:
@@ -1133,13 +1132,13 @@ static void secure_connect_sm( uint8_t * data, uint8_t d_len )
 		case NO_CONNECTION:
 			if ( data[0] == START_SEC_CODE )
 			{
-				app_trace_puts(DEBUG_LOW, "[SEC_STATE] Rx 0x88\r");
-				app_trace_log(DEBUG_LOW, "[KR]: connected_and_bonded = 0x%02X, key_ring[%01u] = 0x%02X\r", connected_and_bonded, key_ring_index, key_ring[key_ring_index] );
+				app_trace_puts(DEBUG_LOW, "[SEC_STATE] Rx 0x88\r\n");
+				app_trace_log(DEBUG_LOW, "[KR]: connected_and_bonded = 0x%02X, key_ring[%01u] = 0x%02X\r\n", connected_and_bonded, key_ring_index, key_ring[key_ring_index] );
 				app_timer_stop(local_detach_timer_id);
 				if((connected_and_bonded == 1) && (key_ring[key_ring_index] == 1)) // this is a bonded connect so enable services and we are done
 				{
 					// Previously Bonded with Device
-					app_trace_puts(DEBUG_LOW, "[SEC_STATE] Bonded\r");
+					app_trace_puts(DEBUG_LOW, "[SEC_STATE] Bonded\r\n");
 					connected_and_bonded = 0;
 					sec_con_state = SECURE_CONNECTION;
 				}
@@ -1152,13 +1151,13 @@ static void secure_connect_sm( uint8_t * data, uint8_t d_len )
 			else
 			{
 				//delete_current_bond();
-				app_trace_log(DEBUG_MED, "[SEC_STATE] Wrong Code 0x%02X\r", data[0]);
+				app_trace_log(DEBUG_MED, "[SEC_STATE] Wrong Code 0x%02X\r\n", data[0]);
 				terminate_connection();
 			}
 			break;
 
 		case GET_KEY_STATE:	// time out routine run while waiting for LED_ID_NUMB
-			app_trace_puts(DEBUG_LOW, "[SEC_STATE] Key\r");
+			app_trace_puts(DEBUG_LOW, "[SEC_STATE] Key\r\n");
 		
 			// Code and Key have been received, Detach Timer can be stopped
 			app_timer_stop(local_detach_timer_id);
@@ -1171,20 +1170,20 @@ static void secure_connect_sm( uint8_t * data, uint8_t d_len )
 				{
 					if( copy_security_key[i] != data[i] )
 					{
-						app_trace_log(DEBUG_MED, "[SEC_STATE] [%01u]: %01u != %01u\r", i, data[i], copy_security_key[i]);
+						app_trace_log(DEBUG_MED, "[SEC_STATE] [%01u]: %01u != %01u\r\n", i, data[i], copy_security_key[i]);
 						key_valid = false;
 					}
 				}
 			}
 			else
 			{
-				app_trace_puts(DEBUG_MED, "[SEC_STATE] Incorrect Len\r");
+				app_trace_puts(DEBUG_MED, "[SEC_STATE] Incorrect Len\r\n");
 				key_valid = false;
 			}
 				
 			if( key_valid )
 			{
-				app_trace_puts(DEBUG_LOW, "[SEC_STATE] COMPLETE\r");
+				app_trace_puts(DEBUG_LOW, "[SEC_STATE] COMPLETE\r\n");
 				gu_prev_battery_state = BATTERY_UNDEF_STATE; // Reset the led state to it's former magenta glory
 				sec_con_state = SECURE_CONNECTION;
 				
@@ -1197,11 +1196,11 @@ static void secure_connect_sm( uint8_t * data, uint8_t d_len )
 				g_config.key_ring[key_ring_index] = key_ring[key_ring_index];
 				g_config.device_index_ring = device_index_ring;
 				set_config_update_flag();	//save new data next time through main()
-				app_trace_log(DEBUG_LOW, "[KR]: NUS Xmit key_ring[%01u] = 0x%02X, device_index_ring = %01u\r", key_ring_index, key_ring[key_ring_index], device_index_ring );
+				app_trace_log(DEBUG_LOW, "[KR]: NUS Xmit key_ring[%01u] = 0x%02X, device_index_ring = %01u\r\n", key_ring_index, key_ring[key_ring_index], device_index_ring );
 			}
 			else
 			{
-				app_trace_puts(DEBUG_MED, "[SEC_STATE] KEY failed\r");
+				app_trace_puts(DEBUG_MED, "[SEC_STATE] KEY failed\r\n");
 				//delete_current_bond();
 				terminate_connection();
 			}
@@ -1209,7 +1208,7 @@ static void secure_connect_sm( uint8_t * data, uint8_t d_len )
 			
 		case SECURE_CONNECTION: // Finished. Enable services. Now looking for disconnect.
 
-			//app_trace_log(DEBUG_LOW, "LEDID State 4\r");
+			//app_trace_log(DEBUG_LOW, "LEDID State 4\r\n");
 			break;
 		
 		default:
@@ -1233,12 +1232,12 @@ static bool queue_packet( T_PKT_TYPES pkt_type, uint8_t * data , uint8_t data_le
 	
 	if( unsent_fifo_length > PKT_FIFO_MASK )
 	{	//queue is full
-		if( !remote_trace_en ) app_trace_log(DEBUG_MED, "[QUEUE] Insufficient Space\r");
+		if( !remote_trace_en ) app_trace_log(DEBUG_MED, "[QUEUE] Insufficient Space\r\n");
 		return false;	//can't add anymore to queue
 	}
 	else if( data_len > MAX_PKT_PAYLOAD )
 	{	//packet too big!
-		if( !remote_trace_en ) app_trace_log(DEBUG_MED, "[QUEUE] Len Error %01u\r", data_len);
+		if( !remote_trace_en ) app_trace_log(DEBUG_MED, "[QUEUE] Len Error %01u\r\n", data_len);
 		return false;	
 	}
 		
@@ -1260,7 +1259,7 @@ static bool queue_packet( T_PKT_TYPES pkt_type, uint8_t * data , uint8_t data_le
 //		{
 //			app_trace_log(DEBUG_LOW, " 0x%02X", packet[g_pkt_head].payload[i]);
 //		}
-//		app_trace_puts(DEBUG_MED, "\r");
+//		app_trace_puts(DEBUG_MED, "\r\n");
 	}
 
 	g_pkt_head = (g_pkt_head+1)&PKT_FIFO_MASK;
@@ -1308,7 +1307,7 @@ static bool ble_transfer_packets( void )
 			if( send_fail_cnt++ >= TXFER_RETRY )
 			{
 				flush_queue();
-				if( gs_bdebug ) app_trace_puts(DEBUG_MED, "[COMMS] Queue Flushed\r");
+				if( gs_bdebug ) app_trace_puts(DEBUG_MED, "[COMMS] Queue Flushed\r\n");
 				return false;
 			}
 			return true;	//wait for several retries before declaring invalid
@@ -1326,7 +1325,7 @@ bool ble_transfer_packets_wrapper( void )
 }
 static void update_queue( void ) 
 {
-	//if( !remote_trace_en ) app_trace_puts(DEBUG_LOW, "Packet: Passed to SD\r");
+	//if( !remote_trace_en ) app_trace_puts(DEBUG_LOW, "Packet: Passed to SD\r\n");
 	g_pkt_tail = (g_pkt_tail+1)&PKT_FIFO_MASK;
 	unsent_fifo_length--;
 }

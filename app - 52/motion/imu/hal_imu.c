@@ -9,6 +9,7 @@
 #include "reports.h"
 #include "../data_crunch.h"
 #include "nrf_drv_gpiote.h"
+#include "common.h"
 #if defined(MPU9250)
 #include "invensense/mpu9250.h"
 #include "invensense/inv_mpu.h"
@@ -96,11 +97,11 @@ ret_code_t imu_init( bool debug )
 	
 	if ( err != NRF_SUCCESS )
 	{
-		if (imu_debug) app_trace_log(DEBUG_MED, "imu_init: failed %02u\r", err);
+		if (imu_debug) app_trace_log(DEBUG_MED, "imu_init: failed %02u\r\n", err);
 		return err;
 	}
 	else {
-		if (imu_debug) app_trace_log(DEBUG_LOW, "imu_init: done\r");
+		if (imu_debug) app_trace_log(DEBUG_LOW, "imu_init: done\r\n");
 	}
 	
 	return NRF_SUCCESS;
@@ -467,7 +468,7 @@ bool start_accel( void )
 
 	if( err != NRF_SUCCESS ) {
 		accel_buf.active_axis.flags = 0;
-		if( prv_err != err ) app_trace_log(DEBUG_HIGH, "Start Accel Err: %01u\r", err);
+		if( prv_err != err ) app_trace_log(DEBUG_HIGH, "Start Accel Err: %01u\r\n", err);
 		prv_err = err;
 		return false;
 	}
@@ -508,7 +509,7 @@ bool start_gyro( void )
 
 	if( err != NRF_SUCCESS ) {
 		gyro_buf.active_axis.flags = 0;
-		if( prv_err != err ) app_trace_log(DEBUG_MED, "Start Gyro Err: %01u\r", err);
+		if( prv_err != err ) app_trace_log(DEBUG_MED, "Start Gyro Err: %01u\r\n", err);
 		prv_err = err;
 		return false;
 	}
@@ -549,7 +550,7 @@ bool start_compass( void )
 
 	if( err != NRF_SUCCESS ) {
 		magnet_buf.active_axis.flags = 0;
-		if( prv_err != err ) app_trace_log(DEBUG_MED, "Start Compass Err: %01u\r", err);
+		if( prv_err != err ) app_trace_log(DEBUG_MED, "Start Compass Err: %01u\r\n", err);
 		prv_err = err;
 		return false;
 	}
@@ -590,7 +591,7 @@ bool stop_gyro( void )
 	gyro_buf.rate = 0;
 	
 	if( err != NRF_SUCCESS ) {
-		if( prv_err != err ) app_trace_log(DEBUG_MED, "Stop Gyro Err: %01u\r", err);
+		if( prv_err != err ) app_trace_log(DEBUG_MED, "Stop Gyro Err: %01u\r\n", err);
 		prv_err = err;
 		return false;
 	}
@@ -625,7 +626,7 @@ bool stop_compass( void )
 	magnet_buf.rate = 0;
 	
 	if( err != NRF_SUCCESS) {
-		if( prv_err != err ) app_trace_log(DEBUG_MED, "Stop Compass Err: %01u\r", err);
+		if( prv_err != err ) app_trace_log(DEBUG_MED, "Stop Compass Err: %01u\r\n", err);
 		prv_err = err;
 		return false;
 	}
@@ -655,7 +656,7 @@ bool stop_imu( void )
 	accel_buf.rate = 0;
 	
 	if( err != NRF_SUCCESS ) {
-		if( prv_err != err ) app_trace_log(DEBUG_MED, "Stop IMU Err: %01u\r", err);
+		if( prv_err != err ) app_trace_log(DEBUG_MED, "Stop IMU Err: %01u\r\n", err);
 		prv_err = err;
 		return false;
 	}
@@ -680,7 +681,7 @@ ret_code_t enable_motion_wakeup( void )
 #endif
 	
 	if( err != NRF_SUCCESS ) {
-		app_trace_log(DEBUG_LOW, "WOM Err: %01u\r", err);
+		app_trace_log(DEBUG_LOW, "WOM Err: %01u\r\n", err);
 	}
 
 	return err;
@@ -822,7 +823,7 @@ bool imu_slp_check( void )
 		if( err != NRF_SUCCESS ) {
 			if( prv_err != err ) 
 			{
-				app_trace_log(DEBUG_HIGH, "IMU WOM Error\r");
+				app_trace_log(DEBUG_HIGH, "IMU WOM Error\r\n");
 			}
 			ret = false;
 		}
@@ -857,9 +858,9 @@ static bool check_wake_up_evt( void )
 /// \param
 /// \return .
 ///
-static volatile TTASK_TIMER accelPowerDownTimer = { 0, 0 };
-static volatile TTASK_TIMER gyroPowerDownTimer= { 0, 0 };
-static volatile TTASK_TIMER magPowerDownTimer = { 0, 0 };
+static expire_timer_t accelPowerDownTimer = { 0, 0 };
+static expire_timer_t gyroPowerDownTimer= { 0, 0 };
+static expire_timer_t magPowerDownTimer = { 0, 0 };
 static T_ACTIVE_SENSORS lock = { .accel.flags = 0, .gyro.flags = 0, .magnet.flags = 0 };
 void imu_power_state( void )
 {
@@ -873,33 +874,33 @@ void imu_power_state( void )
 			if( (lock.accel.flags != 0x00) ) {
 				//Accelerometer needs to turn On to Record data
 				if( start_accel() == true ) {
-					if( imu_debug ) app_trace_log(DEBUG_MED, "Accel On\r");	
+					if( imu_debug ) app_trace_log(DEBUG_MED, "Accel On\r\n");	
 					imu_mode_sv = IMU_ACTIVE;
 				}
 				else {
-					if( imu_debug ) app_trace_log(DEBUG_MED, "Accel On Failure!!!\r");
+					if( imu_debug ) app_trace_log(DEBUG_MED, "Accel On Failure!!!\r\n");
 				}
 			}
 			else if( check_wake_up_evt() ) {
 				if( start_accel() == true ) {
 					keep_accel_on();	//Keep Accel On for at least X more seconds to determine motion...
-					if( imu_debug ) app_trace_log(DEBUG_MED, "IMU Motion Wakeup!!!\r");
+					if( imu_debug ) app_trace_log(DEBUG_MED, "IMU Motion Wakeup!!!\r\n");
 					
 					imu_mode_sv = IMU_ACTIVE;
 				}
 				else {
-					if( imu_debug ) app_trace_log(DEBUG_MED, "Motion Wakeup Failure!!!\r");
+					if( imu_debug ) app_trace_log(DEBUG_MED, "Motion Wakeup Failure!!!\r\n");
 				}
 			}
 			else if( imu_slp_check() != true ) {
 				//imu is not in it's wake on motion mode
 				if( enable_motion_wakeup() == NRF_SUCCESS ) {
-					if( imu_debug ) app_trace_log(DEBUG_MED, "IMU Sleep Mode\r");
+					if( imu_debug ) app_trace_log(DEBUG_MED, "IMU Sleep Mode\r\n");
 				}
 			}
 			else {
 				//imu monitoring for motion, but there has not been a wake event... so why are we here?
-				if( imu_debug ) app_trace_log(DEBUG_MED, "IMU Asleep???\r");
+				if( imu_debug ) app_trace_log(DEBUG_MED, "IMU Asleep???\r\n");
 			}
 			break;
 			
@@ -910,25 +911,25 @@ void imu_power_state( void )
 			//Get the On/Off status of the 9 Axis IMU...
 			get_active_axes( &act_sensors );
 			
-			if( (lock.accel.flags == 0x00) && task_time(accelPowerDownTimer) ) {
+			if( (lock.accel.flags == 0x00) && check_expiration( &accelPowerDownTimer ) ) {
 				//Time to enter back into low power wait for motion mode. Make sure everything is powered down					
-				stop_task_timer( gyroPowerDownTimer );	//turn Timer Off
+				cancel_expire_time( &gyroPowerDownTimer );	//turn Timer Off
 				retries[G] = 0;
 				if( act_sensors.gyro.flags != 0 )	{
-					if( imu_debug ) app_trace_log(DEBUG_LOW, "Gyro Off\r");
+					if( imu_debug ) app_trace_log(DEBUG_LOW, "Gyro Off\r\n");
 					stop_gyro();
 				}
 				
-				stop_task_timer( magPowerDownTimer );	//turn Timer Off
+				cancel_expire_time( &magPowerDownTimer );	//turn Timer Off
 				retries[M] = 0;
 				if( act_sensors.magnet.flags != 0 )	{
-					if( imu_debug ) app_trace_log(DEBUG_LOW, "Compass Off\r");
+					if( imu_debug ) app_trace_log(DEBUG_LOW, "Compass Off\r\n");
 					stop_compass();
 				}
 				
 				//turn on wake on motion interrupt
 				if( enable_motion_wakeup() == NRF_SUCCESS ) {
-					if( imu_debug ) app_trace_log(DEBUG_MED, "IMU Sleep\r");
+					if( imu_debug ) app_trace_log(DEBUG_MED, "IMU Sleep\r\n");
 			
 					imu_mode_sv = WAIT_FOR_MOTION;
 				}
@@ -937,9 +938,9 @@ void imu_power_state( void )
 				//Handle the turning on/off of the Gyroscope	
 				if( act_sensors.gyro.flags == 0 ) {
 					//sensor is currently Off
-					if( (lock.gyro.flags != 0 || gyroPowerDownTimer.period > 0) && retries[G] < 3 ) {
+					if( (lock.gyro.flags != 0 || gyroPowerDownTimer.wait_a_ticks > 0) && retries[G] < 3 ) {
 						//Something has requested the Gyro to turn On either temporarily(timer) or indefinitely(lock)
-						if( imu_debug ) app_trace_log(DEBUG_MED, "Gyro On\r");
+						if( imu_debug ) app_trace_log(DEBUG_MED, "Gyro On\r\n");
 						start_gyro();
 						if( lock.gyro.flags != 0 ) {
 							//Gyro data is going to be recorded. This will force recorded Accel data to sync with it
@@ -950,10 +951,10 @@ void imu_power_state( void )
 				}
 				else {
 					//Sensor is On, wait for the On request to be removed
-					if( (lock.gyro.flags == 0) && task_time(gyroPowerDownTimer) ) {
-						stop_task_timer( gyroPowerDownTimer );	//turn Timer Off
+					if( (lock.gyro.flags == 0) && check_expiration( &gyroPowerDownTimer) ) {
+						cancel_expire_time( &gyroPowerDownTimer );	//turn Timer Off
 						retries[G] = 0;
-						if( imu_debug ) app_trace_log(DEBUG_MED, "Gyro Off\r");
+						if( imu_debug ) app_trace_log(DEBUG_MED, "Gyro Off\r\n");
 						stop_gyro();
 					}
 				}
@@ -961,9 +962,9 @@ void imu_power_state( void )
 				//Handle the turning on/off of the Magnetometer	
 				if( act_sensors.magnet.flags == 0 ) {
 					//sensor is currently Off
-					if( (lock.magnet.flags != 0 || magPowerDownTimer.period > 0) && retries[M] < 3 ) {
+					if( (lock.magnet.flags != 0 || magPowerDownTimer.wait_a_ticks > 0) && retries[M] < 3 ) {
 						//Something has requested the Compass to turn On either temporarily or indefinitely
-						if( imu_debug ) app_trace_log(DEBUG_MED, "Compass On\r");
+						if( imu_debug ) app_trace_log(DEBUG_MED, "Compass On\r\n");
 						start_compass();
 						if( lock.magnet.flags != 0 ) {
 							//Compass data is going to be recorded. This will force recorded Accel data to sync with it
@@ -974,10 +975,10 @@ void imu_power_state( void )
 				}
 				else {
 					//Sensor is On, wait for the On request to be removed
-					if( (lock.magnet.flags == 0) && task_time(magPowerDownTimer) ) {
-						stop_task_timer( magPowerDownTimer );	//turn Timer Off
+					if( (lock.magnet.flags == 0) && check_expiration(&magPowerDownTimer) ) {
+						cancel_expire_time( &magPowerDownTimer );	//turn Timer Off
 						retries[M] = 0;
-						if( imu_debug ) app_trace_log(DEBUG_MED, "Compass Off\r");
+						if( imu_debug ) app_trace_log(DEBUG_MED, "Compass Off\r\n");
 						stop_compass();
 					}
 				}
@@ -1002,19 +1003,19 @@ void imu_power_state( void )
 //Reset timer. Temporarily keeps accelerometer on.
 void keep_accel_on( void )
 {
-	start_task_timer( accelPowerDownTimer, ACCEL_PD_TO );
+	get_expire_time( (1000UL*ACCEL_PD_TO), &accelPowerDownTimer );
 }
 
 //Reset timer. Temporarily keeps gyrometer on.
 void keep_gyro_on( void )
 {
-	start_task_timer( gyroPowerDownTimer, GYRO_PD_TO );
+	get_expire_time( (1000UL*GYRO_PD_TO), &gyroPowerDownTimer );
 }
 
 //Reset timer. Temporarily keeps magnetometer on.
 void keep_magnet_on( void )
 {
-	start_task_timer( magPowerDownTimer, MAG_PD_TO );
+	get_expire_time( (1000UL*MAG_PD_TO), &magPowerDownTimer );
 }
 
 //Force Accelerometer to stay On
@@ -1024,7 +1025,7 @@ static void lock_accel( bool lock_on )
 	get_active_axes( &act_sensors );
 	
 	if( lock_on == true ) {
-///		app_trace_puts(DEBUG_MED, "Accel Lock: On\r");
+///		app_trace_puts(DEBUG_MED, "Accel Lock: On\r\n");
 		lock.accel.flags = 0;
 		lock.accel.x = 1;
 		lock.accel.y = 1;
@@ -1035,7 +1036,7 @@ static void lock_accel( bool lock_on )
 		}
 	}
 	else {
-		app_trace_puts(DEBUG_MED, "Accel Lock: Off\r");
+		app_trace_puts(DEBUG_MED, "Accel Lock: Off\r\n");
 		lock.accel.flags = 0;
 	}
 }
@@ -1044,14 +1045,14 @@ static void lock_accel( bool lock_on )
 static void lock_gyro( bool lock_on )
 {
 	if( lock_on == true ) {
-		app_trace_puts(DEBUG_MED, "Gyro Lock: On\r");
+		app_trace_puts(DEBUG_MED, "Gyro Lock: On\r\n");
 		lock.gyro.flags = 0;
 		lock.gyro.x = 1;
 		lock.gyro.y = 1;
 		lock.gyro.z = 1;
 	}
 	else {
-		app_trace_puts(DEBUG_MED, "Gyro Lock: Off\r");
+		app_trace_puts(DEBUG_MED, "Gyro Lock: Off\r\n");
 		lock.gyro.flags = 0;
 	}
 }
@@ -1060,14 +1061,14 @@ static void lock_gyro( bool lock_on )
 static void lock_magnet( bool lock_on )
 {
 	if( lock_on == true ) {
-		app_trace_puts(DEBUG_MED, "Compass Lock: On\r");
+		app_trace_puts(DEBUG_MED, "Compass Lock: On\r\n");
 		lock.magnet.flags = 0;
 		lock.magnet.x = 1;
 		lock.magnet.y = 1;
 		lock.magnet.z = 1;
 	}
 	else {
-		app_trace_puts(DEBUG_MED, "Compass Lock: Off\r");
+		app_trace_puts(DEBUG_MED, "Compass Lock: Off\r\n");
 		lock.magnet.flags = 0;
 	}
 }

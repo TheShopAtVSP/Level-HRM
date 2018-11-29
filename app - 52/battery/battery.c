@@ -171,7 +171,7 @@ bool battery_shutoff( void )
 		ret_code_t err = bq25120_en_shipmode();
 		if( err != NRF_SUCCESS ) 
 		{
-			app_trace_log(DEBUG_MED, "[BAT_SHUTOFF] Err: %01u\r", err);
+			app_trace_log(DEBUG_MED, "[BAT_SHUTOFF] Err: %01u\r\n", err);
 			ret_val = false;
 		}
 		else
@@ -190,7 +190,7 @@ ret_code_t battery_init( bool debug )
 	ret_code_t err;
 	battery_debug = debug;
 	
-	if( battery_debug) app_trace_puts(DEBUG_MED, "[BAT_INIT]: start\r");
+	if( battery_debug) app_trace_puts(DEBUG_MED, "[BAT_INIT]: start\r\n");
 
 	//Create 2 timers: One that continuously initiates Battery Reads, another 
 	//that progresses the Battery Read State Machine after initiation.
@@ -205,7 +205,7 @@ ret_code_t battery_init( bool debug )
 		err = bq25120_init();
 		if( err != NRF_SUCCESS )
 		{
-			app_trace_log(DEBUG_MED, "[BAT_INIT]: BQ25120 Init Failed %01d\r", err);
+			app_trace_log(DEBUG_MED, "[BAT_INIT]: BQ25120 Init Failed %01d\r\n", err);
 			return err;
 		}
 	#else
@@ -258,7 +258,7 @@ ret_code_t battery_init( bool debug )
 	//Start continuous Reading:
 	battery_monitor_start();
 	
-	if( battery_debug) app_trace_puts(DEBUG_LOW, "[BAT_INIT]: done\r");	
+	if( battery_debug) app_trace_puts(DEBUG_LOW, "[BAT_INIT]: done\r\n");	
 	
 	return NRF_SUCCESS;
 }	
@@ -378,7 +378,7 @@ static void battery_update_status( void )
 	
 	if( battery_dav == false )
 	{	//No ADC reading to analyze
-		app_trace_log(DEBUG_MED, "[BAT_UPDATE] %sNo Data Ava%s @%01u\r", FG_RED, FG_RESET, getSystemTimeMs());
+		app_trace_log(DEBUG_MED, "[BAT_UPDATE] %sNo Data Ava%s @%01u\r\n", FG_RED, FG_RESET, getSystemTimeMs());
 		return;
 	}
 	battery_dav = false;		//clear data available flag
@@ -464,7 +464,7 @@ static void battery_update_status( void )
 				{	//update calling functions battery level
 					reporter_perc_rem = perc_rem;
 					reporter_perc_update = true;
-					//app_trace_puts(DEBUG_LOW, "LEVEL UPDATE!!!!\r");
+					//app_trace_puts(DEBUG_LOW, "LEVEL UPDATE!!!!\r\n");
 				}
 				else
 				{	//set to lowest recorded reading to Stop remaining battery level from fluctuating
@@ -584,7 +584,7 @@ static void battery_update_status( void )
 				{	//update calling functions battery level
 					reporter_perc_rem = (uint8_t)perc_rem;
 					reporter_perc_update = true;
-					//app_trace_puts(DEBUG_LOW, "LEVEL UPDATE\r");
+					//app_trace_puts(DEBUG_LOW, "LEVEL UPDATE\r\n");
 				}
 				
 				next_state = BATTERY_MONITOR_FAIL;
@@ -627,15 +627,15 @@ static void battery_update_status( void )
 					s_state = s_bat_unknown;
 					break;
 			}
-			app_trace_log(DEBUG_MED, "[BAT_UPDATE] S: %s %01umV %01u%% %01ucnt @%01u\r", s_state, temp_bat_mv, perc_rem, ad_cnt, getSystemTimeMs());
+			app_trace_log(DEBUG_MED, "[BAT_UPDATE] S: %s %01umV %01u%% %01ucnt @%01u\r\n", s_state, temp_bat_mv, perc_rem, ad_cnt, getSystemTimeMs());
 		}
 	}
 	else if( reporter_perc_update == true )
 	{
 		if( battery_debug ) 
 		{	//Debug Print new Battery Percent Remaining:
-			app_trace_log(DEBUG_MED, "[BAT_UPDATE] P: %s %01umV %01u%% %01ucnt @%01u\r", s_state, temp_bat_mv, perc_rem, ad_cnt, getSystemTimeMs());
-			//app_trace_log(DEBUG_MED, "[BAT_STAT]: %01u%%, %01u mV, %01u cnt, state %01u \r", bat_per_rsp, bat_volt_mv, ad_cnt, bat_sv);
+			app_trace_log(DEBUG_MED, "[BAT_UPDATE] P: %s %01umV %01u%% %01ucnt @%01u\r\n", s_state, temp_bat_mv, perc_rem, ad_cnt, getSystemTimeMs());
+			//app_trace_log(DEBUG_MED, "[BAT_STAT]: %01u%%, %01u mV, %01u cnt, state %01u \r\n", bat_per_rsp, bat_volt_mv, ad_cnt, bat_sv);
 		}
 	}
 	else
@@ -646,7 +646,7 @@ static void battery_update_status( void )
 		if( last_pg != nrf_gpio_pin_read(CHARGE_PG_INPUT) )
 		{
 			last_pg = nrf_gpio_pin_read(CHARGE_PG_INPUT);
-			app_trace_log(DEBUG_LOW, "[BAT_UPDATE]: PG %01u @%01u\r", last_pg, getSystemTimeMs());
+			app_trace_log(DEBUG_LOW, "[BAT_UPDATE]: PG %01u @%01u\r\n", last_pg, getSystemTimeMs());
 		}
 	}
 	
@@ -675,12 +675,12 @@ static void battery_adc_callback(nrf_drv_saadc_evt_t const * p_event)
 {	
 	if (p_event->type == NRF_DRV_SAADC_EVT_DONE) {
 		// Event generated when the buffer is filled with samples.		
-		//if(battery_debug) app_trace_puts(DEBUG_LOW, "[BAT_AD_CB]: done\r");
+		//if(battery_debug) app_trace_puts(DEBUG_LOW, "[BAT_AD_CB]: done\r\n");
 		
 		battery_reading_sm( p_event->data.done.p_buffer[0] );
 	}
 	else {
-		app_trace_log(DEBUG_MED, "[BAT_ADC_CB]: %01u\r", p_event->type );
+		app_trace_log(DEBUG_MED, "[BAT_ADC_CB]: %01u\r\n", p_event->type );
 	}
 }
 
@@ -691,7 +691,7 @@ static void battery_reading_sm( uint16_t adc_res )
 	switch ( bat_measure_sv )
 	{
 		case 0:
-			//if( battery_debug) app_trace_puts(DEBUG_LOW, "[BAT_TIME_CB]: start\r");
+			//if( battery_debug) app_trace_puts(DEBUG_LOW, "[BAT_TIME_CB]: start\r\n");
 		
 			// Turn on analog battery voltage divider, needs time to rise and settle
 			nrf_gpio_pin_set(BAT_HALF_EN);
@@ -743,7 +743,7 @@ T_HW_FAILURE_FLAGS battery_self_test( bool test4chr )
 {
 	T_HW_FAILURE_FLAGS fail_flag = NO_FAILURE;
 	
-	app_trace_puts( DEBUG_MED, "[BAT_TEST]: Start\r" );
+	app_trace_puts( DEBUG_MED, "[BAT_TEST]: Start\r\n" );
 	
 	battery_monitor_stop();
 	
@@ -752,7 +752,7 @@ T_HW_FAILURE_FLAGS battery_self_test( bool test4chr )
 		// If requested, test that input charging voltage is present. If not, return failure:
 		if( test4chr && !battery_chr_present() )
 		{
-			app_trace_log( DEBUG_MED, "[BAT_TEST]: Charger Not Detected\r" );
+			app_trace_log( DEBUG_MED, "[BAT_TEST]: Charger Not Detected\r\n" );
 			fail_flag = CHARGER_NOT_DETECT;
 			break;
 		}
@@ -770,7 +770,7 @@ T_HW_FAILURE_FLAGS battery_self_test( bool test4chr )
 			battery_enable_charging();		//re-enable charging(after updating status, CD line is picky)
 			if( battery.volt_mv < 3000 )
 			{	//should not read less than 3000 mV if Battery is connected and good
-				app_trace_log( DEBUG_MED, "[BAT_TEST]: Charge Disabled Reading: %01u \r", battery.volt_mv );
+				app_trace_log( DEBUG_MED, "[BAT_TEST]: Charge Disabled Reading: %01u \r\n", battery.volt_mv );
 				fail_flag = BAT_NOT_INCLUDED;
 				break;
 			}
@@ -780,7 +780,7 @@ T_HW_FAILURE_FLAGS battery_self_test( bool test4chr )
 		//Check the TI battery Charger Response to the Charger Disabled Reading:
 		if( bq25120_response == BQ_FAULT || bq25120_response == BQ_READ_FAIL )
 		{	//TI charger BQ25120 is detecting a problem
-			app_trace_log( DEBUG_MED, "[BAT_TEST]: BQ25120 Response %01u\r", bq25120_response );
+			app_trace_log( DEBUG_MED, "[BAT_TEST]: BQ25120 Response %01u\r\n", bq25120_response );
 			fail_flag = BAT_MANAGER_CHIP_FAULT;
 			break;
 		}
@@ -794,7 +794,7 @@ T_HW_FAILURE_FLAGS battery_self_test( bool test4chr )
 		nrf_gpio_cfg_output(BAT_HALF_EN);
 		if( battery.volt_mv > 100 )
 		{	//should read less than 100 mV
-			app_trace_log( DEBUG_MED, "[BAT_TEST]: %01u > 100 mV\r", battery.volt_mv );
+			app_trace_log( DEBUG_MED, "[BAT_TEST]: %01u > 100 mV\r\n", battery.volt_mv );
 			fail_flag = BAT_MEASURE_SWITCH;
 			break;
 		}
@@ -805,13 +805,13 @@ T_HW_FAILURE_FLAGS battery_self_test( bool test4chr )
 		battery_update_status();
 		if( battery.volt_mv < 3000 || battery.volt_mv > 4250 )
 		{	//should not read less than 3000 mV of more than 4250 mV
-			app_trace_log( DEBUG_MED, "[BAT_TEST]: Normal Reading: %01u\r", battery.volt_mv );
+			app_trace_log( DEBUG_MED, "[BAT_TEST]: Normal Reading: %01u\r\n", battery.volt_mv );
 			fail_flag = BAT_MEASURE_CIRCUIT;
 			break;
 		}
 		
 		//Test complete, break from loop:
-		app_trace_log( DEBUG_MED, "[BAT_TEST]: Passed\r" );
+		app_trace_log( DEBUG_MED, "[BAT_TEST]: Passed\r\n" );
 		fail_flag = NO_FAILURE;
 		break;
 		

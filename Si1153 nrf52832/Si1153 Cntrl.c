@@ -119,7 +119,7 @@ int CVICALLBACK LED_A_Current (int panel, int control, int event,
 	{
 		case EVENT_COMMIT:
 			GetCtrlVal(mainpnl, MAINPNL_LED_A_I, &led_current); 
-			strcpy(ser_str, "e"); 
+			strcpy(ser_str, "e");   //LED 1
 			ComWrt (ser_com_port, ser_str, 1);
 			ComWrtByte (ser_com_port, 0x000A);
 			Delay(0.10);
@@ -141,7 +141,7 @@ int CVICALLBACK LED_B_Current (int panel, int control, int event,
 	{
 		case EVENT_COMMIT:
 			GetCtrlVal(mainpnl, MAINPNL_LED_B_I, &led_current); 
-			strcpy(ser_str, "f"); 
+			strcpy(ser_str, "f"); //LED 2
 			ComWrt (ser_com_port, ser_str, 1);
 			ComWrtByte (ser_com_port, 0x000A);
 			Delay(0.10);
@@ -162,7 +162,7 @@ int CVICALLBACK LED_C_Current (int panel, int control, int event,
 	{
 		case EVENT_COMMIT:
 			GetCtrlVal(mainpnl, MAINPNL_LED_C_I, &led_current); 
-			strcpy(ser_str, "g"); 
+			strcpy(ser_str, "g"); //LED 3
 			ComWrt (ser_com_port, ser_str, 1);
 			ComWrtByte (ser_com_port, 0x000A);
 			Delay(0.10);

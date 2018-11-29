@@ -1,5 +1,5 @@
-#ifndef SI115X_FUNCTIONS_H__
-#define SI115X_FUNCTIONS_H__
+#ifndef DRV_SI115X_H_
+#define DRV_SI115X_H_
 
 #ifndef int16_t
 #include <stdint.h>
@@ -68,19 +68,6 @@ void     SetParam(              HANDLE si115x_handle,
                                 uint8_t param_addr, 
                                 uint8_t param_value);
 
-void 	hrm_read_cmd(void);
-
-void 	Get_HRMs(void);
-
-int16_t 	PeakDiff1D(const int16_t *arr, size_t length);
-
-int8_t 	detect_peak(
-        const int16_t*   	data, /* the data */ 
-        int8_t             	data_count, /* row count of data */  
-        int16_t          	delta, /* delta used for distinguishing peaks */
-        int8_t             	emi_first /* should we search emission peak first of
-                                     absorption peak first? */
-        );
 
 /*******************************************************************************
  ************************** Si115x I2C Registers *******************************
@@ -196,6 +183,40 @@ int8_t 	detect_peak(
 #define RSP0_COUNTER_MASK       0x1f
 #define RSP0_SLEEP              0x20
 
-#endif /* SI115X_FUNCTIONS_H_ */
+typedef enum 
+{
+	SI_CUR_5_5 =   0x00, 
+	SI_CUR_11 =    0x08, 
+	SI_CUR_17 =    0x10, 
+	SI_CUR_22 =    0x18, 
+	SI_CUR_28 =    0x20, 
+	SI_CUR_33 =    0x28, 
+	SI_CUR_39 =    0x30, 
+	SI_CUR_44 =    0x38, 
+	SI_CUR_50 =    0x12, 
+	SI_CUR_55 =    0x21, 
+	SI_CUR_66 =    0x29, 
+	SI_CUR_77 =    0x31, 
+	SI_CUR_83 =    0x22, 
+	SI_CUR_88 =    0x39, 
+	SI_CUR_100 =   0x2A, 
+	SI_CUR_111 =   0x23, 
+	SI_CUR_116 =   0x32, 
+	SI_CUR_133 =   0x3A, 
+	SI_CUR_138 =   0x24, 
+	SI_CUR_155 =   0x33, 
+	SI_CUR_166 =   0x2C, 
+	SI_CUR_177 =   0x3B, 
+	SI_CUR_194 =   0x34, 
+	SI_CUR_199 =   0x2D, 
+	SI_CUR_221 =   0x3C, 
+	SI_CUR_232 =   0x35, 
+	SI_CUR_265 =   0x3D, 
+	SI_CUR_271 =   0x36, 
+	SI_CUR_310 =   0x3E, 
+	SI_CUR_354 =   0x3F
+} si_current_t;
+
+#endif /* DRV_SI115X_H_ */
 
 /** @} */

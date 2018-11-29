@@ -32,7 +32,7 @@ ret_code_t lsm6ds3_i2c_read(uint8_t reg_addr, uint8_t len, uint8_t *reply )
 	if( res != NRF_SUCCESS ){
 		if( prv_res != res )
 		{
-			app_trace_log(DEBUG_HIGH, "IMU Read Failed\r");
+			app_trace_log(DEBUG_HIGH, "IMU Read Failed\r\n");
 		}
 	}
 	prv_res = res;
@@ -54,7 +54,7 @@ ret_code_t lsm6ds3_i2c_write(uint8_t reg_addr, uint8_t len, uint8_t *data)
 	if( res != NRF_SUCCESS ){
 		if( prv_res != res )
 		{
-			app_trace_log(DEBUG_HIGH, "IMU Write Failed\r");
+			app_trace_log(DEBUG_HIGH, "IMU Write Failed\r\n");
 		}
 	}
 	prv_res = res;

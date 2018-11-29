@@ -9,6 +9,7 @@
 
 #include <stdlib.h>
 #include "step_detect.h"
+#include "common.h"
 
 #define MIN_DELTA_MAG       12					//Minimum Change (as a % of 1g) to be considered a Step
 
@@ -39,8 +40,6 @@
 #define BLOCK_ACCUM			4		//Prevent Steps from counting for at least x steps
 #define HIGH_AMP_CADENCE	400		//A cadence of this time or less should have a high Amplitude associated with fast walking or running
 #define FASTEST_CADENCE		222		//can only take so many steps/second... making limit 4.5 steps/sec
-
-extern uint32_t get_unix_time( void ); 
 
 #define SAMP_SIZE	8
 static struct {
@@ -212,7 +211,7 @@ TSTEP_FEEDBACK stepStateMachine_1( uint32_t time, uint32_t mag )
             case FIND_SLOPE:
 				if( time < Step.Minima.time || time < Step.Maxima.time ) {
 					//Something has gone awry with the period timers (time overflows are possible: 49.7 days)...
-					app_trace_log(DEBUG_MED, "Step_Algo: Timers Invalid!\r");	
+					app_trace_log(DEBUG_MED, "Step_Algo: Timers Invalid!\r\n");	
 					Step.Maxima.time = Step.Minima.time = 0;
 				}
 				
@@ -278,7 +277,7 @@ TSTEP_FEEDBACK stepStateMachine_1( uint32_t time, uint32_t mag )
 						
 						if (Step.possMaxima.mag > ((uint32_t)Step.u1gVal + (Step.uMinDeltaMag/2)))
 						{
-							//if (mot_debug) app_trace_log(DEBUG_LOW, "Poss Max: %04u\r", (unsigned int)Step.possMaxima.mag);
+							//if (mot_debug) app_trace_log(DEBUG_LOW, "Poss Max: %04u\r\n", (unsigned int)Step.possMaxima.mag);
                             res = POSSIBLE_MAXIMA;		//Motion is definitely occurring
 							stepDetectSV = VERIFY_MAXIMA; //Wait for Signal to fall further than DynamicDeltaMagnitude or restarts rising
 						}
@@ -350,7 +349,7 @@ TSTEP_FEEDBACK stepStateMachine_1( uint32_t time, uint32_t mag )
 					Step.possMaxima.time = time;
                     res = MAXIMA_TIMEOUT;
 
-					//if (imu_debug) app_trace_log(DEBUG_LOW, "Step_Algo: Max TO\r");	
+					//if (imu_debug) app_trace_log(DEBUG_LOW, "Step_Algo: Max TO\r\n");	
                     Step.BlockAccum = true;     //Have to see X Valid Steps before counting again
                     Step.uDynamicDeltaMag = Step.uMinDeltaMag;
 
@@ -370,7 +369,7 @@ TSTEP_FEEDBACK stepStateMachine_1( uint32_t time, uint32_t mag )
 					{
 						Step.BlockAccum = true;
 						Step.Startup_Count = 0;
-						//if (mot_debug) app_trace_log(DEBUG_LOW, "Step Clear\r");
+						//if (mot_debug) app_trace_log(DEBUG_LOW, "Step Clear\r\n");
 						res = STEP_FILTER_CLR;
                     }
 					else if (step2stepDiff > EX_STD_DEV_THRES)
@@ -378,7 +377,7 @@ TSTEP_FEEDBACK stepStateMachine_1( uint32_t time, uint32_t mag )
 						Step.BlockAccum = true;
 						Step.Startup_Count = 1; //There always has to be 1 good step before this second step will match it
 						Step.uPeriods[ Step.PeriodPtr ] = stepPeriod; //Save for next comparison...
-						//if (mot_debug) app_trace_log(DEBUG_LOW, "Step Start\r");
+						//if (mot_debug) app_trace_log(DEBUG_LOW, "Step Start\r\n");
 						
 						recent_history.step[recent_history.head].time = get_unix_time();
 						recent_history.step[recent_history.head].type = POSS_STEP;
@@ -420,7 +419,7 @@ TSTEP_FEEDBACK stepStateMachine_1( uint32_t time, uint32_t mag )
 						if( Step.Cadence.uVar > IN_VAR_THRES ) 
 						{
 							Step.BlockAccum = true;
-							//if (mot_debug) app_trace_log(DEBUG_LOW, "High Variance Motion\r");
+							//if (mot_debug) app_trace_log(DEBUG_LOW, "High Variance Motion\r\n");
 						}
 
 						//Don't Count Steps until Good Cadence and Minimum Successive Steps have been met
@@ -449,14 +448,14 @@ TSTEP_FEEDBACK stepStateMachine_1( uint32_t time, uint32_t mag )
 								//Removes some instances of false positives while driving
 								Step.BlockAccum = true;
 								Step.Startup_Count = 0;
-								//if (mot_debug) app_trace_log(DEBUG_LOW, "Non Stepping Motion\r");
+								//if (mot_debug) app_trace_log(DEBUG_LOW, "Non Stepping Motion\r\n");
 								res = STEP_FILTER_CLR;
 							}
 							else if (Step.Cadence.uAve < FASTEST_CADENCE)
 							{   //Frequency too fast for bipedal motion
 								Step.BlockAccum = true;
 								Step.Startup_Count = 0;
-								//if (mot_debug) app_trace_log(DEBUG_LOW, "Motion Too Fast\r");
+								//if (mot_debug) app_trace_log(DEBUG_LOW, "Motion Too Fast\r\n");
 								res = STEP_FILTER_CLR;
 							}
 							else
@@ -477,7 +476,7 @@ TSTEP_FEEDBACK stepStateMachine_1( uint32_t time, uint32_t mag )
 								Step.Rel_Count++;   //new step!!!
 								Step.Abs_Count++;
 								
-								if( mot_debug ) app_trace_log(DEBUG_MED, "[STEP] %01u\r", Step.Abs_Count);
+								if( mot_debug ) app_trace_log(DEBUG_MED, "[STEP] %01u\r\n", Step.Abs_Count);
 								
 								recent_history.step[recent_history.head].time = get_unix_time();
 								recent_history.step[recent_history.head].type = TRUE_STEP;

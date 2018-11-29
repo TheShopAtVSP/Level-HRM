@@ -9,12 +9,12 @@
 #include "../motion/step_detect.h"
 #include "battery.h"
 //#include "hal_imu.h"
+#include "timing.h"
 
 #define RIDICULOUSLY_OLD	(3600*24L)		//1 day
 
 extern T_CONFIG g_config;
 extern bool gs_bdebug;
-extern uint32_t get_unix_time( void ); 
 extern T_3AXIS_FIFO accel_buf;
 extern T_3AXIS_FIFO gyro_buf;
 extern T_3AXIS_FIFO magnet_buf;
@@ -37,7 +37,7 @@ static uint8_t active_reports = 0;
 //To reduce the possibility of losing steps, the Step Reporter can only be turned off for upto 
 //a maximum of 15 seconds. After that period it will automatically re-enable if the user hasn't
 //already turned it back on.
-#define MAX_STEP_REPORTER_OFF_TIME	(15000UL)	//Max Number of milliseconds that reporter can stay disabled
+#define MAX_STEP_REPORTER_OFF_TIME_US	(15*1000*1000UL)	//Max Number of microseconds that reporter can stay disabled
 
 //elements needed by a step tracking reporter	
 typedef struct{
@@ -48,7 +48,7 @@ typedef struct{
 	uint8_t hist_tail;
 	T_STEP_ELEMENT data;		//number of steps detected during period X
 	uint8_t lock;
-	TTASK_TIMER re_enable;	//Do not allow report to stay off for longer than MAX Disable Time
+	expire_timer_t re_enable;	//Do not allow report to stay off for longer than MAX Disable Time
 } T_STEP_REPORTER;
 
 static union {
@@ -91,11 +91,11 @@ void init_reporters( void )
 	raw_gyro_lock = 0xFF;
 	raw_magnet_lock = 0xFF;
 	
-	stop_task_timer( step_report.re_enable );		//make sure timer is Off
+	cancel_expire_time( &step_report.re_enable );		//make sure timer is Off
 	
 	for( uint i=0; i<REP_CNT; i++ )
 	{			
-		//if (gs_bdebug) app_trace_log(DEBUG_LOW, "Reporter %01u Init\r", i);
+		//if (gs_bdebug) app_trace_log(DEBUG_LOW, "Reporter %01u Init\r\n", i);
 		
 		//load attributes from config memory
 		uint8_t * ptr = (uint8_t *) &reporter[i].atts;
@@ -115,7 +115,7 @@ void init_reporters( void )
 
 		if( set_reporter( &reporter[i].atts, ATTRIBUTE_SIZE ) == NO_ERROR ) {
 			if( reporter[i].atts.records_rep == 0 ) {
-				//app_trace_log(DEBUG_LOW, "Reporter %01u On\r", i );
+				//app_trace_log(DEBUG_LOW, "Reporter %01u On\r\n", i );
 				//Unlimited length reporter
 				if( reporter[i].atts.dependent_data == STEPS_TIME ) {
 					//If no limit on Step Reporter, turn it on automatically
@@ -136,7 +136,7 @@ void init_reporters( void )
 			}
 		}
 		else {
-			if (gs_bdebug) app_trace_log(DEBUG_MED, "Reporter Init Failed!\r");
+			if (gs_bdebug) app_trace_log(DEBUG_MED, "Reporter Init Failed!\r\n");
 		}
 		
 		reporter[i].stat.rep_len = temp;
@@ -155,7 +155,7 @@ bool rec_ack_req( uint8_t rep_inst )
 	bool res;
 	
 	if( rep_inst >= REP_CNT ) {
-		if (gs_bdebug) app_trace_puts(DEBUG_MED, "REC_ACK: Instance Error\r");
+		if (gs_bdebug) app_trace_puts(DEBUG_MED, "REC_ACK: Instance Error\r\n");
 		res = false;
 	}
 	else {
@@ -236,7 +236,7 @@ T_REPORT_ERR set_reporter( T_REPORT_ATTRIBUTES * atts, uint8_t atts_len )
 	}
 	else if( atts_len != ATTRIBUTE_SIZE ) {
 		//Incomplete list of attributes... Assume this must be a request for the existing attributes
-		if (gs_bdebug) app_trace_log(DEBUG_LOW, "Return Current Atts\r" );
+		if (gs_bdebug) app_trace_log(DEBUG_LOW, "Return Current Atts\r\n" );
 		for( uint i=0; i<ATTRIBUTE_SIZE; i++ )
 		{
 			*((uint8_t *)atts+i) = *((uint8_t *)&reporter[atts->inst].atts+i);
@@ -687,7 +687,7 @@ T_REPORT_ERR set_reporter( T_REPORT_ATTRIBUTES * atts, uint8_t atts_len )
 		}
 	}
 	
-	//app_trace_log(DEBUG_LOW, "Attribute Size %02u\r", ATTRIBUTE_SIZE );
+	//app_trace_log(DEBUG_LOW, "Attribute Size %02u\r\n", ATTRIBUTE_SIZE );
 			
 	return NO_ERROR;
 }
@@ -732,7 +732,7 @@ void enable_reporters( uint8_t reports_enable )
 						if( step_report.lock >= REP_CNT ) {
 							//only 1 steps/time reporter can operate at a time. The accum_step_per_time() function
 							//is not designed to support more than 1 calling reporter.
-							if (gs_bdebug) app_trace_log(DEBUG_MED, "Enabled\r");
+							if (gs_bdebug) app_trace_log(DEBUG_MED, "Enabled\r\n");
 							
 							reporter[i].stat.rec_data_len = 0;
 							reporter[i].stat.time_remain = 0;	//set to trigger immediately
@@ -745,27 +745,27 @@ void enable_reporters( uint8_t reports_enable )
 							step_report.period_sum = 0;							
 							step_report.hist_tail = step_report.hist->head;
 							rebase.flag[i] = false;	//clear the rebase flag bit
-							stop_task_timer( step_report.re_enable );		//coming on, no need for an automatic re-enable
+							cancel_expire_time( &step_report.re_enable );		//coming on, no need for an automatic re-enable
 							//clear step History?
 							
 							step_report.lock = i;
 						}
 						else {
-							if (gs_bdebug) app_trace_log(DEBUG_MED, "Already Enabled\r");
+							if (gs_bdebug) app_trace_log(DEBUG_MED, "Already Enabled\r\n");
 						}
 					}
 					else {
-						if (gs_bdebug) app_trace_log(DEBUG_MED, "Reporter Full\r");
+						if (gs_bdebug) app_trace_log(DEBUG_MED, "Reporter Full\r\n");
 					}
 				}
 				else { 
 					if( step_report.lock == i ) {
-						if (gs_bdebug) app_trace_log(DEBUG_MED, "Disabled\r");
+						if (gs_bdebug) app_trace_log(DEBUG_MED, "Disabled\r\n");
 						//Requested to turn off Reporter
 						step_report.lock = 0xFF;
 						
 						//Set to automatically re-enable the Step Reporter if the user forgets to
-						start_task_timer( step_report.re_enable, MAX_STEP_REPORTER_OFF_TIME );
+						get_expire_time( MAX_STEP_REPORTER_OFF_TIME_US, &step_report.re_enable );	//Max time that a routine may lock up the spiflash
 						
 						//Push partial Record to RAM holding buffer
 						if( reporter[i].stat.rec_data_len > 0 ) {
@@ -773,7 +773,7 @@ void enable_reporters( uint8_t reports_enable )
 						}
 					}
 					else {
-						if (gs_bdebug) app_trace_log(DEBUG_MED, "Nothing to Disable\r");
+						if (gs_bdebug) app_trace_log(DEBUG_MED, "Nothing to Disable\r\n");
 					}
 					
 					reporter[i].stat.enabled = false;
@@ -787,7 +787,7 @@ void enable_reporters( uint8_t reports_enable )
 						if( alt_step_report.lock >= REP_CNT ) {
 							//only 1 steps/time reporter can operate at a time. The accum_step_per_time() function
 							//is not designed to support more than 1 calling reporter.
-							if (gs_bdebug) app_trace_log(DEBUG_MED, "Enabled\r");
+							if (gs_bdebug) app_trace_log(DEBUG_MED, "Enabled\r\n");
 							
 							reporter[i].stat.rec_data_len = 0;
 							reporter[i].stat.time_remain = 0;	//set to trigger immediately
@@ -805,16 +805,16 @@ void enable_reporters( uint8_t reports_enable )
 							alt_step_report.lock = i;
 						}
 						else {
-							if (gs_bdebug) app_trace_log(DEBUG_MED, "Already Enabled\r");
+							if (gs_bdebug) app_trace_log(DEBUG_MED, "Already Enabled\r\n");
 						}
 					}
 					else {
-						if (gs_bdebug) app_trace_log(DEBUG_MED, "Reporter Full\r");
+						if (gs_bdebug) app_trace_log(DEBUG_MED, "Reporter Full\r\n");
 					}
 				}
 				else { 
 					if( alt_step_report.lock == i ) {
-						if (gs_bdebug) app_trace_log(DEBUG_MED, "Disabled\r");
+						if (gs_bdebug) app_trace_log(DEBUG_MED, "Disabled\r\n");
 						
 						//Requested to turn off Reporter
 						alt_step_report.lock = 0xFF;
@@ -825,7 +825,7 @@ void enable_reporters( uint8_t reports_enable )
 						}
 					}
 					else {
-						if (gs_bdebug) app_trace_log(DEBUG_MED, "Nothing to Disable\r");
+						if (gs_bdebug) app_trace_log(DEBUG_MED, "Nothing to Disable\r\n");
 					}
 					
 					reporter[i].stat.enabled = false;
@@ -846,7 +846,7 @@ void enable_reporters( uint8_t reports_enable )
 					else if( ave_accel_lock != i ) {
 						//Data type access is is locked to another reporter. Block this Reporter's Access!
 						if( report_on_off != 0 ) {
-							app_trace_log(DEBUG_MED, "Ave Accel Rep %01u Deny\r", i);
+							app_trace_log(DEBUG_MED, "Ave Accel Rep %01u Deny\r\n", i);
 						}
 						report_on_off = 0;
 					}
@@ -856,7 +856,7 @@ void enable_reporters( uint8_t reports_enable )
 							ave_accel_lock = 0xFF;	//release the lock
 						}
 					}
-					if (gs_bdebug) app_trace_log(DEBUG_MED, "Ave Accel Lock: %01u\r", ave_accel_lock);
+					if (gs_bdebug) app_trace_log(DEBUG_MED, "Ave Accel Lock: %01u\r\n", ave_accel_lock);
 				}
 				else if( reporter[i].atts.dependent_data == ACCEL_RAW) {
 					if( raw_accel_lock >= REP_CNT ) {
@@ -869,7 +869,7 @@ void enable_reporters( uint8_t reports_enable )
 					else if( raw_accel_lock != i ) {
 						//Data type access is is locked to another reporter. Block this Reporter's Access!
 						if( report_on_off != 0 ) {
-							app_trace_log(DEBUG_MED, "Raw Accel Rep %01u Deny\r", i);
+							app_trace_log(DEBUG_MED, "Raw Accel Rep %01u Deny\r\n", i);
 						}
 						report_on_off = 0;
 					}
@@ -880,7 +880,7 @@ void enable_reporters( uint8_t reports_enable )
 							record_accel_off();	
 						}
 					} 
-					if (gs_bdebug) app_trace_log(DEBUG_MED, "Raw Accel Lock: %01u\r", raw_accel_lock);
+					if (gs_bdebug) app_trace_log(DEBUG_MED, "Raw Accel Lock: %01u\r\n", raw_accel_lock);
 				}
 				else if( reporter[i].atts.dependent_data == GYRO_RAW) {
 					if( raw_gyro_lock >= REP_CNT ) {
@@ -893,7 +893,7 @@ void enable_reporters( uint8_t reports_enable )
 					else if( raw_gyro_lock != i ) {
 						//Data type access is is locked to another reporter. Block this Reporter's Access!
 						if( report_on_off != 0 ) {
-							app_trace_log(DEBUG_MED, "Raw Gyro Rep %01u Deny\r", i);
+							app_trace_log(DEBUG_MED, "Raw Gyro Rep %01u Deny\r\n", i);
 						}
 						report_on_off = 0;
 					}
@@ -904,7 +904,7 @@ void enable_reporters( uint8_t reports_enable )
 							record_gyro_off();
 						}
 					}
-					if (gs_bdebug) app_trace_log(DEBUG_MED, "Raw Gyro Lock: %01u\r", raw_gyro_lock);
+					if (gs_bdebug) app_trace_log(DEBUG_MED, "Raw Gyro Lock: %01u\r\n", raw_gyro_lock);
 				}
 				else if( reporter[i].atts.dependent_data == MAGNETO_RAW) {
 					if( raw_magnet_lock >= REP_CNT ) {
@@ -917,7 +917,7 @@ void enable_reporters( uint8_t reports_enable )
 					else if( raw_magnet_lock != i ) {
 						//Data type access is is locked to another reporter. Block this Reporter's Access!
 						if( report_on_off != 0 ) {
-							app_trace_log(DEBUG_MED, "Raw Compass Rep %01u Deny\r", i);
+							app_trace_log(DEBUG_MED, "Raw Compass Rep %01u Deny\r\n", i);
 						}
 						report_on_off = 0;
 					}
@@ -928,13 +928,13 @@ void enable_reporters( uint8_t reports_enable )
 							record_compass_off();
 						}
 					}
-					if (gs_bdebug) app_trace_log(DEBUG_MED, "Raw Compass Lock: %01u\r", raw_magnet_lock);
+					if (gs_bdebug) app_trace_log(DEBUG_MED, "Raw Compass Lock: %01u\r\n", raw_magnet_lock);
 				}
 				
 				if( report_on_off != 0 ) {
 					if( reporter[i].stat.rep_len <= (unsigned int)(reporter[i].atts.records_rep-1) ) {	//allows reports of 0 length to stay on indef
 						if( reporter[i].stat.enabled == false ) {
-							if (gs_bdebug) app_trace_log(DEBUG_MED, "Reporter %01u Enabled\r", i);
+							if (gs_bdebug) app_trace_log(DEBUG_MED, "Reporter %01u Enabled\r\n", i);
 							
 							reporter[i].stat.rec_data_len = 0;
 							reporter[i].stat.time_remain = 0;	//set to trigger immediately
@@ -948,7 +948,7 @@ void enable_reporters( uint8_t reports_enable )
 				}
 				else {
 					if( reporter[i].stat.enabled == true ) {
-						if (gs_bdebug) app_trace_log(DEBUG_MED, "Reporter %01u Disabled\r", i);
+						if (gs_bdebug) app_trace_log(DEBUG_MED, "Reporter %01u Disabled\r\n", i);
 					}
 					
 					//Push partial Record to RAM holding buffer
@@ -992,7 +992,7 @@ static void auto_enable_step_reporter( void )
 	
 	for( i=0; i<REP_CNT; i++ ) {
 		if( reporter[i].atts.dependent_data == STEPS_TIME ) {
-			if (gs_bdebug) app_trace_log(DEBUG_MED, "Step Reporter Auto Restart\r");
+			if (gs_bdebug) app_trace_log(DEBUG_MED, "Step Reporter Auto Restart\r\n");
 			enable_reporters( active_reports | (1<<i) );		//turn Step reporter back on
 			break;	
 		}
@@ -1011,10 +1011,10 @@ void check_reporters( void )
 	uint32_t unix_time = get_unix_time();	//stamp coming into function
 	
 	//Check to prevent the Step Reporter froming being permanenatly disabled
-	if( task_time( step_report.re_enable ) ) 
+	if( check_expiration( &step_report.re_enable ) ) 
 	{	//Step Reporter has been off for too long. Automatically turn it back on
 		auto_enable_step_reporter();
-		stop_task_timer( step_report.re_enable );
+		cancel_expire_time( &step_report.re_enable );
 	}
 	
 	for( int i=0; i<REP_CNT; i++ ) {			
@@ -1039,7 +1039,7 @@ void check_reporters( void )
 							//don't start a record unless steps are detected or a record has already started!!!						
 							if( step_report.data.cnt > 0 || reporter[i].stat.rec_data_len > 0 ) {
 								//time to log some data...
-								//if (gs_bdebug) app_trace_log(DEBUG_LOW, "Append Step Data!!!\r");
+								//if (gs_bdebug) app_trace_log(DEBUG_LOW, "Append Step Data!!!\r\n");
 								
 								if( reporter[i].stat.rec_data_len == 0 ) {
 									//start of new record
@@ -1080,7 +1080,7 @@ void check_reporters( void )
 							//don't start a record unless steps are detected or a record has already started!!!						
 							if( alt_step_report.data.cnt > 0 || reporter[i].stat.rec_data_len > 0 ) {
 								//time to log some data...
-								//if (gs_bdebug) app_trace_log(DEBUG_LOW, "Append Step Data!!!\r");
+								//if (gs_bdebug) app_trace_log(DEBUG_LOW, "Append Step Data!!!\r\n");
 								
 								if( reporter[i].stat.rec_data_len == 0 ) {
 									//start of new record
@@ -1129,7 +1129,7 @@ void check_reporters( void )
 					case ACCEL_FILT:
 						//If local time has been changed. Start a new Record to reflect new time
 						if( rebase.flag[i] == true ) {
-							if (gs_bdebug) app_trace_log(DEBUG_MED, "Time update. Saving Reporter\r");
+							if (gs_bdebug) app_trace_log(DEBUG_MED, "Time update. Saving Reporter\r\n");
 							rebase.flag[i] = false;
 							if( reporter[i].stat.rec_data_len > 0 ) {
 								//save portion of record that has been created
@@ -1161,7 +1161,7 @@ void check_reporters( void )
 						if( get_accel_en() == ON ) 
 						{
 							//Sensor On!
-							//if (gs_bdebug) app_trace_log(DEBUG_LOW, "Save Linear Data!!!\r");
+							//if (gs_bdebug) app_trace_log(DEBUG_LOW, "Save Linear Data!!!\r\n");
 							
 							//start of new record
 							if( reporter[i].stat.rec_data_len == 0 )
@@ -1301,7 +1301,7 @@ bool accum_step_per_time( T_STEP_REPORTER * rep )
 		else if( time < rep->start_time ) {
 			rep->start_time = time;
 			
-			if (gs_bdebug) app_trace_log(DEBUG_MED, "Curious?\r");
+			if (gs_bdebug) app_trace_log(DEBUG_MED, "Curious?\r\n");
 		}
 	}
 	else {
@@ -1325,7 +1325,7 @@ bool accum_step_per_time( T_STEP_REPORTER * rep )
 			}
 			else {
 				//timestamp is from before the Record Start Time?
-				if (gs_bdebug) app_trace_log(DEBUG_MED, "Curiouser???\r");
+				if (gs_bdebug) app_trace_log(DEBUG_MED, "Curiouser???\r\n");
 				
 				if( rep->period_sum > 0 ) {
 					rep->data.time_stamp = rep->start_time;							//capture the starting time of the step data element
@@ -1355,7 +1355,7 @@ bool accum_step_per_time( T_STEP_REPORTER * rep )
 //(that time being the next data collection check period).
 void flag_raw_data_sync( void ) 
 {
-	app_trace_log(DEBUG_MED, "[REP] 3 AXIS Sync @%01u\r", getSystemTimeMs());
+	app_trace_log(DEBUG_MED, "[REP] 3 AXIS Sync @%01u\r\n", getSystemTimeMs());
 	if( raw_accel_lock < REP_CNT ) reporter[raw_accel_lock].stat.new_start = true;
 	if( raw_gyro_lock < REP_CNT ) reporter[raw_gyro_lock].stat.new_start = true;
 	if( raw_magnet_lock < REP_CNT ) reporter[raw_magnet_lock].stat.new_start = true;
@@ -1368,7 +1368,7 @@ void accum_3axis_data( T_REPORTER * rep_inst, T_3AXIS_FIFO * buf )
 	uint32_t unix_time = get_unix_time();	//stamp coming into function
 	
 	if( buf->head > IMU_FIFO_MASK ) {
-		app_trace_log(DEBUG_HIGH, "[REP] 3 AXIS Buffer Err!!!\r");
+		app_trace_log(DEBUG_HIGH, "[REP] 3 AXIS Buffer Err!!!\r\n");
 		return;
 	}
 	
@@ -1382,7 +1382,7 @@ void accum_3axis_data( T_REPORTER * rep_inst, T_3AXIS_FIFO * buf )
 	
 	if( buf->active_axis.flags > 0 ) {
 		//Sensor On!
-		//if (gs_bdebug) app_trace_log(DEBUG_LOW, "Save Compass Data!!!\r");
+		//if (gs_bdebug) app_trace_log(DEBUG_LOW, "Save Compass Data!!!\r\n");
 		
 		//start of new record
 		if( rep_inst->stat.rec_data_len == 0 ) {
@@ -1451,13 +1451,13 @@ void ave_accel_data( T_REPORTER * rep_inst, T_3AXIS_FIFO * buf )
 	
 	//this reporter doesn't have access!!!!
 	if( ave_accel_lock != rep_inst->atts.inst ) {
-		app_trace_log(DEBUG_MED, "Ave Accel: Rep %01u Denied, Expect Rep %01u\r", rep_inst->atts.inst, ave_accel_lock);
+		app_trace_log(DEBUG_MED, "Ave Accel: Rep %01u Denied, Expect Rep %01u\r\n", rep_inst->atts.inst, ave_accel_lock);
 		return;
 	}
 	
 	//When reporter first starts up, Zero out the recent data buffer
 	if( rep_inst->stat.new_start == true ) {
-		app_trace_log(DEBUG_LOW, "Ave Accel Reporter %01u On\r", rep_inst->atts.inst);
+		app_trace_log(DEBUG_LOW, "Ave Accel Reporter %01u On\r\n", rep_inst->atts.inst);
 		rep_inst->stat.new_start = false;
 		rep_inst->stat.rec_data_len = 0;
 		rep_inst->stat.data_fifo_tail = buf->head;	//zero out the FIFO data
@@ -1473,7 +1473,7 @@ void ave_accel_data( T_REPORTER * rep_inst, T_3AXIS_FIFO * buf )
 	if( rep_inst->stat.rec_saved == true ) {
 		rep_inst->stat.rec_saved = false;
 		
-		app_trace_log(DEBUG_LOW, "New Ave Accel Rec\r");
+		app_trace_log(DEBUG_LOW, "New Ave Accel Rec\r\n");
 		
 		//start of new record
 		x = y = z = 0;
@@ -1528,7 +1528,7 @@ void ave_accel_data( T_REPORTER * rep_inst, T_3AXIS_FIFO * buf )
 				}
 			}		
 			
-			//app_trace_log(DEBUG_LOW, "Ave Accel Save: %02u\r", -store_val.s16[0] );		//print positive value
+			//app_trace_log(DEBUG_LOW, "Ave Accel Save: %02u\r\n", -store_val.s16[0] );		//print positive value
 		}
 		else {
 			//average value converted to user requested scale: +-1G or +-2G
@@ -1593,11 +1593,11 @@ void ave_accel_data( T_REPORTER * rep_inst, T_3AXIS_FIFO * buf )
 				}
 				if( z > 15 ) 
 				{
-					app_trace_log(DEBUG_LOW, "-%02u\r", 32-z );
+					app_trace_log(DEBUG_LOW, "-%02u\r\n", 32-z );
 				}
 				else 
 				{
-					app_trace_log(DEBUG_LOW, " %02u\r", z );
+					app_trace_log(DEBUG_LOW, " %02u\r\n", z );
 				}
 			}
 			
@@ -1735,13 +1735,13 @@ static bool buffer_record( T_REPORTER * report )
 		report->rec.hdr.rec_len = report->stat.rec_data_len+REC_HEADER_LEN;
 		if( add_record( &report->rec ) == false ) {
 			//mem probably full, report discarded
-			if (gs_bdebug) app_trace_log(DEBUG_MED, "Record Save Failed\r");
+			if (gs_bdebug) app_trace_log(DEBUG_MED, "Record Save Failed\r\n");
 			return false;
 		}
 	}
 	else {
 		//automatically shut reporter Off, it has reached it's limit
-		if (gs_bdebug) app_trace_log(DEBUG_MED, "Reporter Maxed, Auto-Off\r");
+		if (gs_bdebug) app_trace_log(DEBUG_MED, "Reporter Maxed, Auto-Off\r\n");
 		active_reports &= ~(1<<report->atts.inst);	//indicate that reporter is Off
 		report->stat.enabled = false;
 	}
@@ -1758,7 +1758,7 @@ static bool buffer_record( T_REPORTER * report )
 void inc_report_length( uint8_t rep_inst )
 {
 	if( rep_inst >= REP_CNT ) {
-		if (gs_bdebug) app_trace_log(DEBUG_MED, "Reports: Instance Error\r");
+		if (gs_bdebug) app_trace_log(DEBUG_MED, "Reports: Instance Error\r\n");
 	}
 	else {
 		reporter[rep_inst].stat.rep_len++;
@@ -1770,7 +1770,7 @@ void inc_report_length( uint8_t rep_inst )
 void dec_report_length( uint8_t rep_inst )
 {
 	if( rep_inst >= REP_CNT ) {
-		if (gs_bdebug) app_trace_puts(DEBUG_MED, "Reports: Instance Error\r");
+		if (gs_bdebug) app_trace_puts(DEBUG_MED, "Reports: Instance Error\r\n");
 	}
 	else {
 		
@@ -1778,7 +1778,7 @@ void dec_report_length( uint8_t rep_inst )
 			reporter[rep_inst].stat.rep_len--;
 		}
 		else {
-			if (gs_bdebug) app_trace_log(DEBUG_MED, "Report %01u: Length Error\r", rep_inst);
+			if (gs_bdebug) app_trace_log(DEBUG_MED, "Report %01u: Length Error\r\n", rep_inst);
 		}
 
 	}

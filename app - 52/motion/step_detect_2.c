@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "step_detect.h"
+#include "common.h"
 
 #define MIN_DELTA_MAG		4					//Minimum Change (as a % of 1g) to be considered a Step
 
@@ -36,8 +37,7 @@
 #define STD_DEV_THRES		20		//Maximum Standard Deviation Threshold to consider peaks as "walking" (100 * sd)
 #define BLOCK_ACCUM_CNT		4		//Prevent Steps from counting for at least x steps
 #define FASTEST_CADENCE		222		//can only take so many steps/second (1/0.222 = 4.5 steps/sec)
-
-extern uint32_t get_unix_time( void ); 
+ 
 static bool x_mot_debug = true;
 static uint32_t inst_per_amp_thres;
 static uint32_t ave_per_amp_thres;
@@ -241,7 +241,7 @@ TSTEP_FEEDBACK stepStateMachine_2( uint32_t time, int32_t mag )
 				if( time < Step.Minima.time || time < Step.Maxima.time ) {
 					//Something has gone awry with the period timers (time overflows are possible: 49.7 days)...
 					if (x_mot_debug) {
-						app_trace_log(DEBUG_LOW, "step: Timers Invalid!\r");	
+						app_trace_log(DEBUG_LOW, "step: Timers Invalid!\r\n");	
 					}
 					Step.Maxima.time = Step.Minima.time = 0;
 				}
@@ -396,7 +396,7 @@ TSTEP_FEEDBACK stepStateMachine_2( uint32_t time, int32_t mag )
 				else if ( time > (Step.possMaxima.time + MAX_TIME_MAX2MIN) )
                 {   
 					if (x_mot_debug) {
-						app_trace_log(DEBUG_LOW, "step: Max TO\r" );	
+						app_trace_log(DEBUG_LOW, "step: Max TO\r\n" );	
 					}
 					Step.possMaxima.mag = 0;		//accel.ave
 					Step.possMaxima.time = time;
@@ -419,7 +419,7 @@ TSTEP_FEEDBACK stepStateMachine_2( uint32_t time, int32_t mag )
 				if (peak_period > MAX_TIME_MAX2MAX)
 				{
 					if (x_mot_debug) {
-						app_trace_log(DEBUG_LOW, "step: Too Long\r");	
+						app_trace_log(DEBUG_LOW, "step: Too Long\r\n");	
 					}
 					//Way too long. Save new Stats and wait for next peak
 					Step.Maxima.time = Step.possMaxima.time;   //update timestamp
@@ -435,7 +435,7 @@ TSTEP_FEEDBACK stepStateMachine_2( uint32_t time, int32_t mag )
 				if (peak_period < MIN_TIME_MAX2MAX)
 				{
 					if (x_mot_debug) {
-						app_trace_log(DEBUG_LOW, "step: Too Soon\r");	
+						app_trace_log(DEBUG_LOW, "step: Too Soon\r\n");	
 					}
 					//Another Step Peak can't occur this fast. Likely part of the same step.
 					if( Step.possMaxima.mag > Step.Maxima.mag )
@@ -459,7 +459,7 @@ TSTEP_FEEDBACK stepStateMachine_2( uint32_t time, int32_t mag )
 				if ((Step.possMaxima.mag) < per_amp_check)
 				{
 					if (x_mot_debug) {
-						app_trace_log(DEBUG_LOW, "step: Too Small\r");	
+						app_trace_log(DEBUG_LOW, "step: Too Small\r\n");	
 					}
 					//peak is too small to come this fast on the heels of another step peak
 					res = MAXIMA_TOO_SMALL;
@@ -552,7 +552,7 @@ TSTEP_FEEDBACK stepStateMachine_2( uint32_t time, int32_t mag )
 					if( Step.Cadence.per_ave < FASTEST_CADENCE )
 					{   //Frequency too fast for bipedal motion
 						if (x_mot_debug) {
-							app_trace_log(DEBUG_LOW, "step: Cadence Too Fast\r");	
+							app_trace_log(DEBUG_LOW, "step: Cadence Too Fast\r\n");	
 						}
 						res = STEP_FILTER_CLR;
 					}
@@ -560,7 +560,7 @@ TSTEP_FEEDBACK stepStateMachine_2( uint32_t time, int32_t mag )
 					{   //Amplitude is not high enough to match this frequency...
 						//Removes some instances of false positives while driving
 						if (x_mot_debug) {
-							app_trace_log(DEBUG_LOW, "step: Cadence Too Small\r");	
+							app_trace_log(DEBUG_LOW, "step: Cadence Too Small\r\n");	
 						}
 						res = STEP_FILTER_CLR;
 					}
@@ -578,7 +578,7 @@ TSTEP_FEEDBACK stepStateMachine_2( uint32_t time, int32_t mag )
 				switch ( res )
 				{
 					case STEP_FILTER_CLR:
-						if (x_mot_debug) app_trace_puts(DEBUG_LOW, "step: Clear\r");
+						if (x_mot_debug) app_trace_puts(DEBUG_LOW, "step: Clear\r\n");
 						//Clear the startup requirements
 						Step.Startup_Count = 0;
 						Step.BlockAccum = BLOCK_ACCUM_CNT;
@@ -623,7 +623,7 @@ TSTEP_FEEDBACK stepStateMachine_2( uint32_t time, int32_t mag )
 						Step.Rel_Count++;   //new step!!!
 						hrm_step = 1;
 						Step.Abs_Count++;
-						if (x_mot_debug) app_trace_log(DEBUG_MED, "[STEP] %01u\r", Step.Abs_Count);
+						if (x_mot_debug) app_trace_log(DEBUG_MED, "[STEP] %01u\r\n", Step.Abs_Count);
 						
 						recent_history.step[recent_history.head].time = get_unix_time();
 						recent_history.step[recent_history.head].type = TRUE_STEP;
@@ -631,7 +631,7 @@ TSTEP_FEEDBACK stepStateMachine_2( uint32_t time, int32_t mag )
 						break;
 
 					default:
-						//app_trace_log(DEBUG_MED, "step: nothing to update\r");
+						//app_trace_log(DEBUG_MED, "step: nothing to update\r\n");
 						break;
 				}
 				
@@ -713,7 +713,7 @@ static bool mrs_butterworth_filter(int32_t * x)
 	
 	if( butter_nit == false ) {
 		//error, need to initialize filter coefficients
-		app_trace_log(DEBUG_MED, "[STEP_DET_2] Filter Not Init\r");
+		app_trace_log(DEBUG_MED, "[STEP_DET_2] Filter Not Init\r\n");
 		return false;
 	}
 

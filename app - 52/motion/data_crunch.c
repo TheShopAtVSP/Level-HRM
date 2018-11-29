@@ -274,7 +274,7 @@ void calc_linear_accel(void)
 		
 		if( rotate_correct == true ) 
 		{
-			//app_trace_log(DEBUG_MED, "Gyro Corrections Off: %01u, %01u\r", (gyro_buf.head-g_tail)&IMU_FIFO_MASK, (accel_buf.head-a_tail)&IMU_FIFO_MASK);
+			//app_trace_log(DEBUG_MED, "Gyro Corrections Off: %01u, %01u\r\n", (gyro_buf.head-g_tail)&IMU_FIFO_MASK, (accel_buf.head-a_tail)&IMU_FIFO_MASK);
 			rotate_correct = false;
 		}
 		
@@ -316,7 +316,7 @@ void calc_linear_accel(void)
 		{	//There have been enough samples to start applying the rotation corrections:
 			if( rotate_correct == false ) 
 			{
-				//app_trace_log(DEBUG_MED, "Gyro Corrections On: %01u, %01u\r", (gyro_buf.head-g_tail)&IMU_FIFO_MASK, (accel_buf.head-a_tail)&IMU_FIFO_MASK);
+				//app_trace_log(DEBUG_MED, "Gyro Corrections On: %01u, %01u\r\n", (gyro_buf.head-g_tail)&IMU_FIFO_MASK, (accel_buf.head-a_tail)&IMU_FIFO_MASK);
 				rotate_correct = true;
 			}
 			
@@ -544,16 +544,16 @@ uint32_t motionAnalyze(void)
 		//if( Motion.head >= MOT_BUF_MASK ) {
 		//	calc_statistics();
 		//			
-		//	//if (mot_debug) app_trace_log(DEBUG_LOW, "Tilt: %02u \r", mStats.tilt);
-		//	//if (mot_debug) app_trace_log(DEBUG_LOW, "A Mean: %6u, %6u, %6u\r", mStats.mean[A].x, mStats.mean[A].y, mStats.mean[A].z);
-		//	//if (mot_debug) app_trace_log(DEBUG_LOW, "A Var:  %6u, %6u, %6u\r", mStats.var[A][X], mStats.var[A][Y], mStats.var[A][Z]);
+		//	//if (mot_debug) app_trace_log(DEBUG_LOW, "Tilt: %02u \r\n", mStats.tilt);
+		//	//if (mot_debug) app_trace_log(DEBUG_LOW, "A Mean: %6u, %6u, %6u\r\n", mStats.mean[A].x, mStats.mean[A].y, mStats.mean[A].z);
+		//	//if (mot_debug) app_trace_log(DEBUG_LOW, "A Var:  %6u, %6u, %6u\r\n", mStats.var[A][X], mStats.var[A][Y], mStats.var[A][Z]);
 		//}
 			
 		//Uses approximate values for head pivot point to remove some of the rotational accelerations...
 		calc_linear_accel();	
 		
 		//Print Results...
-		//if (inv_debug) app_trace_log(DEBUG_LOW, "Accel Rot: %04u, %04u, %04u\r", Motion.Calc[Motion.head].AxRot, Motion.Calc[Motion.head].AyRot, Motion.Calc[Motion.head].AzRot);
+		//if (inv_debug) app_trace_log(DEBUG_LOW, "Accel Rot: %04u, %04u, %04u\r\n", Motion.Calc[Motion.head].AxRot, Motion.Calc[Motion.head].AyRot, Motion.Calc[Motion.head].AzRot);
 					
 		//fall_motion_monitor( a_tail );
 		
@@ -624,7 +624,7 @@ void cyclic_motion_monitor( void )
 				app_trace_log(DEBUG_HIGH, " ");
 			}
 		}			
-		app_trace_log(DEBUG_HIGH, "\r");
+		app_trace_log(DEBUG_HIGH, "\r\n");
 	}
 	lastone = max_plot;
 	*/

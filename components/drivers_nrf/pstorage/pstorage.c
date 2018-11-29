@@ -250,7 +250,7 @@ static void swap_sub_state_state_change(flash_swap_sub_state_t new_state);
  */
 static void command_queue_element_consume(void)
 {
-	app_trace_log(DEBUG_LOW, "PS: Consumed Command Element %01u\r", m_cmd_queue.rp);
+	app_trace_log(DEBUG_LOW, "PS: Consumed Command Element %01u\r\n", m_cmd_queue.rp);
     // Initialize/free the element as it is now processed.    
     cmd_queue_element_init(m_cmd_queue.rp);
 
@@ -308,13 +308,13 @@ static void flash_api_err_code_process(uint32_t err_code)
         case NRF_ERROR_BUSY:
             // Flash access operation was not accepted and must be reissued upon flash operation 
             // complete event.
-			app_trace_log(DEBUG_HIGH, "PS: Flash Busy\r");
+			app_trace_log(DEBUG_HIGH, "PS: Flash Busy\r\n");
             m_flags |= MASK_FLASH_API_ERR_BUSY;        
             break;
             
         default:
             // Complete the operation with appropriate result code and transit to an error state. 
-			app_trace_log(DEBUG_HIGH, "PS: Flash API Error %01u\r", err_code);
+			app_trace_log(DEBUG_HIGH, "PS: Flash API Error %01u\r\n", err_code);
             command_end_procedure_run(err_code);
             break;
     }
@@ -1283,7 +1283,7 @@ uint32_t pstorage_init(void)
 	
 	//only allow 1 initialization
 	
-	app_trace_log(DEBUG_LOW, "pstorage_init init_cmplt = %x\r", init_cmplt);
+	app_trace_log(DEBUG_LOW, "pstorage_init init_cmplt = %x\r\n", init_cmplt);
 	if( init_cmplt == false ) {
 		cmd_queue_init();
 
@@ -1436,26 +1436,26 @@ uint32_t pstorage_load(uint8_t           * p_dest,
                        pstorage_size_t     size,
                        pstorage_size_t     offset)
 {
-//    app_trace_log(DEBUG_LOW, "[PS]:VERIFY_MODULE_INITIALIZED\r");
+//    app_trace_log(DEBUG_LOW, "[PS]:VERIFY_MODULE_INITIALIZED\r\n");
 	VERIFY_MODULE_INITIALIZED();
-//	app_trace_log(DEBUG_LOW, "[PS]:NULL_PARAM_CHECK src\r");
+//	app_trace_log(DEBUG_LOW, "[PS]:NULL_PARAM_CHECK src\r\n");
     NULL_PARAM_CHECK(p_src);
-//	app_trace_log(DEBUG_LOW, "[PS]:NULL_PARAM_CHECK dest\r");
+//	app_trace_log(DEBUG_LOW, "[PS]:NULL_PARAM_CHECK dest\r\n");
     NULL_PARAM_CHECK(p_dest);
-//	app_trace_log(DEBUG_LOW, "[PS]:MODULE_ID_RANGE_CHECK\r");
+//	app_trace_log(DEBUG_LOW, "[PS]:MODULE_ID_RANGE_CHECK\r\n");
     MODULE_ID_RANGE_CHECK(p_src);
-//	app_trace_log(DEBUG_LOW, "[PS]:BLOCK_ID_RANGE_CHECK\r");
+//	app_trace_log(DEBUG_LOW, "[PS]:BLOCK_ID_RANGE_CHECK\r\n");
     BLOCK_ID_RANGE_CHECK(p_src);
-//	app_trace_log(DEBUG_LOW, "[PS]:SIZE_CHECK\r");
+//	app_trace_log(DEBUG_LOW, "[PS]:SIZE_CHECK\r\n");
     SIZE_CHECK(p_src, size);
-//	app_trace_log(DEBUG_LOW, "[PS]:OFFSET_CHECK\r");
+//	app_trace_log(DEBUG_LOW, "[PS]:OFFSET_CHECK\r\n");
     OFFSET_CHECK(p_src, offset, size);
 
     if ((!is_word_aligned(p_dest))                   || 
         (!is_word_aligned((void *)(uint32_t)offset)) || 
         (!is_word_aligned((uint32_t *)p_src->block_id)))
     {
-        app_trace_log(DEBUG_HIGH, "[PS]:NRF_ERROR_INVALID_ADDR\r");
+        app_trace_log(DEBUG_HIGH, "[PS]:NRF_ERROR_INVALID_ADDR\r\n");
 		return NRF_ERROR_INVALID_ADDR;
     }
 

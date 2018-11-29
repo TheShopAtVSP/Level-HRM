@@ -12,6 +12,7 @@
 #include "nrf_error.h"
 #include "app_trace.h"
 #include "nrf_gpio.h"
+#include "timing.h"
 
 //#define APP_TRACE_ON
 
@@ -56,19 +57,6 @@ typedef union
 // Keep as a (power of 2)-1 so timing is precise for unix_time (0 seems to cause occasional startup glitches)
 // Tick generated every (APP_TIMER_PRESCALER + 1)/32768 = (15 + 1)/32768 = 488 us
 #define APP_TIMER_PRESCALER		15	/**< Value of the RTC1 PRESCALER register. */
-
-// Macros and structure to use for Polled Periodic tasks. Great for ensuring a minimum time
-// between tasks. Potentially quite sloppy, system time resolution can be as high as 125 ms.
-// Setting period to 0 will disable the periodic task.
-uint32_t getSystemTimeMs( void );
-typedef struct {
-	uint32_t start_time;
-	uint32_t period;
-} TTASK_TIMER;
-#define stop_task_timer(x)		x.period = 0;
-#define start_task_timer(x,y)	x.period = y; x.start_time = getSystemTimeMs();
-#define re_arm_task_timer(x)	x.start_time = getSystemTimeMs();
-#define task_time(x)			((x.period != 0) ? (((getSystemTimeMs()-x.start_time) > x.period) ? true : false) : false)
 
 typedef enum {
 	OPMODE_LOW_POWER,

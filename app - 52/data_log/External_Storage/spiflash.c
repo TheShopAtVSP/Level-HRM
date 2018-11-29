@@ -38,6 +38,7 @@
 #include "bsp.h"
 #include "app_util_platform.h"
 #include "app_timer.h"
+#include "timing.h"
 
 //Times to be used with Timer Interrupt m_NVM_timer_id
 #define NVM_CHECK_TIMER_1MS			( APP_TIMER_TICKS(1, APP_TIMER_PRESCALER) )	//Set Timer to go Off in 1MS
@@ -178,13 +179,13 @@ void spiflash_write_status2(uint8_t data);
  ******************************************************************************/
 bool SPIFLASH_LOCK( rd_wr_er_cmplt_cb cb )
 {
-	static TTASK_TIMER to;
+	static expire_timer_t to;
 	
 	if( user_cb != NULL ) 
 	{	//already locked
-		if( task_time(to) ) 
+		if( check_expiration( &to) ) 
 		{	//lock has been held for too long, release it
-			app_trace_puts(DEBUG_MED, "[SPILOCK] Forced Lock Release\r");
+			app_trace_puts(DEBUG_MED, "[SPILOCK] Forced Lock Release\r\n");
 			spi_state_machine_cb = NULL;
 			user_cb = NULL;
 		}
@@ -194,7 +195,7 @@ bool SPIFLASH_LOCK( rd_wr_er_cmplt_cb cb )
 		}
 	}
 	
-	start_task_timer( to, 750);	//Max time that a routine may lock up the spiflash
+	get_expire_time( (750*1000UL), &to );	//Max time that a routine may lock up the spiflash
 	
 	spi_state_machine_cb = NULL;
 	user_cb = cb;
@@ -209,7 +210,7 @@ bool SPIFLASH_RELEASE( rd_wr_er_cmplt_cb cb )
 {
 	if( user_cb != cb ) 
 	{	//this function doe not have the rights to release the spiflash
-		app_trace_puts(DEBUG_MED, "[SPIRELEASE] Access Denied\r");
+		app_trace_puts(DEBUG_MED, "[SPIRELEASE] Access Denied\r\n");
 		return false;
 	}
 	
@@ -244,7 +245,7 @@ bool SPIFLASH_KEY_MATCH( rd_wr_er_cmplt_cb cb )
  ******************************************************************************/
 static void transfer_complete_cb( bool success, uint16_t rx_len )
 {	
-	if( spif_debug ) app_trace_log(DEBUG_LOW, "   [SPI_CB] 0x%02X\r", rx_len);
+	if( spif_debug ) app_trace_log(DEBUG_LOW, "   [SPI_CB] 0x%02X\r\n", rx_len);
 	
 	g_spiflash_busy = false;
 	g_spiflash_res = success;
@@ -252,7 +253,7 @@ static void transfer_complete_cb( bool success, uint16_t rx_len )
 	
 	if( !success )
 	{
-		if( spif_debug ) app_trace_log(DEBUG_MED, "   [SPI_CB] Timeout\r");
+		if( spif_debug ) app_trace_log(DEBUG_MED, "   [SPI_CB] Timeout\r\n");
 	}
 
 	if( spi_state_machine_cb != NULL )
@@ -273,7 +274,7 @@ static void transfer_complete_cb( bool success, uint16_t rx_len )
 // ******************************************************************************/
 //static void spi_ready_cb(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 //{
-//	if( spif_debug ) app_trace_log(DEBUG_LOW, "[ACT_STAT] Pin[%01u] = %01u\r", pin, nrf_gpio_pin_read( pin ));
+//	if( spif_debug ) app_trace_log(DEBUG_LOW, "[ACT_STAT] Pin[%01u] = %01u\r\n", pin, nrf_gpio_pin_read( pin ));
 //		
 //	if( g_busy_pin_en == true )
 //	{	//Only allow callback to execute once (with race conditions it could happen twice):	
@@ -298,10 +299,10 @@ static void start_check_timer( uint16_t milsec )
 	uint32_t ticks = NVM_CHECK_TIMER_1MS*milsec;
 	if( ticks < APP_TIMER_MIN_TIMEOUT_TICKS )
 	{	//Set to minimum value
-		if (spif_debug) app_trace_log(DEBUG_MED, "   [CHECK] Min Tick Violation @%01u\r", getSystemTimeMs());
+		if (spif_debug) app_trace_log(DEBUG_MED, "   [CHECK] Min Tick Violation @%01u\r\n", getSystemTimeMs());
 		ticks = APP_TIMER_MIN_TIMEOUT_TICKS;
 	}
-	if (spif_debug) app_trace_log(DEBUG_LOW, "   [CHECK] Timer On @%01u\r", getSystemTimeMs());
+	if (spif_debug) app_trace_log(DEBUG_LOW, "   [CHECK] Timer On @%01u\r\n", getSystemTimeMs());
 	ret_code_t res = app_timer_start( m_NVM_timer_id, ticks, NULL );	
 	APP_ERROR_CHECK(res);
 }
@@ -313,7 +314,7 @@ static void start_check_timer( uint16_t milsec )
  ******************************************************************************/
 //static void stop_check_timer( void )
 //{
-//	if (spif_debug) app_trace_log(DEBUG_LOW, "   [CHECK] Timer Off @%01u\r", getSystemTimeMs());
+//	if (spif_debug) app_trace_log(DEBUG_LOW, "   [CHECK] Timer Off @%01u\r\n", getSystemTimeMs());
 //	ret_code_t res = app_timer_stop( m_NVM_timer_id );
 //	APP_ERROR_CHECK(res);
 //}
@@ -325,7 +326,7 @@ static void start_check_timer( uint16_t milsec )
  ******************************************************************************/
 static void check_timer_cb(void * p_context)
 {
-    if (spif_debug) app_trace_log(DEBUG_LOW, "   [CHECK] Time @%01u\r", getSystemTimeMs());
+    if (spif_debug) app_trace_log(DEBUG_LOW, "   [CHECK] Time @%01u\r\n", getSystemTimeMs());
 	
 	if( spi_state_machine_cb != NULL )
 	{
@@ -366,7 +367,7 @@ spiflash_id_t spiflash_init( bool debug )
 	spi_state_machine_cb = NULL;
 	user_cb = NULL;
 
-	if( spif_debug ) app_trace_log( DEBUG_LOW, "[SPIINIT] Start\r" );
+	if( spif_debug ) app_trace_log( DEBUG_LOW, "[SPIINIT] Start\r\n" );
 	
 	// Pull Up Hold Pin to allow SPI flash to communicate
 	nrf_gpio_pin_set( SPI_HOLD_PIN );
@@ -388,7 +389,7 @@ spiflash_id_t spiflash_init( bool debug )
 	res = hal_spim_init( debug );
 	if( res != NRF_SUCCESS )
 	{
-		app_trace_log(DEBUG_HIGH, "[SPIINIT] Err\r");
+		app_trace_log(DEBUG_HIGH, "[SPIINIT] Err\r\n");
 		return PART_UNKNOWN;
 	}
 	
@@ -402,7 +403,7 @@ spiflash_id_t spiflash_init( bool debug )
 //	res = nrf_drv_gpiote_in_init( SPI_MISO_PIN, &config, spi_ready_cb);
 //	if( res != NRF_SUCCESS ) 
 //	{
-//		app_trace_log(DEBUG_HIGH, "[SPIINIT] MISO Interrupt Init Err\r");
+//		app_trace_log(DEBUG_HIGH, "[SPIINIT] MISO Interrupt Init Err\r\n");
 //	}
 	
 	// Issue a resume from deep power down
@@ -410,7 +411,7 @@ spiflash_id_t spiflash_init( bool debug )
 	{	//data would not send, try again:
 		if( spiflash_wakeup(NULL) != NRF_SUCCESS )
 		{	//no go
-			app_trace_log(DEBUG_HIGH, "[SPIINIT] Flash Wake Failed\r");
+			app_trace_log(DEBUG_HIGH, "[SPIINIT] Flash Wake Failed\r\n");
 			return PART_UNKNOWN;
 		}
 	}
@@ -420,11 +421,11 @@ spiflash_id_t spiflash_init( bool debug )
 	{	//failed to send:
 		if( spiflash_read_id() != NRF_SUCCESS )
 		{	//no go
-			app_trace_log(DEBUG_HIGH, "[SPIINIT] Flash Read Failed\r");
+			app_trace_log(DEBUG_HIGH, "[SPIINIT] Flash Read Failed\r\n");
 			return PART_UNKNOWN;
 		}
 	}
-	if( spif_debug ) app_trace_log( DEBUG_MED, "[SPIINIT] ID: 0x%02X, 0x%02X, 0x%02X, 0x%02X\r", read.buf[1], read.buf[2], read.buf[3], read.buf[4] );
+	if( spif_debug ) app_trace_log( DEBUG_MED, "[SPIINIT] ID: 0x%02X, 0x%02X, 0x%02X, 0x%02X\r\n", read.buf[1], read.buf[2], read.buf[3], read.buf[4] );
 	for (i = 0; i < SPIFLASH_INFO_TABLE_SIZE; i++)
 	{
 		p = &spiflash_info_table[i];
@@ -443,12 +444,12 @@ spiflash_id_t spiflash_init( bool debug )
 		spiflash_global_protect( false );
 	}	
 	spiflash_read_status( 2 );	//verify that Protection Bits have cleared
-	if( spif_debug ) app_trace_log( DEBUG_LOW, "[SPIINIT] Stat: 0x%02X, 0x%02X\r", read.buf[1], read.buf[2] );
+	if( spif_debug ) app_trace_log( DEBUG_LOW, "[SPIINIT] Stat: 0x%02X, 0x%02X\r\n", read.buf[1], read.buf[2] );
 	
 //	//erase the first X 4K Sections of memory
 //	for (int i=0; i<0x80; i++ )
 //	{
-//		app_trace_log(DEBUG_MED, "[SPIINIT] Erase Section 0x%02X\r", i*0x1000 );
+//		app_trace_log(DEBUG_MED, "[SPIINIT] Erase Section 0x%02X\r\n", i*0x1000 );
 //		spiflash_erase_4k_block( i*0x1000, NULL );
 //	}
 //	while(1);
@@ -479,12 +480,12 @@ static ret_code_t spiflash_xfer( uint8_t * tx_data, uint16_t tx_len, uint16_t rx
 	//Make sure parameters are acceptable:
 	if( g_spiflash_busy ) 
 	{
-		app_trace_puts(DEBUG_MED, "[SPIXFR] Busy\r");
+		app_trace_puts(DEBUG_MED, "[SPIXFR] Busy\r\n");
 		return NRF_ERROR_BUSY;
 	}
 	else if( (rx_len + tx_len) > SPI_MAX_XFER_SIZE )
 	{
-		app_trace_puts(DEBUG_HIGH, "[SPIXFR] Buffer too Small\r");
+		app_trace_puts(DEBUG_HIGH, "[SPIXFR] Buffer too Small\r\n");
 		return NRF_ERROR_INVALID_LENGTH;
 	}
 	
@@ -608,7 +609,7 @@ static void erase_sm( bool success, uint16_t len )
 	{
 		case 0:
 			//Send command to enable WEL bit (Write Enable)
-			if(spif_debug) app_trace_log(db_priority, "  [SPIER] Wr En\r");
+			if(spif_debug) app_trace_log(db_priority, "  [SPIER] Wr En\r\n");
 		
 			erase.state++;
 			res = spiflash_write_enable( true );
@@ -622,11 +623,11 @@ static void erase_sm( bool success, uint16_t len )
 			if( res != NRF_SUCCESS ) 
 			{
 				erase.state = 0xFF;
-				app_trace_log(DEBUG_MED, "  [SPIER] Stat Read Failed\r");
+				app_trace_log(DEBUG_MED, "  [SPIER] Stat Read Failed\r\n");
 			}
 			else
 			{
-				if(spif_debug) app_trace_log(db_priority, "  [SPIER] Stat Issued\r");
+				if(spif_debug) app_trace_log(db_priority, "  [SPIER] Stat Issued\r\n");
 			}
 			break;
 		
@@ -639,17 +640,17 @@ static void erase_sm( bool success, uint16_t len )
 				{
 					app_trace_log(db_priority, "0x%02X, ", read.buf[i]);
 				}
-				app_trace_log(db_priority, "\r");
+				app_trace_log(db_priority, "\r\n");
 			}
 			
 			if( (read.buf[1]&READ_STATUS_RDY_BSY_MASK) != 0 )
 			{	//Device Busy
-				app_trace_log(DEBUG_MED, "  [SPIER] Device Busy\r");
+				app_trace_log(DEBUG_MED, "  [SPIER] Device Busy\r\n");
 				erase.state = 0xFF;
 			}
 			else if( (read.buf[1]&READ_STATUS_WEL_MASK) != 0 )
 			{
-				if(spif_debug) app_trace_log(db_priority, "  [SPIER] Erase Issued\r");
+				if(spif_debug) app_trace_log(db_priority, "  [SPIER] Erase Issued\r\n");
 			
 				erase.state++;
 				res = spiflash_address_command( erase.cmd, erase.addr, 0, false );
@@ -663,13 +664,13 @@ static void erase_sm( bool success, uint16_t len )
 		
 		case 3:
 			//callback after erase has been issued
-			if(spif_debug) app_trace_log(db_priority, "  [SPIER] Status Out En\r");
+			if(spif_debug) app_trace_log(db_priority, "  [SPIER] Status Out En\r\n");
 		
 			erase.state++;
 			res = spiflash_enable_active_status();	//Output Status Bit STATUS_RDY_BSY on MISO pin
 			if( res != NRF_SUCCESS ) 
 			{
-				app_trace_log(DEBUG_HIGH, "  [SPIER] Active Status Err %01u\r", res);
+				app_trace_log(DEBUG_HIGH, "  [SPIER] Active Status Err %01u\r\n", res);
 				erase.state = 0xFF;
 			}
 			break;
@@ -678,7 +679,7 @@ static void erase_sm( bool success, uint16_t len )
 			//callback after Enable Active Status has been written
 			if( nrf_gpio_pin_read( SPI_MISO_PIN ) )
 			{	//still busy
-				if(spif_debug) app_trace_log(db_priority, "  [SPIER] Wait Erase %01u @ %01u\r", nrf_gpio_pin_read( SPI_MISO_PIN ), getSystemTimeMs());	
+				if(spif_debug) app_trace_log(db_priority, "  [SPIER] Wait Erase %01u @ %01u\r\n", nrf_gpio_pin_read( SPI_MISO_PIN ), getSystemTimeMs());	
 				
 				//enable check timer...
 				start_check_timer( 5 );	//generate interrupt in 5 milliseconds to check again for completion
@@ -694,10 +695,10 @@ static void erase_sm( bool success, uint16_t len )
 
 		case 5:
 			//Callback after Read of Status Register. If good, we're done:
-			if(spif_debug) app_trace_log(db_priority, "  [SPIER] Stat: 0x%02X\r", read.buf[1]);
+			if(spif_debug) app_trace_log(db_priority, "  [SPIER] Stat: 0x%02X\r\n", read.buf[1]);
 			if( (read.buf[1]&READ_STATUS_RDY_BSY_MASK) != 0 )
 			{	//write has not completed
-				app_trace_log(DEBUG_MED, "  [SPIER] Device Busy\r");
+				app_trace_log(DEBUG_MED, "  [SPIER] Device Busy\r\n");
 				if( retry++ < 5 ) 
 				{
 					res = spiflash_read_status( 1 );
@@ -710,7 +711,7 @@ static void erase_sm( bool success, uint16_t len )
 			}
 			else if( (read.buf[1]&READ_STATUS_EPE_MASK) == 0 )
 			{
-				if(spif_debug) app_trace_log(db_priority, "  [SPIER] Cmplt @%01u\r", getSystemTimeMs());
+				if(spif_debug) app_trace_log(db_priority, "  [SPIER] Cmplt @%01u\r\n", getSystemTimeMs());
 				spi_state_machine_cb = NULL;
 				erase.state = 0xFE;	//Finished
 			
@@ -718,7 +719,7 @@ static void erase_sm( bool success, uint16_t len )
 			}
 			else
 			{	//A byte did not write Correctly
-				app_trace_log(DEBUG_HIGH, "  [SPIER] EPE Failure\r", getSystemTimeMs());
+				app_trace_log(DEBUG_HIGH, "  [SPIER] EPE Failure\r\n", getSystemTimeMs());
 				erase.state = 0xFF;
 			}
 			break;
@@ -730,7 +731,7 @@ static void erase_sm( bool success, uint16_t len )
 	
 	if( erase.state == 0xFF )
 	{	//operation has failed
-		app_trace_log(DEBUG_HIGH, "  [SPIER] Fail @%01u\r\r\r", getSystemTimeMs());
+		app_trace_log(DEBUG_HIGH, "  [SPIER] Fail @%01u\r\r\r\n", getSystemTimeMs());
 		spi_state_machine_cb = NULL;
 		g_spiflash_busy = false;
 		
@@ -753,17 +754,17 @@ ret_code_t spiflash_page_erase( uint32_t page_addr, rd_wr_er_cmplt_cb cb )
 {	
 	if( !SPIFLASH_KEY_MATCH(cb) ) 
 	{
-		app_trace_log(DEBUG_MED, "  [SPIPGER] KEY Denied\r");
+		app_trace_log(DEBUG_MED, "  [SPIPGER] KEY Denied\r\n");
 		return NRF_ERROR_BUSY;
 	}
 	else if( id != PART_UNKNOWN && page_addr > spiflash_info_table[id].device_size )
 	{
-		app_trace_log(DEBUG_MED, "  [SPIPGER] Address Invalid\r");
+		app_trace_log(DEBUG_MED, "  [SPIPGER] Address Invalid\r\n");
 		return NRF_ERROR_INVALID_ADDR;
 	}
 	else if( (page_addr&0x0000FF) != 0 )
 	{	//addr not aligned to page boundary
-		app_trace_log(DEBUG_MED, "  [SPIPGER] Addr Boundary Error: 0x%06X\r", page_addr);
+		app_trace_log(DEBUG_MED, "  [SPIPGER] Addr Boundary Error: 0x%06X\r\n", page_addr);
 		page_addr &= 0xFFFFFF00;	//align to page boundary
 	}
 	
@@ -789,12 +790,12 @@ ret_code_t spiflash_page_erase( uint32_t page_addr, rd_wr_er_cmplt_cb cb )
 				SPIFLASH_RELEASE(cb);
 				spiflash_read( erase.addr, erase.size, NULL );
 				
-				app_trace_log(DEBUG_MED, "  [SPIPGER] Read on Err AD:0x%06X\r", erase.addr);
+				app_trace_log(DEBUG_MED, "  [SPIPGER] Read on Err AD:0x%06X\r\n", erase.addr);
 				for( int i=0; i<(read.len-SPI_BUF_DATA_OFFSET); i++ )
 				{
 					app_trace_log(DEBUG_MED, "%02X ", read.buf[SPI_BUF_DATA_OFFSET+i]);
 				}
-				app_trace_log(DEBUG_MED, "\r");
+				app_trace_log(DEBUG_MED, "\r\n");
 			}
 			
 			return NRF_ERROR_INTERNAL;	//operation failed
@@ -820,17 +821,17 @@ ret_code_t spiflash_erase_4k_block( uint32_t block_addr, rd_wr_er_cmplt_cb cb )
 {
 	if( !SPIFLASH_KEY_MATCH(cb) ) 
 	{
-		app_trace_log(DEBUG_MED, "  [SPI4KER] KEY Denied\r");
+		app_trace_log(DEBUG_MED, "  [SPI4KER] KEY Denied\r\n");
 		return NRF_ERROR_BUSY;
 	}
 	else if( id != PART_UNKNOWN && block_addr > spiflash_info_table[id].device_size )
 	{
-		app_trace_log(DEBUG_MED, "  [SPI4KER] Address Invalid\r");
+		app_trace_log(DEBUG_MED, "  [SPI4KER] Address Invalid\r\n");
 		return NRF_ERROR_INVALID_ADDR;
 	}
 	else if( (block_addr&0x000FFF) != 0 )
 	{	//addr not aligned to 4K block boundary
-		app_trace_log(DEBUG_MED, "  [SPI4KER] Addr Boundary Error: 0x%06X\r", block_addr);
+		app_trace_log(DEBUG_MED, "  [SPI4KER] Addr Boundary Error: 0x%06X\r\n", block_addr);
 		block_addr &= 0xFFFFF000;	//align to block boundary
 	}
 	
@@ -885,7 +886,7 @@ static void write_sm( bool success, uint16_t len )
 	{
 		case 0:
 			//Send command to enable WEL bit (Write Enable)
-			if(spif_debug) app_trace_log(db_priority, "  [SPIWR] Wr En\r");
+			if(spif_debug) app_trace_log(db_priority, "  [SPIWR] Wr En\r\n");
 		
 			write.state++;
 			res = spiflash_write_enable( true );
@@ -898,12 +899,12 @@ static void write_sm( bool success, uint16_t len )
 			res = spiflash_read_status( 1 );
 			if( res != NRF_SUCCESS )
 			{
-				app_trace_log(DEBUG_HIGH, "  [SPIWR] Stat Read Failed\r");
+				app_trace_log(DEBUG_HIGH, "  [SPIWR] Stat Read Failed\r\n");
 				write.state = 0xFF;
 			}
 			else
 			{
-				if(spif_debug) app_trace_log(db_priority, "  [SPIWR] Stat Issued\r");
+				if(spif_debug) app_trace_log(db_priority, "  [SPIWR] Stat Issued\r\n");
 			}
 			break;
 		
@@ -916,12 +917,12 @@ static void write_sm( bool success, uint16_t len )
 				{
 					app_trace_log(db_priority, "0x%02X, ", read.buf[i]);
 				}
-				app_trace_log(db_priority, "\r");
+				app_trace_log(db_priority, "\r\n");
 			}
 			
 			if( (read.buf[1]&READ_STATUS_RDY_BSY_MASK) != 0 )
 			{	//Device Busy
-				app_trace_log(DEBUG_MED, "  [SPIWR] Device Busy\r");
+				app_trace_log(DEBUG_MED, "  [SPIWR] Device Busy\r\n");
 				write.state = 0xFF;
 			}
 			else if( (read.buf[1]&READ_STATUS_WEL_MASK) != 0 )
@@ -932,7 +933,7 @@ static void write_sm( bool success, uint16_t len )
 			}
 			else
 			{	//Write Enebale Bit did not set
-				app_trace_log(DEBUG_HIGH, "  [SPIWR] Write En Err %01u\r", res);
+				app_trace_log(DEBUG_HIGH, "  [SPIWR] Write En Err %01u\r\n", res);
 				write.state = 0xFF;
 			}
 			break;
@@ -944,7 +945,7 @@ static void write_sm( bool success, uint16_t len )
 			res = spiflash_enable_active_status();	//Output Status Bit STATUS_RDY_BSY on MISO pin
 			if( res != NRF_SUCCESS ) 
 			{
-				app_trace_log(DEBUG_HIGH, "  [SPIWR] Act_Stat Err %01u\r", res);
+				app_trace_log(DEBUG_HIGH, "  [SPIWR] Act_Stat Err %01u\r\n", res);
 				write.state = 0xFF;
 			}			
 			break;
@@ -953,7 +954,7 @@ static void write_sm( bool success, uint16_t len )
 			//callback after Enable Active Status has been written
 			if( nrf_gpio_pin_read( SPI_MISO_PIN ) )
 			{	//still busy
-				if(spif_debug) app_trace_log(db_priority, "  [SPIWR] Wait Write @ %01u\r", getSystemTimeMs());	
+				if(spif_debug) app_trace_log(db_priority, "  [SPIWR] Wait Write @ %01u\r\n", getSystemTimeMs());	
 				
 				//enable check timer...
 				start_check_timer( 5 );	//generate interrupt in 5 milliseconds to check again for completion
@@ -969,10 +970,10 @@ static void write_sm( bool success, uint16_t len )
 
 		case 5:
 			//Callback after Read of Status Register. If good, we're done:
-			if(spif_debug) app_trace_log(db_priority, "  [SPIWR] Stat: 0x%02X\r", read.buf[1]);
+			if(spif_debug) app_trace_log(db_priority, "  [SPIWR] Stat: 0x%02X\r\n", read.buf[1]);
 			if( (read.buf[1]&READ_STATUS_RDY_BSY_MASK) != 0 )
 			{	//write has not completed
-				app_trace_log(DEBUG_MED, "  [SPIWR] Device Busy\r");
+				app_trace_log(DEBUG_MED, "  [SPIWR] Device Busy\r\n");
 				if( retry++ < 5 ) 
 				{
 					res = spiflash_read_status( 1 );
@@ -985,7 +986,7 @@ static void write_sm( bool success, uint16_t len )
 			}
 			else if( (read.buf[1]&READ_STATUS_EPE_MASK) == 0 )
 			{
-				if(spif_debug) app_trace_log(db_priority, "  [SPIWR] Cmplt @%01u\r", getSystemTimeMs());
+				if(spif_debug) app_trace_log(db_priority, "  [SPIWR] Cmplt @%01u\r\n", getSystemTimeMs());
 				spi_state_machine_cb = NULL;
 				write.state = 0xFE;	//Finished
 			
@@ -993,7 +994,7 @@ static void write_sm( bool success, uint16_t len )
 			}
 			else
 			{	//A byte did not write Correctly
-				app_trace_log(DEBUG_HIGH, "  [SPIWR] EPE Failure\r", getSystemTimeMs());
+				app_trace_log(DEBUG_HIGH, "  [SPIWR] EPE Failure\r\n", getSystemTimeMs());
 				write.state = 0xFF;
 			}
 			break;
@@ -1005,7 +1006,7 @@ static void write_sm( bool success, uint16_t len )
 	
 	if( write.state == 0xFF )
 	{	//operation has failed
-		app_trace_log(DEBUG_HIGH, "  [SPIWR] Fail @%01u\r\r\r", getSystemTimeMs());
+		app_trace_log(DEBUG_HIGH, "  [SPIWR] Fail @%01u\r\r\r\n", getSystemTimeMs());
 		spi_state_machine_cb = NULL;
 		g_spiflash_busy = false;
 		
@@ -1036,17 +1037,17 @@ ret_code_t spiflash_byte_page_write( uint32_t addr, uint8_t * data, uint16_t len
 {	
 	if( !SPIFLASH_KEY_MATCH(cb) ) 
 	{
-		app_trace_log(DEBUG_MED, "  [SPIPGWR] KEY Denied\r");
+		app_trace_log(DEBUG_MED, "  [SPIPGWR] KEY Denied\r\n");
 		return NRF_ERROR_BUSY;
 	}
 	else if( id != PART_UNKNOWN && addr > spiflash_info_table[id].device_size )
 	{
-		app_trace_log(DEBUG_MED, "  [SPIPGWR] Address Invalid\r");
+		app_trace_log(DEBUG_MED, "  [SPIPGWR] Address Invalid\r\n");
 		return NRF_ERROR_INVALID_ADDR;
 	}
 	else if( ((uint16_t)(addr&0x000000FF) + len) > 0x100 ) 
 	{
-		app_trace_log(DEBUG_MED, "  [SPIPGWR] Error 0x%02X+0x%02X, 0x%04X\r", (addr&0x000000FF), len, addr);
+		app_trace_log(DEBUG_MED, "  [SPIPGWR] Error 0x%02X+0x%02X, 0x%04X\r\n", (addr&0x000000FF), len, addr);
 		return NRF_ERROR_INVALID_LENGTH;
 	}
 		
@@ -1069,17 +1070,17 @@ ret_code_t spiflash_byte_page_write( uint32_t addr, uint8_t * data, uint16_t len
 		{
 			if( false )
 			{	//Print memory contents on failure!
-				app_trace_log(DEBUG_MED, "  [SPIPGWR] MISO PIN = %01u\r", nrf_gpio_pin_read( SPI_MISO_PIN ));
+				app_trace_log(DEBUG_MED, "  [SPIPGWR] MISO PIN = %01u\r\n", nrf_gpio_pin_read( SPI_MISO_PIN ));
 				
 				SPIFLASH_RELEASE(cb);
 				spiflash_read( write.addr, write.len, NULL );
 				
-				app_trace_log(DEBUG_MED, "  [SPIPGWR] Read on Err AD:0x%06X LN:0x%02X\r", write.addr, write.len);
+				app_trace_log(DEBUG_MED, "  [SPIPGWR] Read on Err AD:0x%06X LN:0x%02X\r\n", write.addr, write.len);
 				for( int i=0; i<(read.len-SPI_BUF_DATA_OFFSET); i++ )
 				{
 					app_trace_log(DEBUG_MED, "%02X ", read.buf[SPI_BUF_DATA_OFFSET+i]);
 				}
-				app_trace_log(DEBUG_MED, "\r");
+				app_trace_log(DEBUG_MED, "\r\n");
 			}
 
 			return NRF_ERROR_INTERNAL;	//operation failed
@@ -1092,7 +1093,7 @@ ret_code_t spiflash_byte_page_write( uint32_t addr, uint8_t * data, uint16_t len
 			{
 				app_trace_log(DEBUG_MED, "0x%02X, ", write.data[i]);
 			}
-			app_trace_log(DEBUG_MED, "\r");
+			app_trace_log(DEBUG_MED, "\r\n");
 		}
 	}
 	
@@ -1123,7 +1124,7 @@ static void protect_sm( bool success, uint16_t len )
 	{
 		case 0:
 			//Send command to enable WEL bit (Write Enable)
-			if(spif_debug) app_trace_log(db_priority, "  [SPIPRT] Wr En\r");
+			if(spif_debug) app_trace_log(db_priority, "  [SPIPRT] Wr En\r\n");
 		
 			protect.state++;
 			res = spiflash_write_enable( true );
@@ -1137,11 +1138,11 @@ static void protect_sm( bool success, uint16_t len )
 			if( res != NRF_SUCCESS )
 			{
 				protect.state = 0xFF;
-				app_trace_log(DEBUG_MED, "  [SPIPRT] Stat Read Failed\r");
+				app_trace_log(DEBUG_MED, "  [SPIPRT] Stat Read Failed\r\n");
 			}
 			else
 			{
-				if(spif_debug) app_trace_log(db_priority, "  [SPIPRT] Stat Issued\r");
+				if(spif_debug) app_trace_log(db_priority, "  [SPIPRT] Stat Issued\r\n");
 			}
 			break;
 		
@@ -1154,17 +1155,17 @@ static void protect_sm( bool success, uint16_t len )
 				{
 					app_trace_log(db_priority, "0x%02X, ", read.buf[i]);
 				}
-				app_trace_log(db_priority, "\r");
+				app_trace_log(db_priority, "\r\n");
 			}
 			
 			if( (read.buf[1]&READ_STATUS_RDY_BSY_MASK) != 0 )
 			{	//Device Busy
-				app_trace_log(DEBUG_MED, "  [SPIPRT] Device Busy\r");
+				app_trace_log(DEBUG_MED, "  [SPIPRT] Device Busy\r\n");
 				protect.state = 0xFF;
 			}
 			else if( (read.buf[1]&READ_STATUS_WEL_MASK) != 0 )
 			{
-				if(spif_debug) app_trace_log(db_priority, "  [SPIPRT] Protect Issued\r");
+				if(spif_debug) app_trace_log(db_priority, "  [SPIPRT] Protect Issued\r\n");
 			
 				protect.state++;
 				res = spiflash_address_command( protect.cmd, protect.addr, 0, false );
@@ -1178,7 +1179,7 @@ static void protect_sm( bool success, uint16_t len )
 		
 		case 3:
 			//Callback after Protect/Unprotect Command issued
-			if(spif_debug) app_trace_log(db_priority, "  [SPIPRT] Cmplt @%01u\r", getSystemTimeMs());
+			if(spif_debug) app_trace_log(db_priority, "  [SPIPRT] Cmplt @%01u\r\n", getSystemTimeMs());
 			spi_state_machine_cb = NULL;
 			protect.state = 0xFE;		//Finished
 		
@@ -1192,7 +1193,7 @@ static void protect_sm( bool success, uint16_t len )
 	
 	if( protect.state == 0xFF )
 	{	//operation has failed
-		app_trace_log(DEBUG_HIGH, "  [SPIPRT] Fail @%01u\r", getSystemTimeMs());
+		app_trace_log(DEBUG_HIGH, "  [SPIPRT] Fail @%01u\r\n", getSystemTimeMs());
 		spi_state_machine_cb = NULL;
 		g_spiflash_busy = false;
 		
@@ -1212,7 +1213,7 @@ ret_code_t spiflash_sector_protection( bool protection, uint32_t addr, rd_wr_er_
 {
 	if( !SPIFLASH_KEY_MATCH(cb) ) 
 	{
-		app_trace_log(DEBUG_MED, "  [SPIPRT] KEY Denied\r");
+		app_trace_log(DEBUG_MED, "  [SPIPRT] KEY Denied\r\n");
 		return NRF_ERROR_BUSY;
 	}
 
@@ -1274,7 +1275,7 @@ static ret_code_t spiflash_global_protect( bool protect )
 		protect ? 0x3c : 0x00
 	};
 
-	if(spif_debug) app_trace_log(DEBUG_LOW, "  [SPIGP] GP = %01u\r", protect);
+	if(spif_debug) app_trace_log(DEBUG_LOW, "  [SPIGP] GP = %01u\r\n", protect);
 	
 	res = spiflash_xfer( tx_buf, 2, 0, false );
 	
@@ -1306,7 +1307,7 @@ static ret_code_t spiflash_read_status( size_t read_len )
 	ret_code_t res;
 	uint8_t cmd = CMD_READ_STATUS;
 	
-	if(spif_debug) app_trace_log(DEBUG_LOW, "  [SPIRDST]\r");
+	if(spif_debug) app_trace_log(DEBUG_LOW, "  [SPIRDST]\r\n");
 	
 	res = spiflash_xfer( &cmd, 1, read_len, false );
 	
@@ -1456,17 +1457,17 @@ ret_code_t spiflash_read( uint32_t addr, uint16_t read_len, rd_wr_er_cmplt_cb cb
 	
 	if( !SPIFLASH_KEY_MATCH(cb) ) 
 	{
-		app_trace_log(DEBUG_MED, "  [SPIRD] KEY Denied\r");
+		app_trace_log(DEBUG_MED, "  [SPIRD] KEY Denied\r\n");
 		return NRF_ERROR_BUSY;
 	}
 	else if( id != PART_UNKNOWN && addr > spiflash_info_table[id].device_size )
 	{
-		app_trace_log(DEBUG_MED, "  [SPIRD] Address Invalid\r");
+		app_trace_log(DEBUG_MED, "  [SPIRD] Address Invalid\r\n");
 		return NRF_ERROR_INVALID_ADDR;
 	}
 	else if( read_len > SPI_BUF_MAX_DATA )
 	{
-		app_trace_log(DEBUG_MED, "  [SPIRD] Buffer Too Small\r");
+		app_trace_log(DEBUG_MED, "  [SPIRD] Buffer Too Small\r\n");
 		return NRF_ERROR_DATA_SIZE;
 	}
 	
@@ -1476,7 +1477,7 @@ ret_code_t spiflash_read( uint32_t addr, uint16_t read_len, rd_wr_er_cmplt_cb cb
 	spi_state_machine_cb = NULL;			//No State machine callbacks needed, read can be done in 1 operation
 	cmd = CMD_READ_ARRAY_SLOW;
 	
-	if(spif_debug) app_trace_log(db_priority, "  [SPIRD] AD:0x%04X LN:0x%02X\r", addr, read_len);
+	if(spif_debug) app_trace_log(db_priority, "  [SPIRD] AD:0x%04X LN:0x%02X\r\n", addr, read_len);
 
 	read.len = 0;
 	res = spiflash_address_command( cmd, addr, read_len, false );
@@ -1497,13 +1498,13 @@ ret_code_t spiflash_read( uint32_t addr, uint16_t read_len, rd_wr_er_cmplt_cb cb
 				{
 					app_trace_log(db_priority, "%02X ", read.buf[SPI_BUF_DATA_OFFSET+i]);
 				}
-				app_trace_log(db_priority, "\r");
+				app_trace_log(db_priority, "\r\n");
 			}
 		}
 	}
 	else
 	{
-		app_trace_log(DEBUG_HIGH, "  [SPIRD] Failed AD:0x%06X, %01u\r", addr, res);
+		app_trace_log(DEBUG_HIGH, "  [SPIRD] Failed AD:0x%06X, %01u\r\n", addr, res);
 	}
 	
 	return res;
@@ -1519,7 +1520,7 @@ ret_code_t spiflash_wakeup( rd_wr_er_cmplt_cb cb )
 {
 	if( !SPIFLASH_KEY_MATCH(cb) ) 
 	{
-		app_trace_log(DEBUG_MED, "  [SPIWK] KEY Denied\r");
+		app_trace_log(DEBUG_MED, "  [SPIWK] KEY Denied\r\n");
 		return NRF_ERROR_BUSY;
 	}
 	
@@ -1550,7 +1551,7 @@ ret_code_t spiflash_deep_power_down( rd_wr_er_cmplt_cb cb )
 {
 	if( !SPIFLASH_KEY_MATCH(cb) ) 
 	{
-		app_trace_log(DEBUG_MED, "  [SPIDPD] KEY Denied\r");
+		app_trace_log(DEBUG_MED, "  [SPIDPD] KEY Denied\r\n");
 		return NRF_ERROR_BUSY;
 	}
 		
@@ -1571,7 +1572,7 @@ ret_code_t spiflash_deep_power_down( rd_wr_er_cmplt_cb cb )
 	}
 	else
 	{
-		app_trace_log(DEBUG_HIGH, "  [SPIDPD] Sleep Cmd Failed %01u\r", res);
+		app_trace_log(DEBUG_HIGH, "  [SPIDPD] Sleep Cmd Failed %01u\r\n", res);
 	}
 	
 	return res;
@@ -1588,7 +1589,7 @@ ret_code_t spiflash_ultra_deep_power_down( rd_wr_er_cmplt_cb cb )
 {
 	if( !SPIFLASH_KEY_MATCH(cb) ) 
 	{
-		app_trace_log(DEBUG_MED, "  [SPIUDPD] KEY Denied\r");
+		app_trace_log(DEBUG_MED, "  [SPIUDPD] KEY Denied\r\n");
 		return NRF_ERROR_BUSY;
 	}
 	
@@ -1609,7 +1610,7 @@ ret_code_t spiflash_ultra_deep_power_down( rd_wr_er_cmplt_cb cb )
 	}
 	else
 	{
-		app_trace_log(DEBUG_HIGH, "  [SPIUDPD] Sleep Cmd Failed %01u\r", res);
+		app_trace_log(DEBUG_HIGH, "  [SPIUDPD] Sleep Cmd Failed %01u\r\n", res);
 	}
 	
 	return res;
@@ -1630,7 +1631,7 @@ ret_code_t spiflash_reset( rd_wr_er_cmplt_cb cb )
 {
 	if( !SPIFLASH_KEY_MATCH(cb) ) 
 	{
-		app_trace_log(DEBUG_MED, "  [SPIRST] KEY Denied\r");
+		app_trace_log(DEBUG_MED, "  [SPIRST] KEY Denied\r\n");
 		return NRF_ERROR_BUSY;
 	}
 	
@@ -1670,7 +1671,7 @@ ret_code_t spiflash_read_otp( uint32_t addr, size_t read_len, rd_wr_er_cmplt_cb 
 {
 	if( !SPIFLASH_KEY_MATCH(cb) ) 
 	{
-		app_trace_log(DEBUG_MED, "  [SPIOTP] KEY Denied\r");
+		app_trace_log(DEBUG_MED, "  [SPIOTP] KEY Denied\r\n");
 		return NRF_ERROR_BUSY;
 	}
 	

@@ -71,7 +71,8 @@
 #include "ble_dfu.h"
 #include "dfu_app_handler.h"
 #endif // BLE_DFU_APP_SUPPORT
-#include "si115x_functions.h"
+#include "hrm_detect.h"
+#include "timing.h"
 
 
 #define ERASE_BONDS false
@@ -174,45 +175,7 @@ struct
 	char sw[20];
 	char hw_rev[4];
 } dis_str;
-
-// ====================> Some HRM test globals <=======================
-#define		HRM_RUNNING_AVG_SAMPLES		32 
-// HRM_SAMPLE_TIME = 6000  = 50 mSec = 20Hz
-#define 	HRM_SAMPLE_TIME		6000
-// HRM_SAMPLE_TIME = 13333  = 10Hz
-//#define 	HRM_SAMPLE_TIME		13333
-#define		HRM_STITCH_TRESH	300
-#define		HRM_ZERO_SEEKER_TRESH	10000
-#define		HRM_AVG_SIZE	2
-uint16_t 	accel_x;
-uint16_t 	accel_y;
-uint16_t 	accel_z;
-uint8_t 	uart_rev_buffer[1] = {0};
-uint8_t 	uart_rx_ubyte;
-T_PKT_TYPES tx_type;			//T_PKT_TYPES type;
-uint8_t 	tx_payload[ MAX_PKT_PAYLOAD ];
-int8_t 		tx_pay_len = -1;	//default no response
-volatile uint8_t 	current_hrm = 69;
-uint8_t 	hrm_step = 0;
-uint16_t	hrm_tx_rdy_cntr = 0;
-uint16_t 	run_get_hrms = 0;
-int16_t 	hrm_chan1_raw[256], hrm_chan2_raw[256], hrm_chan3_raw[256], hrm_raw_index = 0, hrm_raw_index_old;
-int32_t		hrm_chan_1_raw32, hrm_chan_2_raw32;
-uint8_t		hrm_running_avg_indx = 0, hac_index = 0;
-int32_t		hrm_chan1_running_avg[HRM_RUNNING_AVG_SAMPLES], hrm_chan2_running_avg[HRM_RUNNING_AVG_SAMPLES];
-int32_t		hrm_chan1_running_avg_accm, hrm_chan2_running_avg_accm;
-int32_t 	hrm_ch1_avg, hrm_ch2_avg;
-int32_t 	hrm_chan1_fbs = 0, hrm_chan2_fbs = 0;
-int32_t		hrm_avg_chan132[HRM_AVG_SIZE], hrm_avg_chan232[HRM_AVG_SIZE], hrm_avg_chan132_accm, hrm_avg_chan232_accm;
-int16_t 	pd_emi_delta;
-float		silly_ratio;
-bool		hrm_stitch_flag = 0;
-/// note default index = 8 = 0x12 = 50mA
-uint8_t hrm_agc_led_current_idx1 = 29;
-uint8_t hrm_agc_led_current_idx3 = 29;
-uint8_t hrm_agc_led_current[30] = {0x00, 0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38, 0x12, 0x21, 0x29, 0x31, 0x22, 0x39, 0x2A, 
-									0x23, 0x32, 0x3A, 0x24, 0x33, 0x2C, 0x3B, 0x34, 0x2D, 0x3C, 0x35, 0x3D, 0x36, 0x3E, 0x3F};
-									
+								
 //
 // main locals
 //
@@ -249,8 +212,8 @@ APP_TIMER_DEF(m_LED_FLASH_timer_id);
 APP_TIMER_DEF(m_DETACH_timer_id);
 
 // Default Main Loop task times:
-#define SHIP_MODE_DELAY					(5*60000UL)	//Shutoff after 5 minutes off charger
-#define DEFAULT_IMU_CHECK_PERIOD		(60000UL)	//time between imu checks
+#define SHIP_MODE_DELAY_US				(5*60*1000*1000UL)	//Shutoff after 5 minutes off charger
+#define DEFAULT_IMU_CHECK_PERIOD_US		(60*1000*1000UL)	//time between imu checks
 
 //
 // imu/mag interrupt
@@ -261,25 +224,6 @@ static bool imu_int_req = false;
 //function prototypes
 uint32_t ble_uart_tx(uint8_t *buffer, uint8_t buffer_len);
 void delete_current_bond(void);
-
-/**@brief Timing Functions
- *
- * @details These functions track time for the use of periodic tasks and time stamping.
- */
-uint32_t get_unix_time( void )
-{
-	return unix_time;
-}
-
-void set_unix_time( uint32_t new_time )
-{
-	unix_time = new_time;
-}
-
-__INLINE uint32_t getSystemTimeMs(void)
-{
-	return systick_ms;
-}
 
 /**@brief Function for assert macro callback.
  *
@@ -356,7 +300,7 @@ static void advertising_stop(void)
 {
 	uint32_t err_code;
 
-	app_trace_puts(DEBUG_MED, "Advertising Stopped!\r");
+	app_trace_puts(DEBUG_MED, "Advertising Stopped!\r\n");
 	err_code = sd_ble_gap_adv_stop();
 	APP_ERROR_CHECK(err_code);
 
@@ -395,7 +339,7 @@ void terminate_connection(void)
 {
 	uint32_t      err_code;
 
-	app_trace_puts(DEBUG_MED, "\rConnection Terminated!\r\r");
+	app_trace_puts(DEBUG_MED, "\rConnection Terminated!\r\r\n");
 	err_code = sd_ble_gap_disconnect(m_conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
 	APP_ERROR_CHECK(err_code);
 }
@@ -412,7 +356,7 @@ void delete_all_bonds(void)
 		g_config.key_ring[i] = key_ring[i] = 0;
 	}
 	set_config_update_flag();
-	app_trace_puts(DEBUG_MED, "dm_device_delete_all\r");
+	app_trace_puts(DEBUG_MED, "dm_device_delete_all\r\n");
 }
 
 void delete_current_bond(void)
@@ -427,7 +371,7 @@ void delete_current_bond(void)
 	key_ring[key_ring_index] = 0;
 	g_config.key_ring[key_ring_index] = key_ring[key_ring_index];
 	g_config.device_index_ring = device_index_ring;
-	app_trace_log(DEBUG_MED, "[KR] delete_current_bond: key_ring[key_ring_index] %d  key_ring_index %d\r", key_ring[key_ring_index], key_ring_index);
+	app_trace_log(DEBUG_MED, "[KR] delete_current_bond: key_ring[key_ring_index] %d  key_ring_index %d\r\n", key_ring[key_ring_index], key_ring_index);
 	set_config_update_flag();
 }
 
@@ -436,7 +380,7 @@ void set_key_ring(uint8_t key)
 	key_ring[key_ring_index] = key;
 	g_config.key_ring[key_ring_index] = key_ring[key_ring_index];
 	g_config.device_index_ring = device_index_ring;
-	app_trace_log(DEBUG_LOW, "[KR] ==>set_key_ring(int) key_ring[key_ring_index] %d  key_ring_index %d key %d\r", key_ring[key_ring_index], key_ring_index, key);
+	app_trace_log(DEBUG_LOW, "[KR] ==>set_key_ring(int) key_ring[key_ring_index] %d  key_ring_index %d key %d\r\n", key_ring[key_ring_index], key_ring_index, key);
 	set_config_update_flag();
 }
 
@@ -454,20 +398,20 @@ void dfu_control_data_handler(ble_nus_t * p_bas, uint8_t * p_data, uint16_t leng
 	volatile uint8_t magic;
 	volatile uint32_t retval = NRF_SUCCESS;
 	magic = *p_data;
-	app_trace_puts(DEBUG_LOW, "[DFU_CNTRL]\r");
+	app_trace_puts(DEBUG_LOW, "[DFU_CNTRL]\r\n");
 	
 	if( secure_connection() )
 	{
 		if ( (length == 1) && ( magic == MAGIC_DFU_ENABLE_NUM ) )
 		{
-			if (gs_bdebug) app_trace_puts(DEBUG_LOW, "Enable DFU\r");
+			if (gs_bdebug) app_trace_puts(DEBUG_LOW, "Enable DFU\r\n");
 			//g_config.advertise_dfu = MAGIC_DFU_ENABLE_NUM;
 			g_update_and_reset = true;
 		}
 	}
 	else
 	{	//Not allowed. Good bye!
-		app_trace_puts(DEBUG_MED, "[DFU_CNTRL] Access Denied!!!\r");
+		app_trace_puts(DEBUG_MED, "[DFU_CNTRL] Access Denied!!!\r\n");
 		terminate_connection();
 	}
 }
@@ -486,11 +430,11 @@ static void nus_data_handler(ble_nus_t * p_nus, uint8_t * p_data, uint16_t lengt
 {
 	T_PACKET rx_msg;
 
-	//if (gs_bdebug) app_trace_puts(DEBUG_LOW, "UART data received\r");
+	//if (gs_bdebug) app_trace_puts(DEBUG_LOW, "UART data received\r\n");
 
 	if( length < 2 || length > sizeof(T_PACKET) )
 	{
-		app_trace_puts(DEBUG_MED, "[NUS] length error\r");
+		app_trace_puts(DEBUG_MED, "[NUS] length error\r\n");
 
 		rx_msg.id = 0;
 		rx_msg.type = (T_PKT_TYPES) 0;
@@ -510,7 +454,7 @@ static void nus_data_handler(ble_nus_t * p_nus, uint8_t * p_data, uint16_t lengt
 		}
 	}
 
-	if (gs_bdebug) app_trace_log(DEBUG_MED, "[NUS] PK:0x%02X TY:0x%02X LN:%u @%01u\r",rx_msg.id ,rx_msg.type, rx_msg.pkt_len, systick_ms);
+	if (gs_bdebug) app_trace_log(DEBUG_MED, "[NUS] PK:0x%02X TY:0x%02X LN:%u @%01u\r\n",rx_msg.id ,rx_msg.type, rx_msg.pkt_len, systick_ms);
 
 	if( m_nus.conn_handle != BLE_CONN_HANDLE_INVALID ) {
 		parse_msg(&rx_msg);
@@ -537,7 +481,7 @@ static void ble_bas_update( void )
 		(err_code != BLE_ERROR_GATTS_SYS_ATTR_MISSING) )
 	{
 		//error 0x3004 = BLE_ERROR_NO_TX_PACKETS:
-		if (gs_bdebug) app_trace_log(DEBUG_MED, "[BAS_UPDATE]: failed %01u\r", err_code);
+		if (gs_bdebug) app_trace_log(DEBUG_MED, "[BAS_UPDATE]: failed %01u\r\n", err_code);
 		APP_ERROR_HANDLER(err_code);
 	}
 	
@@ -546,7 +490,7 @@ static void ble_bas_update( void )
 		(err_code != NRF_ERROR_INVALID_STATE) &&
 		(err_code != BLE_ERROR_GATTS_SYS_ATTR_MISSING) )
 	{
-		if (gs_bdebug) app_trace_log(DEBUG_MED, "[BAS_UPDATE]: failed %01u\r", err_code);
+		if (gs_bdebug) app_trace_log(DEBUG_MED, "[BAS_UPDATE]: failed %01u\r\n", err_code);
 		APP_ERROR_HANDLER(err_code);
 	}
 }
@@ -564,12 +508,12 @@ void indicate_battery_state(void)
 		{
 			case BATTERY_CHARGING:
 				//led(1,0,1,10,10);
-				app_trace_puts(DEBUG_MED, "[LED_IND]: CHARGING\r");
+				app_trace_puts(DEBUG_MED, "[LED_IND]: CHARGING\r\n");
 				break;
 			
 			case BATTERY_CHARGED:
 				//led(1,0,1,-1,0);
-				app_trace_puts(DEBUG_MED, "[LED_IND]: CHARGED\r");
+				app_trace_puts(DEBUG_MED, "[LED_IND]: CHARGED\r\n");
 				break;
 			
 			case BATTERY_MONITOR_FAIL:
@@ -577,19 +521,19 @@ void indicate_battery_state(void)
 				//measurement circuit. In this case, continue operation as normal so a device
 				//will be capable of connecting and learning of this issue.
 				//led(0,0,0,0,-1);
-				app_trace_puts(DEBUG_HIGH, "[LED_IND]: BAT MON FAIL\r");
+				app_trace_puts(DEBUG_HIGH, "[LED_IND]: BAT MON FAIL\r\n");
 				break;
 			
 			case BATTERY_DISCHARGING:
 				//led(0,0,0,0,-1);
-				app_trace_puts(DEBUG_MED, "[LED_IND]: DISCHARGING\r");
+				app_trace_puts(DEBUG_MED, "[LED_IND]: DISCHARGING\r\n");
 				break;
 			
 			default:
 				// Using absolute stop instead of led_stop_flash_timer here.
 				//led(0,0,0,0,-1);
 				nrf_gpio_pin_clear(LED_ON);		//Sure fire way to turn LEDs Off
-				app_trace_puts(DEBUG_MED, "[LED_IND]: LOW\r");
+				app_trace_puts(DEBUG_MED, "[LED_IND]: LOW\r\n");
 				break;
 		}
 	}
@@ -600,7 +544,7 @@ void HardFault_Handler(void)
 	uint32_t *sp = (uint32_t *) __get_MSP(); // Get stack pointer
 	uint32_t ia = sp[24/4]; // Get instruction address from stack
 
-	app_trace_log(DEBUG_HIGH, "Hard Fault at address: 0x%08x\r", (unsigned int)ia);
+	app_trace_log(DEBUG_HIGH, "Hard Fault at address: 0x%08x\r\n", (unsigned int)ia);
 	UNUSED_VARIABLE(ia);
 	while(1);
 }
@@ -642,7 +586,7 @@ static void services_init(void)
 	}
 
 	err_code = ble_dis_init(&dis_init);
-	if ((gs_bdebug) && (err_code != NRF_SUCCESS) ) app_trace_log(DEBUG_MED, "services_init: dis failed %i\r",err_code);
+	if ((gs_bdebug) && (err_code != NRF_SUCCESS) ) app_trace_log(DEBUG_MED, "services_init: dis failed %i\r\n",err_code);
 	APP_ERROR_CHECK(err_code);
 
 	// Initialize Battery Service.
@@ -681,10 +625,10 @@ static void services_init(void)
 	bas_init.dfu_control_data_handler = (ble_bas_data_handler_t) dfu_control_data_handler;
 
 	err_code = ble_bas_init(&m_bas, &bas_init);
-	if ((gs_bdebug) && (err_code != NRF_SUCCESS) ) app_trace_log(DEBUG_MED, "services_init: bas failed %i\r",err_code);
+	if ((gs_bdebug) && (err_code != NRF_SUCCESS) ) app_trace_log(DEBUG_MED, "services_init: bas failed %i\r\n",err_code);
 	APP_ERROR_CHECK(err_code);
 
-	if (gs_bdebug) app_trace_puts(DEBUG_LOW, "Services include NUS\r");
+	if (gs_bdebug) app_trace_puts(DEBUG_LOW, "Services include NUS\r\n");
 	
 	// Init Nordic UART Service
 	memset(&nus_init, 0, sizeof(nus_init));
@@ -693,7 +637,7 @@ static void services_init(void)
 
 	nus_init.data_handler = nus_data_handler;
 	err_code = ble_nus_init(&m_nus, &nus_init);
-	if ((gs_bdebug) && (err_code != NRF_SUCCESS) ) app_trace_log(DEBUG_MED, "services_init: nus failed %i\r",err_code);
+	if ((gs_bdebug) && (err_code != NRF_SUCCESS) ) app_trace_log(DEBUG_MED, "services_init: nus failed %i\r\n",err_code);
 	APP_ERROR_CHECK(err_code);
 
 }
@@ -716,7 +660,7 @@ static void on_conn_params_evt(ble_conn_params_evt_t * p_evt)
 
 	if(p_evt->evt_type == BLE_CONN_PARAMS_EVT_FAILED)
 	{
-		app_trace_puts(DEBUG_MED, "On Conn Param Evt: Negotiation Failed\r");
+		app_trace_puts(DEBUG_MED, "On Conn Param Evt: Negotiation Failed\r\n");
 		err_code = sd_ble_gap_disconnect(m_conn_handle, BLE_HCI_CONN_INTERVAL_UNACCEPTABLE);
 		APP_ERROR_CHECK(err_code);
 	}
@@ -769,18 +713,18 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
 	switch (ble_adv_evt)
 	{
 		case BLE_ADV_EVT_FAST:
-			app_trace_puts(db_pri, "[ON_ADV_EVT] Fast Adv\r");
+			app_trace_puts(db_pri, "[ON_ADV_EVT] Fast Adv\r\n");
 			g_advertise_state = ON;
 			break;
 
 		case BLE_ADV_EVT_SLOW:
-			app_trace_puts(db_pri, "[ON_ADV_EVT] Slow Adv\r");
+			app_trace_puts(db_pri, "[ON_ADV_EVT] Slow Adv\r\n");
 			g_advertise_state = ON;
 			break;
 
 		case BLE_ADV_EVT_IDLE:
 			//sleep_mode_enter();
-			app_trace_puts(db_pri, "[ON_ADV_EVT] Adv Idle\r");
+			app_trace_puts(db_pri, "[ON_ADV_EVT] Adv Idle\r\n");
 			g_advertise_state = OFF;
 			break;
 
@@ -827,14 +771,14 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
 	switch (p_ble_evt->header.evt_id)
 	{
 		case BLE_GAP_EVT_CONNECTED:
-			app_trace_puts(DEBUG_MED, "[ON_BLE_EVT] Connected\r");
+			app_trace_puts(DEBUG_MED, "[ON_BLE_EVT] Connected\r\n");
 			m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
 			g_advertise_state = OFF;
 			flag_new_comms();
 			break;
 
 		case BLE_GAP_EVT_DISCONNECTED:
-			app_trace_puts(DEBUG_MED, "[ON_BLE_EVT] Disconnected\r");
+			app_trace_puts(DEBUG_MED, "[ON_BLE_EVT] Disconnected\r\n");
 			m_conn_handle = BLE_CONN_HANDLE_INVALID;
 			g_advertise_state = OFF;
 			app_timer_stop(m_DETACH_timer_id);	//detach is unnecessary, make sure it is OFF
@@ -842,7 +786,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
 			break;
 
 		case BLE_GAP_EVT_TIMEOUT:
-			app_trace_puts(DEBUG_LOW, "[ON_BLE_EVT] Adv Idle\r");
+			app_trace_puts(DEBUG_LOW, "[ON_BLE_EVT] Adv Idle\r\n");
 			g_advertise_state = OFF;
 			break;
 		
@@ -850,7 +794,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
 			// This is handled by the DM in DMP.c
 			if( !USE_DM )
 			{
-				app_trace_puts(DEBUG_MED, "[ON_BLE_EVT] Params Req in on_ble_evt\r");
+				app_trace_puts(DEBUG_MED, "[ON_BLE_EVT] Params Req in on_ble_evt\r\n");
 				err_code = sd_ble_gap_sec_params_reply(m_conn_handle, BLE_GAP_SEC_STATUS_PAIRING_NOT_SUPP, NULL, NULL);
 				APP_ERROR_CHECK(err_code);
 			}
@@ -858,7 +802,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
 
 		case BLE_GATTS_EVT_SYS_ATTR_MISSING:
 			// No system attributes have been stored.
-			app_trace_puts(DEBUG_MED, "[ON_BLE_EVT] Atts Missing\r");
+			app_trace_puts(DEBUG_MED, "[ON_BLE_EVT] Atts Missing\r\n");
 			err_code = sd_ble_gatts_sys_attr_set(m_conn_handle, NULL, 0, 0);
 			APP_ERROR_CHECK(err_code);
 			break;
@@ -880,7 +824,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
  */
 static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 {
-	if(gs_bdebug) app_trace_log(DEBUG_LOW, "[BLE_EVT_DISPATCH] 0x%02X\r", p_ble_evt->header.evt_id);
+	if(gs_bdebug) app_trace_log(DEBUG_LOW, "[BLE_EVT_DISPATCH] 0x%02X\r\n", p_ble_evt->header.evt_id);
 
 	if( USE_DM ) dm_ble_evt_handler(p_ble_evt);
 	ble_nus_on_ble_evt(&m_nus, p_ble_evt);
@@ -895,10 +839,10 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 
 //	if( p_ble_evt->header.evt_id == BLE_EVT_TX_COMPLETE ) 
 //	{
-//		app_trace_log(DEBUG_MED, "NUS WR %01u: @%01u\r", p_ble_evt->evt.common_evt.params.tx_complete.count, getSystemTimeMs());
+//		app_trace_log(DEBUG_MED, "NUS WR %01u: @%01u\r\n", p_ble_evt->evt.common_evt.params.tx_complete.count, getSystemTimeMs());
 //	}
 //	else if ( p_ble_evt->header.evt_id == BLE_GAP_EVT_CONNECTED ) {
-//		app_trace_log(DEBUG_MED, "REQ CONN INT: %02u\r", p_ble_evt->evt.gap_evt.params.connected.conn_params.max_conn_interval ); 
+//		app_trace_log(DEBUG_MED, "REQ CONN INT: %02u\r\n", p_ble_evt->evt.gap_evt.params.connected.conn_params.max_conn_interval ); 
 //	}
 	
 	on_ble_evt(p_ble_evt);
@@ -915,7 +859,7 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 static void sys_evt_dispatch(uint32_t sys_evt)
 {
 	//These are all related to writing memory
-	app_trace_log(DEBUG_LOW, "[SYS_EVT_DISPATCH] %x: @%01u\r", sys_evt, systick_ms);
+	app_trace_log(DEBUG_LOW, "[SYS_EVT_DISPATCH] %x: @%01u\r\n", sys_evt, systick_ms);
 	pstorage_sys_event_handler(sys_evt);
 	on_sys_evt(sys_evt);
 }
@@ -966,7 +910,6 @@ static void ble_stack_init(void)
 static void  ticks_timer_handler(void * p_context)
 {
 	static uint16_t second_counter = 0;
-	//static uint16_t hrm_timer_counter = 0;
 
 	// updated system timer
 	systick_ms += systick_period_ms;
@@ -979,36 +922,16 @@ static void  ticks_timer_handler(void * p_context)
 		second_counter -= APP_TIMER_CLOCK_FREQ;	//keeps remainder that could be there, more accurate time tracking
 		unix_time++;
 	}
-	
-//	if (m_conn_handle != BLE_CONN_HANDLE_INVALID)
-//	{
-//		//if( hrm_timer_counter = HRM_SAMPLE_TIME)
-//		//{	 	
-////			hrm_chan_1_raw32 = ((uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT1) << 8) + (uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT2);
-////			hrm_chan_2_raw32 = ((uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT4) << 8) + (uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT5);
-////			Si115xWriteToRegister(SI115x_REG_COMMAND, 0x11); // Force cmd
-////			hrm_read_cmd();
-//			hrm_tx_rdy_flag = 1;
-//			//hrm_timer_counter = 0;
-//		//}
-//		//hrm_timer_counter++;
-//	}
 }
 
 //static void  hrm_timer_handler(void * p_context)
-//{
-//	static uint16_t hrm_timer_counter = 0;
-//	
-//	if( hrm_timer_counter == HRM_SAMPLE_TIME)
-//	{	 	
+//{	
 //		hrm_chan_1_raw32 = ((uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT1) << 8) + (uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT2);
 //		hrm_chan_2_raw32 = ((uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT4) << 8) + (uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT5);
 //		Si115xWriteToRegister(SI115x_REG_COMMAND, 0x11); // Force cmd
 //		hrm_read_cmd();
 //		hrm_tx_rdy_flag = 1;
 //		hrm_timer_counter = 0;
-//	}
-//	hrm_timer_counter++;
 //}
 
 /**@brief Function for initializing the Advertising functionality.
@@ -1049,15 +972,15 @@ uint32_t ble_uart_tx(uint8_t *buffer, uint8_t buffer_len)
 
 //	if (gs_bdebug) {
 //		for (int i=0;i< buffer_len;i++) {
-//			app_trace_log(DEBUG_LOW, "%c\r",buffer[i]);
+//			app_trace_log(DEBUG_LOW, "%c\r\n",buffer[i]);
 //		}
-//		app_trace_puts(DEBUG_LOW, "\r");
+//		app_trace_puts(DEBUG_LOW, "\r\n");
 //	}
 
 	err_code = ble_nus_string_send(&m_nus, buffer,buffer_len);
 	if( err_code == NRF_SUCCESS)
 	{
-		//app_trace_log(DEBUG_LOW, "NUS Sent\r");
+		//app_trace_log(DEBUG_LOW, "NUS Sent\r\n");
 	}
 	else if( err_code == BLE_ERROR_NO_TX_PACKETS ) 
 	{
@@ -1065,7 +988,7 @@ uint32_t ble_uart_tx(uint8_t *buffer, uint8_t buffer_len)
 	}
 	else 
 	{
-		app_trace_log(DEBUG_MED, "NUS Send Err: 0x%02X\r", err_code);
+		app_trace_log(DEBUG_MED, "NUS Send Err: 0x%02X\r\n", err_code);
 	}
 
 	return err_code;
@@ -1151,7 +1074,7 @@ static void system_powerdown( void )
 
 void motion_int_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
-	//app_trace_puts(DEBUG_LOW, "int hit\r");
+	//app_trace_puts(DEBUG_LOW, "int hit\r\n");
 	imu_int_req = true;
 }
 
@@ -1161,7 +1084,7 @@ static ret_code_t config_imu(void)
 	ret_code_t err;
 	
 	//struct eic_line_config imu_line_conf;
-	app_trace_puts(DEBUG_LOW, "[INIT_IMU] start\r");
+	app_trace_puts(DEBUG_LOW, "[INIT_IMU] start\r\n");
 
 	// init i2c interface
 	err = hal_twim_init( false );
@@ -1177,7 +1100,7 @@ static ret_code_t config_imu(void)
 				err = nrf_drv_gpiote_init();
 				if( err != NRF_SUCCESS )
 				{
-					app_trace_log(DEBUG_HIGH, "[INIT_IMU] gpiote err: %01d\r", err);
+					app_trace_log(DEBUG_HIGH, "[INIT_IMU] gpiote err: %01d\r\n", err);
 				}
 			}
 			nrf_drv_gpiote_in_config_t config = GPIOTE_CONFIG_IN_SENSE_LOTOHI( false );
@@ -1185,23 +1108,23 @@ static ret_code_t config_imu(void)
 			if( err == NRF_SUCCESS )
 			{
 				nrf_drv_gpiote_in_event_enable(IMU_INT, true);
-				app_trace_puts(DEBUG_LOW, "[INIT_IMU] done\r");
+				app_trace_puts(DEBUG_LOW, "[INIT_IMU] done\r\n");
 			}
 			else
 			{
-				app_trace_log(DEBUG_HIGH, "[INIT_IMU] imu_int pin err: %01d\r", err);
+				app_trace_log(DEBUG_HIGH, "[INIT_IMU] imu_int pin err: %01d\r\n", err);
 			}
 		}
 		else
 		{
 			//Keep trying. If a reset happened in the middle of a read, the accel may be
 			//stuck for up to 8 retries (gives 1 clock per retry).
-			app_trace_log(DEBUG_HIGH, "[INIT_IMU] imu init err: %01d\r", err);
+			app_trace_log(DEBUG_HIGH, "[INIT_IMU] imu init err: %01d\r\n", err);
 		}
 	}
 	else
 	{
-		app_trace_log(DEBUG_HIGH, "[INIT_IMU] i2c init err: %01d\r", err);
+		app_trace_log(DEBUG_HIGH, "[INIT_IMU] i2c init err: %01d\r\n", err);
 	}
 	
 	init_motion_analysis( MOTION_DEBUG, 0 );	// set motion tracking variables and pointers
@@ -1211,7 +1134,7 @@ static ret_code_t config_imu(void)
 
 void service_imu( void )
 {
-	static TTASK_TIMER imu_check = { 0, DEFAULT_IMU_CHECK_PERIOD };
+	static expire_timer_t imu_check = { 0, 0 };
 	
 	//If the Interrupt has triggered (or the pin is still active) read the IMU
 	if( (imu_int_req == true) || (nrf_gpio_pin_read(IMU_INT) == 1) )
@@ -1226,24 +1149,24 @@ void service_imu( void )
 			motionAnalyze();	//check for motion profiles
 			
 			//push out the check, only desired when the IMU goes silent
-			start_task_timer( imu_check, 1000 );	//run check once IRQs stop for more than 1 second
+			get_expire_time( (1000*1000UL), &imu_check );	//run check once IRQs stop for more than 1 second	
 		}
 		else
 		{
-			if( MAIN_DEBUG ) app_trace_log(DEBUG_LOW, "IMU Read Fail: %01u\r", res);
+			if( MAIN_DEBUG ) app_trace_log(DEBUG_LOW, "IMU Read Fail: %01u\r\n", res);
 		}
 	}
 	
-	if( task_time( imu_check ) )
+	if( check_expiration( &imu_check ) )
 	{
 		//No int_requests for some time. Make sure the IMU is still operational
-		start_task_timer( imu_check, DEFAULT_IMU_CHECK_PERIOD );
-		//app_trace_puts(DEBUG_LOW, "Checking IMU\r");
+		get_expire_time( DEFAULT_IMU_CHECK_PERIOD_US, &imu_check );
+		//app_trace_puts(DEBUG_LOW, "Checking IMU\r\n");
 		
 		if( imu_slp_check() == false )
 		{
 			//Module is non-responsive
-			app_trace_puts(DEBUG_MED, "IMU failure: re-initializing\r");
+			app_trace_puts(DEBUG_MED, "IMU failure: re-initializing\r\n");
 			hal_twim_uninit();
 			hal_twim_init(IMU_DEBUG);
 			if( imu_init(IMU_DEBUG) == NRF_SUCCESS )
@@ -1285,7 +1208,7 @@ void service_calendar_events( void )
 				if( prv_unix_time%(3600*24) == 0)
 				{
 					//make sure we periodically back up the config... in case of sudden power loss
-					app_trace_puts(DEBUG_MED, "[UT] New Day, Save Cfg\r");
+					app_trace_puts(DEBUG_MED, "[UT] New Day, Save Cfg\r\n");
 					set_config_update_flag();
 				}
 			}
@@ -1345,7 +1268,7 @@ void app_error_fault_handler(uint32_t id, uint32_t pc, uint32_t p_info)
 	{
 		if( MAIN_DEBUG )
 		{
-			app_trace_log(DEBUG_HIGH, "Err 0x%02X: l-%01u\r", err_info->err_code, err_info->line_num);	//, err_info->p_file_name);
+			app_trace_log(DEBUG_HIGH, "Err 0x%02X: l-%01u\r\n", err_info->err_code, err_info->line_num);	//, err_info->p_file_name);
 			BREAK_POINT;
 		}
 	}
@@ -1357,7 +1280,7 @@ void app_error_fault_handler(uint32_t id, uint32_t pc, uint32_t p_info)
  */
 void wdt_event_handler(void)
 {
-	app_trace_puts(DEBUG_HIGH, "XXX\r");	//try to print before death toll
+	app_trace_puts(DEBUG_HIGH, "XXX\r\n");	//try to print before death toll
 		
 	while(1);
 	//NOTE: The max amount of time we can spend in WDT interrupt is two cycles of 32768[Hz] clock - after that, reset occurs
@@ -1385,7 +1308,7 @@ static void timers_init(void)
 		//Set source to desired input
 		nrf_clock_lf_src_set( NRF_CLOCK_LFCLK_Xtal );
 	}
-	app_trace_puts(pri, "\r");
+	app_trace_puts(pri, "\r\n");
 	
 	// Errata 20:
 	{	//Execute before using RTC		
@@ -1427,6 +1350,9 @@ static void timers_init(void)
 	err_code = app_timer_start(m_SYST_timer_id, SYSTEM_TIME_TICKS, NULL);
 	APP_ERROR_CHECK(err_code);
 	nrf_delay_ms(5);
+	
+	//Start up RTC2
+	unix_timer_init();
 
 	//Configure WDT.
 #if WDT_ENABLED
@@ -1449,7 +1375,7 @@ static uint32_t device_manager_evt_handler(dm_handle_t const * p_handle,
 	APP_ERROR_CHECK(event_result);
 	
 	if( event_result != NRF_SUCCESS ) {
-		if (gs_bdebug) app_trace_log(DEBUG_LOW, "dm_cb_handler: Evt_ID: 0x02X, Res: 0x02X\r", p_event->event_id, event_result);
+		if (gs_bdebug) app_trace_log(DEBUG_LOW, "dm_cb_handler: Evt_ID: 0x02X, Res: 0x02X\r\n", p_event->event_id, event_result);
 	}
 
 #ifdef BLE_DFU_APP_SUPPORT
@@ -1463,7 +1389,7 @@ static uint32_t device_manager_evt_handler(dm_handle_t const * p_handle,
 
 static void null_cb_handler(pstorage_handle_t * handle, uint8_t op_code, uint32_t result, uint8_t * p_data, uint32_t data_len)
 {
-	if (gs_bdebug) app_trace_puts(DEBUG_LOW, "null_cb_handler: \r");
+	if (gs_bdebug) app_trace_puts(DEBUG_LOW, "null_cb_handler: \r\n");
 }
 
 
@@ -1485,12 +1411,12 @@ void form_version_strings( void )
 	ble_gap_addr_t d_addr;
 	sd_ble_gap_address_get(&d_addr);
 	sprintf( dis_str.hwid, "%02X%02X%02X%02X%02X%02X", (uint8_t)(d_addr.addr[5]), (uint8_t)(d_addr.addr[4]), (uint8_t)(d_addr.addr[3]), (uint8_t)(d_addr.addr[2]), (uint8_t)(d_addr.addr[1]), (uint8_t)(d_addr.addr[0]) );		//obfuscate partial MAC
-	app_trace_log(DEBUG_MED, "[MAC]: %s%s\r", FG_RED, dis_str.hwid );
+	app_trace_log(DEBUG_MED, "[MAC]: %s%s\r\n", FG_RED, dis_str.hwid );
 	
 	//Form Version Strings and Print:
 	sprintf( dis_str.fw, "%01u.%02u", FW_REV_MAJOR, FW_REV_MINOR );
 	sprintf( dis_str.sw, "SD-%03u BL-%01u.%02u", sd_rev.subversion_number, (boot_settings.bl_rev>>8)&0xFF, boot_settings.bl_rev&0xFF );
-	app_trace_log(DEBUG_HIGH, "HW-%s %s A-%s%s\r", dis_str.hw_rev, dis_str.sw, dis_str.fw, FG_RESET );
+	app_trace_log(DEBUG_HIGH, "HW-%s %s A-%s%s\r\n", dis_str.hw_rev, dis_str.sw, dis_str.fw, FG_RESET );
 }
 
 
@@ -1543,11 +1469,11 @@ static void device_manager_init(bool erase_bonds)
 			res = pstorage_register(&param, &null_handle);
 			if ( res == NRF_SUCCESS )
 			{
-				if( gs_bdebug ) app_trace_puts(DEBUG_LOW, "p_store success\r");
+				if( gs_bdebug ) app_trace_puts(DEBUG_LOW, "p_store success\r\n");
 			}
 			else
 			{
-				if( gs_bdebug ) app_trace_log(DEBUG_HIGH, "p_store: Failed %01u\r", res);
+				if( gs_bdebug ) app_trace_log(DEBUG_HIGH, "p_store: Failed %01u\r\n", res);
 			}
 		}
 	}
@@ -1581,7 +1507,7 @@ void init_key_ring( void )
 	/*
 	for(i=0; i<7; i++)
 	{
-		app_trace_log(DEBUG_LOW, "[KR]: 0x%02X init_mem_manager: key_ring[i] = 0x%02X\r", i, key_ring[i]);
+		app_trace_log(DEBUG_LOW, "[KR]: 0x%02X init_mem_manager: key_ring[i] = 0x%02X\r\n", i, key_ring[i]);
 	}
 	*/
 }
@@ -1590,7 +1516,6 @@ void init_key_ring( void )
  */
 int main(void)
 {
-	uint8_t 	i;
 	uint32_t 	err_code;
 	uint32_t 	reset_reason = NRF_POWER->RESETREAS;
 	bool 		power_down = false;
@@ -1602,8 +1527,8 @@ int main(void)
 	gpio_defaults();
 	app_trace_init();
 	app_set_min_debug_priority(DEBUG_MED);	//Allow somethings to print!!!
-	app_trace_log(DEBUG_HIGH, "%s\n\r%s\r", FG_CYAN, DEVICE_NAME);
-	app_trace_log(DEBUG_HIGH, "Reset: 0x%08X%s\r", reset_reason, FG_RESET );
+	app_trace_log(DEBUG_HIGH, "%s\n\r%s\r\n", FG_CYAN, DEVICE_NAME);
+	app_trace_log(DEBUG_HIGH, "Reset: 0x%08X%s\r\n", reset_reason, FG_RESET );
 	//	SEGGER_RTT_printf(0, "\033[4;41mRESET\n");
 	nrf_delay_ms(1);	//Give a little time for things to settle
 
@@ -1650,10 +1575,9 @@ int main(void)
 		//flag_hw_init_error( battery_self_test(false) );	//~100 ms to run
 	}
 	
-	Si1153_twi_init();
-	Si1153_Init();
+	hrm_init();
 	
-	app_trace_log(DEBUG_MED, "Start of Main @%01u\r", getSystemTimeMs());
+	app_trace_log(DEBUG_MED, "Start of Main @%01u\r\n", getSystemTimeMs());
 	
 //	nrf_drv_wdt_channel_feed( m_wdt_channel_id );
 //	set_hw_test_request();
@@ -1675,7 +1599,7 @@ int main(void)
 			
 			if( gu_battery_level <= LOW_BAT_THRESH )
 			{
-				if( power_down == false) app_trace_log(DEBUG_HIGH, "Low Battery Warning @%01u\r", getSystemTimeMs());
+				if( power_down == false) app_trace_log(DEBUG_HIGH, "Low Battery Warning @%01u\r\n", getSystemTimeMs());
 				power_down = true;
 			}
 			else
@@ -1689,7 +1613,7 @@ int main(void)
 			case OPMODE_LOW_POWER:
 				if( !power_down || manufacture_mode() )
 				{
-					app_trace_log(DEBUG_MED, "Powering Up @%01u\r", getSystemTimeMs());
+					app_trace_log(DEBUG_MED, "Powering Up @%01u\r\n", getSystemTimeMs());
 					
 					// Light LED for testing:
 					if( manufacture_mode() )
@@ -1718,7 +1642,7 @@ int main(void)
 					// Start Wake On Motion (delta I = +5uA)
 					enable_motion_wakeup();
 					
-					app_trace_puts(DEBUG_MED, "Advertising Start\r");
+					app_trace_puts(DEBUG_MED, "Advertising Start\r\n");
 					err_code = ble_advertising_start(BLE_ADV_MODE_SLOW);
 					APP_ERROR_CHECK(err_code);
 					
@@ -1730,7 +1654,7 @@ int main(void)
 				
 				if( m_conn_handle == BLE_CONN_HANDLE_INVALID && g_advertise_state == OFF )
 				{	//No Connection and Not currently advertising: kick that Radio On!
-					if(gs_bdebug) app_trace_puts(DEBUG_LOW, "Advertising Restart\r");
+					if(gs_bdebug) app_trace_puts(DEBUG_LOW, "Advertising Restart\r\n");
 					err_code = ble_advertising_start(BLE_ADV_MODE_SLOW);
 					APP_ERROR_CHECK(err_code);
 				}
@@ -1770,7 +1694,7 @@ int main(void)
 				// Bootloader has been requested
 				if ( g_update_and_reset )
 				{
-					if( MAIN_DEBUG ) app_trace_puts(DEBUG_MED, "Reset to Bootloader\r" );
+					if( MAIN_DEBUG ) app_trace_puts(DEBUG_MED, "Reset to Bootloader\r\n" );
 					
 					//Save active records and updated config values
 					power_down_save_records();
@@ -1784,7 +1708,7 @@ int main(void)
 				{
 					if ( power_down )
 					{	//enter low power hibernation mode
-						app_trace_log(DEBUG_MED, "Low Power Mode @%01u\r", getSystemTimeMs());
+						app_trace_log(DEBUG_MED, "Low Power Mode @%01u\r\n", getSystemTimeMs());
 
 						// If advertising, stop
 						if( g_advertise_state != OFF )
@@ -1820,7 +1744,7 @@ int main(void)
 				else
 				{	//Still in shipmode. Keep the battery from over charging and switch battery power Off when we are
 					//no longer need to communicate.
-					static TTASK_TIMER ship_mode_delay = { 0, SHIP_MODE_DELAY };
+					static expire_timer_t ship_mode_delay = { 0, 0 };
 					
 					if( get_hw_test_request() )
 					{	//hardware tests have been requested
@@ -1829,14 +1753,14 @@ int main(void)
 					
 					if( battery_chr_present() )
 					{	//keep pushing out the shutoff timer as long as we are on the battery charger
-						re_arm_task_timer( ship_mode_delay );
+						get_expire_time( SHIP_MODE_DELAY_US, &ship_mode_delay );
 					}
 					else 
 					{	//Charger no longer Detected. Powerdown if in Manufacturing Mode and system has been On longer than 5 seconds 
 						//(allows some time for LED feedback in a charger detect failure mode) or powerdown after 5 minutes off charger:
-						if( task_time(ship_mode_delay) || ( manufacture_mode() && (getSystemTimeMs() > 5000)) )
+						if( check_expiration(&ship_mode_delay) || ( manufacture_mode() && (getSystemTimeMs() > 5000)) )
 						{	//Have been Off the Charger for X seconds, enter Ship Mode and turn power Off
-							app_trace_log(DEBUG_MED, "Entering Ship Mode @%01u\r", getSystemTimeMs());
+							app_trace_log(DEBUG_MED, "Entering Ship Mode @%01u\r\n", getSystemTimeMs());
 							
 							// If advertising, stop
 							if( g_advertise_state != OFF )
@@ -1880,7 +1804,7 @@ int main(void)
 				//Wait for battery to drop below 30% charger
 				if( gu_battery_level <= SHIP_MODE_THRESH )
 				{
-					app_trace_log(DEBUG_MED, "Powering Off @%01u\r", getSystemTimeMs());
+					app_trace_log(DEBUG_MED, "Powering Off @%01u\r\n", getSystemTimeMs());
 					delay_ms(250);	//Give time for print before powering Off
 					
 					if( true )
@@ -1916,230 +1840,13 @@ int main(void)
 //		err_code = sd_app_evt_wait();
 //		APP_ERROR_CHECK(err_code);
 		
-		
-/*                      Proto 1153 HRM code                                 
-	uint8_t		hrm_running_avg_indx = 0;
-	int16_t	hrm_chan1_running_avg[5], hrm_chan2_running_avg[5];
-	int32_t	hrm_chan1_running_avg_accm, hrm_chan2_running_avg_accm;
-	int16_t hrm_chan1_fbs = 0, hrm_chan2_fbs = 0;	
-*/
-// HRM_SAMPLE_TIME = 6667 * 150 uSec = 50 mSec = 20Hz
-//#define		HRM_AVG_SAMPLES		6
-//#define 	HRM_SAMPLE_TIME		6667
-//#define		HRM_STITCH_TRESH	100
-		
-/// note default index = 8 = 0x12 = 50mA
-///uint8_t hrm_agc_led_current_idx = 8;
-///uint8_t hrm_agc_led_current[30] = {0x00, 0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38, 0x12, 0x21, 0x29, 0x31, 0x22, 0x39, 0x2A, 
-///									0x23, 0x32, 0x3A, 0x24, 0x33, 0x2C, 0x3B, 0x34, 0x2D, 0x3C, 0x35, 0x3D, 0x36, 0x3E, 0x3F};	
-
-	//if ((m_conn_handle != BLE_CONN_HANDLE_INVALID) && get_accel_en())  // Auto Off
-	if (m_conn_handle != BLE_CONN_HANDLE_INVALID)
-	{		
-		if(hrm_tx_rdy_cntr == HRM_SAMPLE_TIME) 
-		{		
-			/// Get a hrm sample every 0.05 seconds = 20 Hz.
-			hrm_chan_1_raw32 = 	(Si115xReadFromRegister(SI115x_REG_HOSTOUT0) << 16) | 
-								(uint16_t)(Si115xReadFromRegister(SI115x_REG_HOSTOUT1) << 8) | 
-								(uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT2);
-			
-			hrm_chan_2_raw32 = 	(Si115xReadFromRegister(SI115x_REG_HOSTOUT3) << 16) | 
-								(uint16_t)(Si115xReadFromRegister(SI115x_REG_HOSTOUT4) << 8) | 
-								(uint8_t)Si115xReadFromRegister(SI115x_REG_HOSTOUT5);
-				
-			Si115xWriteToRegister(SI115x_REG_COMMAND, 0x11); // Force cmd
-			
-#if 1			
-			/// Running Signal Average
-			hrm_avg_chan132[hac_index] = hrm_chan_1_raw32;
-			hrm_avg_chan232[hac_index] = hrm_chan_2_raw32;
-			hrm_avg_chan132_accm = hrm_avg_chan232_accm = 0;
-			for(i = 0; i < HRM_AVG_SIZE; i++)
-			{
-				hrm_avg_chan132_accm += hrm_avg_chan132[hac_index];
-				hrm_avg_chan232_accm += hrm_avg_chan232[hac_index];
-			}
-			hrm_chan_1_raw32 = hrm_avg_chan132_accm / HRM_AVG_SIZE;
-			hrm_chan_2_raw32 = hrm_avg_chan232_accm / HRM_AVG_SIZE;
-			hac_index++;
-			if(hac_index == HRM_AVG_SIZE)
-				hac_index = 0;
-#endif		
-			
-			
-#if 1
-			/// Running Bias Average.
-			// To make this better and save memory reduce HRM_RUNNING_AVG_SAMPLES[<120>>2] and spread the samples over the entire last 6 sec frame.
-//			hrm_chan1_running_avg[hrm_running_avg_indx] = hrm_chan_1_raw32;
-//			hrm_chan2_running_avg[hrm_running_avg_indx] = hrm_chan_2_raw32;
-//			hrm_chan1_running_avg_accm = 0;
-//			hrm_chan2_running_avg_accm = 0;
-//			for(i=0; i<HRM_RUNNING_AVG_SAMPLES; i++)
-//			{
-//				hrm_chan1_running_avg_accm += hrm_chan1_running_avg[i];
-//				hrm_chan2_running_avg_accm += hrm_chan2_running_avg[i];
-//			}
-//			hrm_chan1_fbs = hrm_chan1_running_avg_accm / HRM_RUNNING_AVG_SAMPLES;
-//			hrm_chan2_fbs = hrm_chan2_running_avg_accm / HRM_RUNNING_AVG_SAMPLES;
-		//	if(((hrm_raw_index >> 1) & 0x01) == 0x01)
-		//	{
-				hrm_chan1_running_avg[(hrm_raw_index >> 2)] = hrm_chan_1_raw32;//cheeper to assign than qualify every forth one.
-				hrm_chan2_running_avg[(hrm_raw_index >> 2)] = hrm_chan_2_raw32;
-		//		hrm_running_avg_indx++;
-				//if(hrm_running_avg_indx == HRM_RUNNING_AVG_SAMPLES)
-					//hrm_running_avg_indx = 0;
-		//	}
-//#else
-//			hrm_chan1_fbs = hrm_chan2_fbs = 0;
-#endif
-			
-			/// Done, throw it in the pile. Now that the bias has been subtracted we can move down to 16 bits
-			hrm_chan_1_raw32 = hrm_chan_1_raw32 - hrm_chan1_fbs;
-			hrm_chan_2_raw32 = hrm_chan_2_raw32 - hrm_chan2_fbs;
-			hrm_chan1_raw[hrm_raw_index] = hrm_chan_1_raw32; //cast as (int16_t)
-			hrm_chan2_raw[hrm_raw_index] = hrm_chan_2_raw32;
-		
-#if 0			
-			/// Stitcher.
-			/* 	Break this into two pices. Calc the new bias while timing a threshold rejection. 
-				Throw away the new bias if we recover in xx seconds or adopt the new hrm_chanX_fbs 
-				if the event lasts it was a level change. A problem will occur if the event happens 
-				in the last xx seconds of the frame. */
-
-			if( (hrm_chan_1_raw32 > HRM_STITCH_TRESH) || (hrm_chan_1_raw32 < -HRM_STITCH_TRESH) || 
-				(hrm_chan_2_raw32 > HRM_STITCH_TRESH) || (hrm_chan_2_raw32 < -HRM_STITCH_TRESH) )
-			{
-				if(!hrm_stitch_flag)
-					hrm_raw_index_old = hrm_raw_index;
-				hrm_stitch_flag = 1;
-				hrm_chan1_fbs = hrm_chan1_fbs + ((hrm_chan_1_raw32) / 2);
-				hrm_chan2_fbs = hrm_chan2_fbs + ((hrm_chan_2_raw32) / 2);
-			}
-			else if(hrm_stitch_flag)
-			{
-				hrm_stitch_flag = 0;
-				if(hrm_raw_index_old >= 2)
-					hrm_raw_index = hrm_raw_index_old - 2;
-				else
-					hrm_raw_index = hrm_raw_index_old; /// make rolling!!!
-				
-//				for(i=0; i<HRM_AVG_SAMPLES; i++)
-//				{
-//					hrm_chan1_running_avg[i] = hrm_chan_1_raw32; 
-//					hrm_chan2_running_avg[i] = hrm_chan_2_raw32; 
-//				}	
-			}				
-#endif		
-			
-			/// Pump it out. Pass queued messages to the radio.
-			if(!hrm_stitch_flag)
-			{
-				char silly_data[sizeof(float)];
-				memcpy(silly_data, &silly_ratio, sizeof silly_ratio);
-				tx_type = HRM_PKT;
-				tx_pay_len = 11;
-				tx_payload[0] = (uint16_t) silly_data[0];
-				tx_payload[1] = (uint16_t) silly_data[1];
-				tx_payload[2] = (uint16_t) silly_data[2];
-				tx_payload[3] = (uint16_t) silly_data[3];
-				//tx_payload[0] = hrm_ch1_avg >> 8;
-				//tx_payload[1] = hrm_ch1_avg & 0xFF;
-				//tx_payload[2] = (uint16_t)(hrm_chan_1_raw32 + hrm_chan1_fbs) >> 8; Si115xReadFromRegister(SI115x_REG_HOSTOUT0
-				//tx_payload[2] = (uint16_t) (hrm_chan_1_raw32 & 0x00FF0000) >> 16;
-				//tx_payload[3] = (uint16_t) (hrm_chan_2_raw32 & 0x00FF0000) >> 16;
-				//tx_payload[2] = (uint16_t) pd_emi_delta;
-				//tx_payload[3] = (uint16_t)(hrm_chan_1_raw32 + hrm_chan1_fbs) & 0xFF;
-				tx_payload[4] = current_hrm;
-				tx_payload[5] = pd_emi_delta;
-				//tx_payload[6] = (uint16_t) (hrm_chan_1_raw32 & 0x0000FF00) >> 8;;
-				//tx_payload[7] = (uint16_t) (hrm_chan_1_raw32 & 0x000000FF);
-				tx_payload[6] = (hrm_chan1_raw[hrm_raw_index]) >> 8;
-				tx_payload[7] = hrm_chan1_raw[hrm_raw_index]  ;
-				tx_payload[8] = (hrm_chan2_raw[hrm_raw_index]) >> 8;
-				tx_payload[9] = hrm_chan2_raw[hrm_raw_index]  ;
-				queue_packet_wrapper( tx_type, tx_payload, tx_pay_len );
-				ble_transfer_packets_wrapper();		
-				run_get_hrms++;
-				
-				if(run_get_hrms == 6 * 20) // 6sec * 20 sps
-				{
-					hrm_chan1_running_avg_accm = 0;
-					hrm_chan2_running_avg_accm = 0;
-					for(i = 0; i < 30; i++)
-					{
-						hrm_chan1_running_avg_accm += hrm_chan1_running_avg[i];
-						hrm_chan2_running_avg_accm += hrm_chan2_running_avg[i];
-					}
-					hrm_chan1_fbs = hrm_chan1_running_avg_accm / 30;//(int32_t)(hrm_running_avg_indx);
-					hrm_chan2_fbs = hrm_chan2_running_avg_accm / 30;//(int32_t)(hrm_running_avg_indx);
-					silly_ratio = (float)hrm_chan1_fbs / (float)hrm_chan2_fbs;
-					hrm_running_avg_indx = 0;
-					
-					Get_HRMs();
-					
-					hrm_raw_index = 0;
-					run_get_hrms = 0;
-#if 0
-					/// LED Current Control (AGC).
-					hrm_agc_led_current_idx1 = 14 - (uint8_t)((abs(hrm_chan1_fbs) >> 8) - 25) / 3; // 32000 = 29(354mA), 1000 = 0(5.5mA), 14=100 mA
-					if(hrm_agc_led_current_idx1 < 0)
-						hrm_agc_led_current_idx1 = 0; // (5.5mA)
-					if(hrm_agc_led_current_idx1 > 14)
-						hrm_agc_led_current_idx1 = 14; // (14 = 100 mA limit)
-					Si115xParamSet(PARAM_LED1_A, hrm_agc_led_current[hrm_agc_led_current_idx1]);
-					///hrm_agc_led_current_idx1 = (uint8_t)(hrm_chan1_fbs >> 8);
-					hrm_agc_led_current_idx3 = 14 - (uint8_t)((abs(hrm_chan2_fbs) >> 8) - 25) / 3; // 32000 = 29(354mA), 1000 = 0(5.5mA), 14=100 mA
-					if(hrm_agc_led_current_idx3 < 0)
-						hrm_agc_led_current_idx3 = 0; // (5.5mA)
-					if(hrm_agc_led_current_idx3 > 14)
-						hrm_agc_led_current_idx3 = 14; // (14 = 100 mA limit)
-					Si115xParamSet(PARAM_LED3_A, hrm_agc_led_current[hrm_agc_led_current_idx3]);
-					
-#endif	
-#if 0
-					/// LED Current Control (AGC). 
-					//  chan1 = 2.6k(OPEN), 8.2k(OD29), 16.2k(OF29)   		
-					//  chan2 = 500(OPEN), 16.3k(OD29), 21.4k(OF29)
-					if( (hrm_chan1_fbs < 10000) && (hrm_agc_led_current_idx1 > 15)) // limit to 100mA
-					{
-						hrm_agc_led_current_idx1--;
-						Si115xParamSet(PARAM_LED1_A, hrm_agc_led_current[hrm_agc_led_current_idx1]);
-						//Si115xParamSet(PARAM_LED1_B, hrm_agc_led_current[hrm_agc_led_current_idx]);
-					}
-					
-					if( (hrm_chan1_fbs > 16000) && (hrm_agc_led_current_idx1 < 29)) // limit to 5.5 mA
-					{
-						hrm_agc_led_current_idx1++;
-						Si115xParamSet(PARAM_LED1_A, hrm_agc_led_current[hrm_agc_led_current_idx1]);
-						//Si115xParamSet(PARAM_LED1_B, hrm_agc_led_current[hrm_agc_led_current_idx]);
-					}
-					
-					if( (hrm_chan2_fbs < 10000) && (hrm_agc_led_current_idx3 > 15))
-					{
-						hrm_agc_led_current_idx3--;
-						Si115xParamSet(PARAM_LED3_A, hrm_agc_led_current[hrm_agc_led_current_idx3]);
-						//Si115xParamSet(PARAM_LED1_B, hrm_agc_led_current[hrm_agc_led_current_idx]);
-					}
-					
-					if( (hrm_chan2_fbs > 16000) && (hrm_agc_led_current_idx3 < 29))
-					{
-						hrm_agc_led_current_idx3++;
-						Si115xParamSet(PARAM_LED3_A, hrm_agc_led_current[hrm_agc_led_current_idx3]);
-						//Si115xParamSet(PARAM_LED1_B, hrm_agc_led_current[hrm_agc_led_current_idx]);
-					}
-#endif						
-				}
-				hrm_tx_rdy_cntr = 0;
-				hrm_raw_index++;
-			}
-			
-			/// See if the host wants anything.
-			hrm_read_cmd(); 
+		if( m_nus.conn_handle != BLE_CONN_HANDLE_INVALID )
+		{
+			//Take HRM readings to pass back to client
+			hrm_loop();
 		}
-		///else    if(!hrm_stitch_flag)
-			hrm_tx_rdy_cntr++;	
-	}
-	nrf_drv_wdt_channel_feed( m_wdt_channel_id );
+	
+		nrf_drv_wdt_channel_feed( m_wdt_channel_id );
 	}//end forever loop
 }//end main
 

@@ -84,7 +84,7 @@ void led_init( bool debug, app_timer_id_t p_timer )
 	
 	local_led_timer_id = p_timer;
 
-	app_trace_puts(DEBUG_LOW, "led_init: hw start\r");
+	app_trace_puts(DEBUG_LOW, "led_init: hw start\r\n");
 
 	// setup output pins so LEDS are Off
 	nrf_gpio_cfg_output(LED_ON);
@@ -112,7 +112,7 @@ void led_init( bool debug, app_timer_id_t p_timer )
 
 	led_initialied = true;
 
-	app_trace_puts(DEBUG_LOW, "led_init: done\r");
+	app_trace_puts(DEBUG_LOW, "led_init: done\r\n");
 }
 
 void led_uninit( void )
@@ -147,14 +147,14 @@ void led_flash_timer_handler(void * p_context)
 		if ( led_setting[pri_lvl].off_time == -1)
 		{
 			// -1 for off time overrides on times and sets leds off
-			app_trace_puts(DEBUG_LOW, "led_flash_timer_handler: stay off\r");
+			app_trace_puts(DEBUG_LOW, "led_flash_timer_handler: stay off\r\n");
 			nrf_gpio_pin_clear(LED_ON);
 			led_stop_flash_timer();
 		}
 		else if ( led_setting[pri_lvl].on_time == -1 )
 		{
 			// -1 for on times sets leds on
-			app_trace_puts(DEBUG_LOW, "led_flash_timer_handler: stay on\r");
+			app_trace_puts(DEBUG_LOW, "led_flash_timer_handler: stay on\r\n");
 			nrf_gpio_pin_set(LED_ON);
 			led_control();
 			led_stop_flash_timer();
@@ -164,7 +164,7 @@ void led_flash_timer_handler(void * p_context)
 	{
 		if ( g_on != 0 )
 		{
-			//app_trace_puts(DEBUG_LOW, "led_flash_timer_handler: on\r");
+			//app_trace_puts(DEBUG_LOW, "led_flash_timer_handler: on\r\n");
 			led_control();
 			nrf_gpio_pin_set(LED_ON);
 			
@@ -175,7 +175,7 @@ void led_flash_timer_handler(void * p_context)
 		}
 		else if ( g_off != 0)
 		{
-			//app_trace_puts(DEBUG_LOW, "led_flash_timer_handler: off\r");
+			//app_trace_puts(DEBUG_LOW, "led_flash_timer_handler: off\r\n");
 			nrf_gpio_pin_clear(LED_ON);
 			
 			if( --g_off <= 0 )
@@ -285,12 +285,12 @@ static bool led_start_flash_timer( void )
 		err_code = app_timer_start( local_led_timer_id, LED_FLASH_INTERVAL, NULL );
 		if( err_code != NRF_SUCCESS ) 
 		{	//Timer failed to start
-			app_trace_log(DEBUG_HIGH, "[LED_TMR] Start Failed @%01u\r\r", getSystemTimeMs());
+			app_trace_log(DEBUG_HIGH, "[LED_TMR] Start Failed @%01u\r\r\n", getSystemTimeMs());
 			return false;
 		}
 		else
 		{
-			app_trace_puts(DEBUG_LOW, "[LED_TMR] On\r");
+			app_trace_puts(DEBUG_LOW, "[LED_TMR] On\r\n");
 		}
 	}
 
@@ -306,12 +306,12 @@ static bool led_stop_flash_timer( void )
 		err_code = app_timer_stop( local_led_timer_id );
 		if( err_code != NRF_SUCCESS ) 
 		{	//Timer failed to stop
-			app_trace_log(DEBUG_HIGH, "[LED_TMR] Stop Failed @%01u\r\r", getSystemTimeMs());
+			app_trace_log(DEBUG_HIGH, "[LED_TMR] Stop Failed @%01u\r\r\n", getSystemTimeMs());
 			return false;
 		}
 		else
 		{
-			app_trace_puts(DEBUG_LOW, "[LED_TMR] Off\r");
+			app_trace_puts(DEBUG_LOW, "[LED_TMR] Off\r\n");
 		}
 	}
 

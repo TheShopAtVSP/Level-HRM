@@ -49,7 +49,7 @@ static ret_code_t bq25120_i2c_read(uint8_t reg_addr, uint8_t len, uint8_t *reply
 	if( res != NRF_SUCCESS ){
 		if( prv_res != res )
 		{
-			app_trace_log(DEBUG_HIGH, "[BQ25120_I2C] Rd Failed: %01d\r", res);
+			app_trace_log(DEBUG_HIGH, "[BQ25120_I2C] Rd Failed: %01d\r\n", res);
 		}
 	}
 	prv_res = res;
@@ -71,7 +71,7 @@ static ret_code_t bq25120_i2c_write(uint8_t reg_addr, uint8_t len, uint8_t *data
 	if( res != NRF_SUCCESS ){
 		if( prv_res != res )
 		{
-			app_trace_log(DEBUG_HIGH, "[BQ25120_I2C] Wr Failed: %01d\r", res);
+			app_trace_log(DEBUG_HIGH, "[BQ25120_I2C] Wr Failed: %01d\r\n", res);
 		}
 	}
 	prv_res = res;
@@ -156,7 +156,7 @@ ret_code_t bq25120_init( void )
 		{
 			app_trace_log(DEBUG_MED, "0x%02X ", reg[i]);
 		}
-		app_trace_puts(DEBUG_MED, "\r");
+		app_trace_puts(DEBUG_MED, "\r\n");
 		
 		//Reset values of Registers: 			0xC1 0x00 0xA8 0x14 0x0E 0x78 0xAA 0x7C 0x68 0x0A 0x00 0x42 
 		//Values Read from Jason v1.04:			B: 0xC1 0x03 0xA7 0x26 0xA6 0xF4 0xD6 0x7D 0x60 0x1F 0x44 0x82 
@@ -173,16 +173,16 @@ ret_code_t bq25120_init( void )
 		{
 			app_trace_log(DEBUG_MED, "0x%02X ", reg[i]);
 		}
-		app_trace_puts(DEBUG_MED, "\r");
+		app_trace_puts(DEBUG_MED, "\r\n");
 	#endif
 	
 	if( res == NRF_SUCCESS ) 
 	{
-		app_trace_puts(DEBUG_MED, "[BQ25120_INIT] complete\r");
+		app_trace_puts(DEBUG_MED, "[BQ25120_INIT] complete\r\n");
 	}
 	else 
 	{
-		app_trace_log(DEBUG_HIGH, "[BQ25120_INIT] Failed: %01d\r", res);
+		app_trace_log(DEBUG_HIGH, "[BQ25120_INIT] Failed: %01d\r\n", res);
 	}
 	
 	//Enable Charging:
@@ -281,7 +281,7 @@ T_BQ25120_STATUS bq25120_read_status( void )
 	err = bq25120_i2c_read( bq25120_STATUS_SHIPMODE_ADDR, len, reg );
 	if( err != NRF_SUCCESS )
 	{	//Try again
-		app_trace_puts(DEBUG_MED, "[BQ25120] Re-read\r");
+		app_trace_puts(DEBUG_MED, "[BQ25120] Re-read\r\n");
 		
 		//Force I2C wakeup condition:
 		nrf_gpio_pin_clear(CD_OUT_PIN);
@@ -304,10 +304,10 @@ T_BQ25120_STATUS bq25120_read_status( void )
 		{	//fault was not cleared by previous read, more drastic measures needed:
 			if( retries < 3 )
 			{
-				app_trace_log(DEBUG_MED, "[BQ25120] %sRe-Init Registers%s @%01u\r", FG_RED, FG_RESET, getSystemTimeMs());
+				app_trace_log(DEBUG_MED, "[BQ25120] %sRe-Init Registers%s @%01u\r\n", FG_RED, FG_RESET, getSystemTimeMs());
 				if( bq2510_reg_defaults() != NRF_SUCCESS )
 				{
-					app_trace_puts(DEBUG_MED, "[BQ25120] Re-Init Failed\r");
+					app_trace_puts(DEBUG_MED, "[BQ25120] Re-Init Failed\r\n");
 				}
 			}
 			retries = (retries+1)%30;	//As long as fault remains unchanged, retry re-initializing the part every 30th pass (=30 seconds)
@@ -397,7 +397,7 @@ T_BQ25120_STATUS bq25120_read_status( void )
 		{
 			app_trace_log(DEBUG_MED, "0x%02X ", reg[i]);
 		}
-		app_trace_log(DEBUG_MED, "@%01u\r", getSystemTimeMs());
+		app_trace_log(DEBUG_MED, "@%01u\r\n", getSystemTimeMs());
 	}
 	
 	//Debug the possible situation where we are not Charging and/or indicating Charging when we should be:
@@ -406,7 +406,7 @@ T_BQ25120_STATUS bq25120_read_status( void )
 		//This condition is expected when charging has been disabled
 		if( !disable_charge )
 		{	
-			app_trace_log(DEBUG_MED, "[BQ25120] %sChr_Present Mismatch!!!%s\r", FG_GREEN, FG_RESET );
+			app_trace_log(DEBUG_MED, "[BQ25120] %sChr_Present Mismatch!!!%s\r\n", FG_GREEN, FG_RESET );
 		}
 	}
 

@@ -92,7 +92,7 @@ ret_code_t hal_init_non_volatile_mem( bool debug )
 			
 	if( ret != NRF_SUCCESS) 
 	{		
-		app_trace_log(DEBUG_HIGH, "[INIT_NVM] Failed, Config Invalid!\r");	
+		app_trace_log(DEBUG_HIGH, "[INIT_NVM] Failed, Config Invalid!\r\n");	
 	}
 	else {
 		//Config was loaded by init_flash(). Run a sanity check on the data
@@ -156,12 +156,12 @@ bool hal_store_data( uint8_t * data, uint16_t len, uint16_t head_inc, uint16_t t
 	//check for possible errors!
 	if( pointers_good == false ) 
 	{
-		app_trace_log(DEBUG_MED, "[PUSH] Pointers Not Initialized!\r");
+		app_trace_log(DEBUG_MED, "[PUSH] Pointers Not Initialized!\r\n");
 		return false;	//record is bigger than memory, can't save this...
 	}
 	else if( write_len > remain_log_space )
 	{	//Not enough space left to write this much data. Need to erase some pages so this will fit
-		app_trace_log(DEBUG_HIGH, "[PUSH] Insufficient Mem: Ad:0x%04X 0x%02X<0x%02X\r", log_region.head_offset, remain_log_space, write_len);
+		app_trace_log(DEBUG_HIGH, "[PUSH] Insufficient Mem: Ad:0x%04X 0x%02X<0x%02X\r\n", log_region.head_offset, remain_log_space, write_len);
 		while( write_len > remain_log_space )
 		{	//discard as many pages as needed to ensure 
 			hal_discard_tail_page();	//tracks records that are being thrown out and then erases the page
@@ -176,7 +176,7 @@ bool hal_store_data( uint8_t * data, uint16_t len, uint16_t head_inc, uint16_t t
 			int i=0;
 			bool error = false;
 			uint8_t read_copy[ REC_MAX_MEM ];
-			app_trace_log(DEBUG_MED, "[PUSH] Save Error: 0x%04X\r", log_region.head_offset+log_region.start);
+			app_trace_log(DEBUG_MED, "[PUSH] Save Error: 0x%04X\r\n", log_region.head_offset+log_region.start);
 			
 			//Read back memory to find where Error Starts:
 			copy_nvm( read_copy, write_len, log_region.head_offset );
@@ -184,7 +184,7 @@ bool hal_store_data( uint8_t * data, uint16_t len, uint16_t head_inc, uint16_t t
 			{
 				if( read_copy[i] != data[i] )
 				{	//there is a write error
-					app_trace_log(DEBUG_HIGH, "[PUSH] Error AD:0x%04X %02X != %02X\r", (log_region.start+log_region.head_offset+i), read_copy[i], data[i] );
+					app_trace_log(DEBUG_HIGH, "[PUSH] Error AD:0x%04X %02X != %02X\r\n", (log_region.start+log_region.head_offset+i), read_copy[i], data[i] );
 					
 					//erase the problem section (need to make sure all preambles are eradicated):
 					memset( read_copy, 0xFF, write_len);
@@ -199,7 +199,7 @@ bool hal_store_data( uint8_t * data, uint16_t len, uint16_t head_inc, uint16_t t
 			
 			if( error == false )
 			{	//data check indicates NVM wrote correctly... proceed
-				app_trace_log(DEBUG_MED, "[PUSH] No Error Found\r");
+				app_trace_log(DEBUG_MED, "[PUSH] No Error Found\r\n");
 				res = NRF_SUCCESS;
 			}
 			else if( ++retry >= 3 )
@@ -215,7 +215,7 @@ bool hal_store_data( uint8_t * data, uint16_t len, uint16_t head_inc, uint16_t t
 	update_tail( tail_inc );
 	
 	//Successfully updated. Print new Head
-	app_trace_log(DEBUG_MED, "[PUSH] OF:0x%04X @%01u\r", log_region.head_offset, getSystemTimeMs());
+	app_trace_log(DEBUG_MED, "[PUSH] OF:0x%04X @%01u\r\n", log_region.head_offset, getSystemTimeMs());
 	
 	return true;
 }
@@ -229,13 +229,13 @@ static ret_code_t update_log( uint8_t * data, uint16_t save_len, uint32_t flash_
 	
 	if( flash_offset > TOTAL_LOG_LEN )
 	{	//Offset beyond Memory Region
-		app_trace_log(DEBUG_HIGH, "[UPDATE] Illegal OF: 0x%04X\r", flash_offset);
+		app_trace_log(DEBUG_HIGH, "[UPDATE] Illegal OF: 0x%04X\r\n", flash_offset);
 		return NRF_ERROR_INVALID_ADDR;	
 	}
 	
 	if(nvm_debug) 
 	{
-		app_trace_log(DEBUG_MED, "[UPDATE] OF:0x%04X LN:0x%02X @%01u\r", flash_offset, i_save_len, getSystemTimeMs());
+		app_trace_log(DEBUG_MED, "[UPDATE] OF:0x%04X LN:0x%02X @%01u\r\n", flash_offset, i_save_len, getSystemTimeMs());
 	}
 
 	// when trying to save across a memory page boundary, the memory object must be broken up so the calls can be 
@@ -248,7 +248,7 @@ static ret_code_t update_log( uint8_t * data, uint16_t save_len, uint32_t flash_
 		
 		if( i_save_len > (PAGE_LEN_BYTES - offset_into_page) ) 
 		{	//More Data than can fit on the remainder of this page. Need to break up the save calls
-			//if (gs_bdebug) app_trace_log(DEBUG_LOW, "mem_update: Crossing Page Boundary\r");		
+			//if (gs_bdebug) app_trace_log(DEBUG_LOW, "mem_update: Crossing Page Boundary\r\n");		
 			page_update_len = PAGE_LEN_BYTES - offset_into_page;
 		}
 		else 
@@ -274,7 +274,7 @@ static ret_code_t update_log( uint8_t * data, uint16_t save_len, uint32_t flash_
 			{	//flash bits are cleared that must be set again via an Erase operation
 				if(nvm_debug) 
 				{
-					app_trace_log(DEBUG_MED, "[UPDATE] Erase OF:0x%04X Old:0x%02X New:0x%02X\r", (page_start+offset_into_page+i), copy_page[i], data[i] );
+					app_trace_log(DEBUG_MED, "[UPDATE] Erase OF:0x%04X Old:0x%02X New:0x%02X\r\n", (page_start+offset_into_page+i), copy_page[i], data[i] );
 				}
 				
 				#if defined( MEM_EXTERNAL )
@@ -285,7 +285,7 @@ static ret_code_t update_log( uint8_t * data, uint16_t save_len, uint32_t flash_
 				
 				if(retval != NRF_SUCCESS) 
 				{
-					app_trace_log(DEBUG_MED, "[UPDATE] Failed Erase OF:0x%04X 0x%02X\r", page_start, retval);
+					app_trace_log(DEBUG_MED, "[UPDATE] Failed Erase OF:0x%04X 0x%02X\r\n", page_start, retval);
 					//Proceed for now
 				}
 			
@@ -310,12 +310,12 @@ static ret_code_t update_log( uint8_t * data, uint16_t save_len, uint32_t flash_
 			#endif
 			if(retval != NRF_SUCCESS) 
 			{		
-				app_trace_log(DEBUG_MED, "[UPDATE] Possible Failure %u, AD:%04X LN:%02X\r", retval, log_region.start+mem_offset, wr_len);
+				app_trace_log(DEBUG_MED, "[UPDATE] Possible Failure %u, AD:%04X LN:%02X\r\n", retval, log_region.start+mem_offset, wr_len);
 				//read back the data that was just supposed to have been written
 				copy_nvm( copy_page, wr_len, mem_offset );	
 				if( memcmp( copy_page, p_data, wr_len ) != 0 )
 				{	//NVM data did not write correctly
-					app_trace_log(DEBUG_MED, "[UPDATE] Write Failed\r");
+					app_trace_log(DEBUG_MED, "[UPDATE] Write Failed\r\n");
 					break;	//save has failed, abort while() loop and return error
 				}
 				retval = NRF_SUCCESS;		//No error found in Write Data, continue
@@ -344,7 +344,7 @@ bool hal_retrieve_rec(T_RECORD *rec)
 	if( saved_log_len < REC_MIN_LEN ) 
 	{
 		//nothing in memory log to pull out
-		app_trace_log(DEBUG_MED, "[POP] Not Enough Mem: %01u\r", saved_log_len);
+		app_trace_log(DEBUG_MED, "[POP] Not Enough Mem: %01u\r\n", saved_log_len);
 		return false;	
 	}
 
@@ -372,12 +372,12 @@ bool hal_retrieve_rec(T_RECORD *rec)
 					//them til we reach a New Record or the head
 					if( rec_hd.hdr.rec_len > REC_MAX_LEN )
 					{
-						app_trace_log(DEBUG_MED, "[POP] Tail Record invalid\r");
+						app_trace_log(DEBUG_MED, "[POP] Tail Record invalid\r\n");
 						tail_inc = WORD_SIZE;
 					}
 					else
 					{
-						if(nvm_debug) app_trace_log( DEBUG_MED, "[POP] Old NV Rec @ 0x%04X\r", log_region.tail_offset );
+						if(nvm_debug) app_trace_log( DEBUG_MED, "[POP] Old NV Rec @ 0x%04X\r\n", log_region.tail_offset );
 						tail_inc = force_word_aligned(rec_hd.hdr.rec_len + REC_PREAMBLE_LEN);
 					}
 						
@@ -401,13 +401,13 @@ bool hal_retrieve_rec(T_RECORD *rec)
 						}
 					}
 					
-					app_trace_log(DEBUG_MED, "[POP] Hunt Rec @ 0x%04X, 0x%02X, %01d\r", log_region.tail_offset, tail_inc, saved_log_len);
+					app_trace_log(DEBUG_MED, "[POP] Hunt Rec @ 0x%04X, 0x%02X, %01d\r\n", log_region.tail_offset, tail_inc, saved_log_len);
 				}
 			}
 		}
 		else 
 		{	//file isn't long enough to hold a valid record...
-			app_trace_log(DEBUG_MED, "[POP] Rec too Short\r");
+			app_trace_log(DEBUG_MED, "[POP] Rec too Short\r\n");
 			return false;
 		}
 	} while ( rec_hd.preamble != NEW_REC_PREAMBLE );	
@@ -416,7 +416,7 @@ bool hal_retrieve_rec(T_RECORD *rec)
 	if(	(rec_hd.hdr.rec_len < REC_MIN_LEN) || (rec_hd.hdr.rec_len > REC_MAX_LEN) ||
 		((rec_hd.hdr.rec_len+REC_PREAMBLE_LEN) > saved_log_len) ) 
 	{
-		app_trace_log(DEBUG_MED, "[POP] Rec Length Error: %01u, %01u\r", rec_hd.hdr.rec_len, saved_log_len);
+		app_trace_log(DEBUG_MED, "[POP] Rec Length Error: %01u, %01u\r\n", rec_hd.hdr.rec_len, saved_log_len);
 		
 		//Update Tail Offset by 1 Word to move passed this erroneous "LOG:"
 		update_tail( WORD_SIZE );	
@@ -432,7 +432,7 @@ bool hal_retrieve_rec(T_RECORD *rec)
 	ret = copy_nvm( (uint8_t *) rec, rec_hd.hdr.rec_len+REC_PREAMBLE_LEN, log_region.tail_offset );
 	if( ret != NRF_SUCCESS )
 	{
-		app_trace_log(DEBUG_MED, "[POP] Tail Failed: @0x%04X Er:%01u\r", log_region.tail_offset, ret);
+		app_trace_log(DEBUG_MED, "[POP] Tail Failed: @0x%04X Er:%01u\r\n", log_region.tail_offset, ret);
 		
 		//Update Tail Offset by 1 Word to move passed this erroneous "LOG:"
 		update_tail( WORD_SIZE );	
@@ -442,7 +442,7 @@ bool hal_retrieve_rec(T_RECORD *rec)
 	{	//Copy was good}
 		if( nvm_debug ) 
 		{
-			app_trace_log(DEBUG_MED, "[POP] ID:%01u RP:%01u TS:0x%02X LN:0x%03X OF:0x%04X @%01u\r", rec->hdr.id, rec->hdr.report_inst, rec->hdr.time, rec->hdr.rec_len, log_region.tail_offset, getSystemTimeMs());
+			app_trace_log(DEBUG_MED, "[POP] ID:%01u RP:%01u TS:0x%02X LN:0x%03X OF:0x%04X @%01u\r\n", rec->hdr.id, rec->hdr.report_inst, rec->hdr.time, rec->hdr.rec_len, log_region.tail_offset, getSystemTimeMs());
 		}
 	}
 	
@@ -466,12 +466,12 @@ ret_code_t hal_mark_rec_sent( uint16_t rec_id )
 		{
 			if( rec_hd.hdr.rec_len > REC_MAX_LEN )
 			{
-				if(nvm_debug) app_trace_log(DEBUG_MED, "[MARK] Tail Record invalid\r");
+				if(nvm_debug) app_trace_log(DEBUG_MED, "[MARK] Tail Record invalid\r\n");
 				log_size = update_tail( WORD_SIZE );
 			}
 			else
 			{
-				if(nvm_debug) app_trace_log(DEBUG_MED, "[MARK] Tail already Marked\r");
+				if(nvm_debug) app_trace_log(DEBUG_MED, "[MARK] Tail already Marked\r\n");
 				log_size = update_tail( (rec_hd.hdr.rec_len+REC_PREAMBLE_LEN) );
 			}
 			
@@ -480,7 +480,7 @@ ret_code_t hal_mark_rec_sent( uint16_t rec_id )
 		}
 		else if( rec_hd.preamble != NEW_REC_PREAMBLE )
 		{
-			app_trace_log(DEBUG_MED, "[MARK] Tail does Not point to Record\r");
+			app_trace_log(DEBUG_MED, "[MARK] Tail does Not point to Record\r\n");
 			log_size = update_tail( WORD_SIZE );
 		}
 	}
@@ -492,7 +492,7 @@ ret_code_t hal_mark_rec_sent( uint16_t rec_id )
 		
 		if( rec_id != rec_hd.hdr.id ) 
 		{	//Inform User of a Mismatch
-			app_trace_log(DEBUG_MED, "[MARK] Record ID Mismatch: 0x%04X != 0x%04X\r", rec_id, rec_hd.hdr.id);
+			app_trace_log(DEBUG_MED, "[MARK] Record ID Mismatch: 0x%04X != 0x%04X\r\n", rec_id, rec_hd.hdr.id);
 		}
 		
 		//Change preamble to indicate record as sent		
@@ -503,7 +503,7 @@ ret_code_t hal_mark_rec_sent( uint16_t rec_id )
 			{		
 				if( rec_hd.hdr.rec_len > REC_MAX_LEN )
 				{
-					app_trace_log(DEBUG_MED, "[MARK] Rec Len Err: 0x%02X\r", rec_hd.hdr.rec_len);
+					app_trace_log(DEBUG_MED, "[MARK] Rec Len Err: 0x%02X\r\n", rec_hd.hdr.rec_len);
 					update_tail( WORD_SIZE );
 				}
 				else
@@ -513,7 +513,7 @@ ret_code_t hal_mark_rec_sent( uint16_t rec_id )
 			}
 			else 
 			{
-				app_trace_log(DEBUG_MED, "[MARK] Save Failed\r");
+				app_trace_log(DEBUG_MED, "[MARK] Save Failed\r\n");
 			}
 		} while( res != NRF_SUCCESS && retry++ < 3 );
 	}
@@ -527,7 +527,7 @@ void hal_erase_tail_block( void )
 	uint32_t block_remainder = get_block_remainder( log_region.tail_offset );
 	uint32_t update_len = (ERASE_BLOCK_LEN - block_remainder);
 	
-	if(nvm_debug) app_trace_log(DEBUG_MED, "[DELETE] Log Block: 0x%04X\r", tail_block_offset);
+	if(nvm_debug) app_trace_log(DEBUG_MED, "[DELETE] Log Block: 0x%04X\r\n", tail_block_offset);
 	
 	#if defined( MEM_EXTERNAL )
 		ext_clear_log_block( tail_block_offset );
@@ -550,7 +550,7 @@ uint32_t hal_discard_tail_page( void )
 	uint32_t tail_page_offset = get_page_start_offset( log_region.tail_offset );
 	uint32_t dis_page_offset = tail_page_offset;
 	
-	if(nvm_debug) app_trace_log(DEBUG_MED, "[DISCARD] Clear Record Page:\r");
+	if(nvm_debug) app_trace_log(DEBUG_MED, "[DISCARD] Clear Record Page:\r\n");
 	
 	do 
 	{	//Continue pulling records until we're onto the next memory page.		
@@ -562,7 +562,7 @@ uint32_t hal_discard_tail_page( void )
 		{
 			if( lost_rec.hdr.rec_len > REC_MAX_LEN )
 			{
-				app_trace_log(DEBUG_MED, "[DISCARD] Rec Len Err: 0x%02X\r", lost_rec.hdr.rec_len);
+				app_trace_log(DEBUG_MED, "[DISCARD] Rec Len Err: 0x%02X\r\n", lost_rec.hdr.rec_len);
 				update_tail( WORD_SIZE );
 			}
 			else
@@ -585,7 +585,7 @@ uint32_t hal_discard_tail_page( void )
 		clear_log_page_i( dis_page_offset );
 	#endif
 
-	if(nvm_debug) app_trace_log(DEBUG_MED, "[DISCARD] %01u Records Discarded\r", discard_count);
+	if(nvm_debug) app_trace_log(DEBUG_MED, "[DISCARD] %01u Records Discarded\r\n", discard_count);
 	
 	return discard_count;
 }
@@ -604,12 +604,12 @@ static uint32_t update_tail( uint32_t tail_inc )
 	tail_inc = force_word_aligned( tail_inc );
 	if( tail_inc > saved_len ) 
 	{
-		app_trace_log(DEBUG_HIGH, "[TAIL_UPDATE] INC LEN ERR: %01u > %01u\r", tail_inc, saved_len);
+		app_trace_log(DEBUG_HIGH, "[TAIL_UPDATE] INC LEN ERR: %01u > %01u\r\n", tail_inc, saved_len);
 		tail_inc = saved_len;
 	}
 	else
 	{
-		if(nvm_debug) app_trace_log(DEBUG_LOW, "[TAIL_UPDATE] 0x%04X+0x%02X\r", log_region.tail_offset, tail_inc);
+		if(nvm_debug) app_trace_log(DEBUG_LOW, "[TAIL_UPDATE] 0x%04X+0x%02X\r\n", log_region.tail_offset, tail_inc);
 	}
 	
 	//Update log tail:
@@ -627,7 +627,7 @@ static uint32_t update_head( uint32_t head_inc )
 	head_inc = force_word_aligned( head_inc );
 	if( head_inc > unsaved_len ) 
 	{
-		app_trace_log(DEBUG_HIGH, "[HEAD_UPDATE] INC LEN ERR: %01u > %01u\r", head_inc, unsaved_len);
+		app_trace_log(DEBUG_HIGH, "[HEAD_UPDATE] INC LEN ERR: %01u > %01u\r\n", head_inc, unsaved_len);
 		head_inc = 0;
 	}
 	
@@ -665,7 +665,7 @@ static uint32_t calc_log_len( uint32_t head_offset, uint32_t tail_offset )
 {
 	if( head_offset >= TOTAL_LOG_LEN || tail_offset >= TOTAL_LOG_LEN )
 	{
-		app_trace_log( DEBUG_HIGH, "[LOG_LEN] Offset Out of Bounds: H:0x%04X, T:0x%04X\r", head_offset, tail_offset );
+		app_trace_log( DEBUG_HIGH, "[LOG_LEN] Offset Out of Bounds: H:0x%04X, T:0x%04X\r\n", head_offset, tail_offset );
 		return 0;
 	}
 	
@@ -711,13 +711,13 @@ uint16_t hal_log_memory_check( void )
 	//Make sure the head and tail are valid. They must be word aligned
 	log_region.head_offset = force_word_aligned( g_config.log_head_offset );
 	if( log_region.head_offset >= TOTAL_LOG_LEN ) {
-		app_trace_log(DEBUG_MED, "[MEM_CHECK] Head Offset Err 0x%04X\r", log_region.head_offset);
+		app_trace_log(DEBUG_MED, "[MEM_CHECK] Head Offset Err 0x%04X\r\n", log_region.head_offset);
 		log_region.head_offset = 0;
 	}
 	log_region.tail_offset = force_word_aligned( g_config.log_tail_offset );
 	if( log_region.tail_offset >= TOTAL_LOG_LEN ) {
 		//offset is invalid, set it equal to head_offset
-		app_trace_log(DEBUG_MED, "[MEM_CHECK] Tail Offset Err 0x%04X\r", log_region.tail_offset);
+		app_trace_log(DEBUG_MED, "[MEM_CHECK] Tail Offset Err 0x%04X\r\n", log_region.tail_offset);
 		log_region.tail_offset = log_region.head_offset;
 	}
 	
@@ -818,7 +818,7 @@ uint16_t hal_log_memory_check( void )
 						
 						update_log( (uint8_t *) &rec_seed, REC_FOOTER_LEN, recent.offset );
 						
-						app_trace_log(DEBUG_MED, "[MEM_CHECK] Seeded 0x%04X\r", (recent.offset+log_region.start));
+						app_trace_log(DEBUG_MED, "[MEM_CHECK] Seeded 0x%04X\r\n", (recent.offset+log_region.start));
 					}
 					search_state = COMPLETE;	//stop looking for Head of Records, no more exist...
 				}
@@ -848,7 +848,7 @@ uint16_t hal_log_memory_check( void )
 							uint32_t next_offset;
 							T_REC_START next_rec;
 							
-							if(nvm_debug) app_trace_log(DEBUG_MED, "[MEM_CHECK] ID Sequence Start @ 0x%04X\r", log_region.start+offset_copy);
+							if(nvm_debug) app_trace_log(DEBUG_MED, "[MEM_CHECK] ID Sequence Start @ 0x%04X\r\n", log_region.start+offset_copy);
 							
 							//move pointer forward by Record Length + Preamble Length
 							inc_temp_ptr = force_word_aligned( temp_rec->hdr.rec_len + REC_PREAMBLE_LEN );	
@@ -863,13 +863,13 @@ uint16_t hal_log_memory_check( void )
 
 							if( next_rec.hdr.id == temp_rec->hdr.id+1 ) 
 							{
-								if(nvm_debug) app_trace_log(DEBUG_MED, "Verified\r");
+								if(nvm_debug) app_trace_log(DEBUG_MED, "Verified\r\n");
 								head_id = temp_rec->hdr.id;		//head of current Record is valid
 							}	
 							else 
 							{
 								//Doesn't fit Sequence, will likely be skipped
-								app_trace_log(DEBUG_MED, "Anomaly\r", log_region.start+offset_copy);
+								app_trace_log(DEBUG_MED, "Anomaly\r\n", log_region.start+offset_copy);
 							}
 						}
 						else
@@ -882,10 +882,10 @@ uint16_t hal_log_memory_check( void )
 				inc_temp_ptr = WORD_SIZE;	//increment temp_ptr by 1 word, unless changed below
 				if( temp_rec->preamble == OLD_REC_PREAMBLE ) 
 				{	//"HOG:"
-					if(nvm_debug) app_trace_log(DEBUG_LOW, "[MEM_CHECK] hog @ 0x%04X\r", log_region.start+offset_copy);
+					if(nvm_debug) app_trace_log(DEBUG_LOW, "[MEM_CHECK] hog @ 0x%04X\r\n", log_region.start+offset_copy);
 					if( temp_rec->hdr.id == head_id ) 
 					{
-						//if (gs_bdebug) app_trace_log(DEBUG_LOW, "HOG\r");
+						//if (gs_bdebug) app_trace_log(DEBUG_LOW, "HOG\r\n");
 						recent.offset = offset_copy;	//new Record header
 						memcpy( (uint8_t *) &recent.rec, &nvm_copy[offset_copy&NVM_COPY_SECTION_OFFSET_MASK], REC_START_LEN );
 						if( (temp_rec->hdr.rec_len <= REC_MAX_LEN && temp_rec->hdr.rec_len >= REC_MIN_LEN) ) 
@@ -896,12 +896,12 @@ uint16_t hal_log_memory_check( void )
 					else 
 					{
 						//Random "HOG:" written into Memory?
-						app_trace_log(DEBUG_MED, "[MEM_CHECK] hog Skipped\r");
+						app_trace_log(DEBUG_MED, "[MEM_CHECK] hog Skipped\r\n");
 					}
 				}
 				else if( temp_rec->preamble == NEW_REC_PREAMBLE ) 
 				{	//"LOG:"
-					if(nvm_debug) app_trace_log(DEBUG_LOW, "[MEM_CHECK] log @ 0x%04X\r", log_region.start+offset_copy);
+					if(nvm_debug) app_trace_log(DEBUG_LOW, "[MEM_CHECK] log @ 0x%04X\r\n", log_region.start+offset_copy);
 					if( temp_rec->hdr.rec_len == 0x0FFF ) 
 					{	//The length is Perfectly unwritten. This is the Head of the Log!!!
 						//report instance and time should also be completely unwritten. Could check to be extra certain???
@@ -921,18 +921,18 @@ uint16_t hal_log_memory_check( void )
 						}
 						else 
 						{
-							app_trace_log(DEBUG_MED, "[MEM_CHECK] Invalid Rec Length\r");
+							app_trace_log(DEBUG_MED, "[MEM_CHECK] Invalid Rec Length\r\n");
 						}
 					}
 					else 
 					{
 						//Random "LOG:" written into Memory?
-						app_trace_log(DEBUG_MED, "[MEM_CHECK] log Skipped\r");
+						app_trace_log(DEBUG_MED, "[MEM_CHECK] log Skipped\r\n");
 					}
 				}	
 				else 
 				{
-					app_trace_log(DEBUG_MED, "[MEM_CHECK] ?\r");
+					app_trace_log(DEBUG_MED, "[MEM_CHECK] ?\r\n");
 				}
 			}				
 		} 
@@ -941,7 +941,7 @@ uint16_t hal_log_memory_check( void )
 	
 	//The Head now points to the most recent "LOG:" that was discovered, or seeded.
 	recent.offset = force_word_aligned( recent.offset );	
-	app_trace_log(DEBUG_MED, "[MEM_CHECK] Head: 0x%04X saved ptr, 0x%04X new ptr\r", log_region.head_offset+log_region.start, recent.offset+log_region.start);
+	app_trace_log(DEBUG_MED, "[MEM_CHECK] Head: 0x%04X saved ptr, 0x%04X new ptr\r\n", log_region.head_offset+log_region.start, recent.offset+log_region.start);
 	log_region.head_offset = recent.offset;
 	
 	//Make sure the COpy buffer holds the pag the Head is on
@@ -966,11 +966,11 @@ uint16_t hal_log_memory_check( void )
 
 			if( temp_rec->hdr.rec_len <= REC_MAX_LEN && temp_rec->hdr.report_inst < REP_CNT ) {
 				//add 1 to reporter length
-				//app_trace_log(DEBUG_LOW, "INC\r");
+				//app_trace_log(DEBUG_LOW, "INC\r\n");
 				record_added( temp_rec->hdr.report_inst );	//increase report length
 			}
 			else {
-				//app_trace_log(DEBUG_LOW, "EXC\r");
+				//app_trace_log(DEBUG_LOW, "EXC\r\n");
 			}
 		}
 		else if( temp_rec->preamble == OLD_REC_PREAMBLE ) {
@@ -1003,7 +1003,7 @@ uint16_t hal_log_memory_check( void )
 				
 				if( calc_log_len( log_region.head_offset, offset_copy ) > (TOTAL_LOG_LEN-8) ) {
 					//running out of memory to search
-					if(nvm_debug) app_trace_log(DEBUG_LOW, "[MEM_CHECK] Searched\r");
+					if(nvm_debug) app_trace_log(DEBUG_LOW, "[MEM_CHECK] Searched\r\n");
 					search_state = COMPLETE;
 				}
 				else if( temp_rec->preamble == NEW_REC_PREAMBLE || temp_rec->preamble == OLD_REC_PREAMBLE ) {	//"LOG:" || "HOG:"
@@ -1013,13 +1013,13 @@ uint16_t hal_log_memory_check( void )
 					}
 					else {						
 						//Sequence ID does not match what we expected. Could be a random HOG or LOG saved into memory. Could be an ID Sequence discontinuity...
-						app_trace_log(DEBUG_MED, "[MEM_CHECK] ID Seq Err: 0x%0X != 0x%0X\r", temp_rec->hdr.id, test_id );
+						app_trace_log(DEBUG_MED, "[MEM_CHECK] ID Seq Err: 0x%0X != 0x%0X\r\n", temp_rec->hdr.id, test_id );
 						
 						if( temp_rec->hdr.id == copy_test_id ) {
 							T_REC_START old_rec;
 							
 							//2 ID matches in a row... an ID Sequence discontinuity has occurred
-							app_trace_log(DEBUG_MED, "[MEM_CHECK] ReSequencing\r");
+							app_trace_log(DEBUG_MED, "[MEM_CHECK] ReSequencing\r\n");
 
 							//reload the record header from the start of the discontinuity
 							copy_nvm( (uint8_t *) &old_rec, REC_FOOTER_LEN, copy_offset_copy );
@@ -1034,7 +1034,7 @@ uint16_t hal_log_memory_check( void )
 				}
 				else if( last_tail > CHECK_LEN ) {
 					//haven't seen a Start of Record in too long
-					//if (gs_bdebug) app_trace_log(DEBUG_LOW, "Mem Check: NTF\r");	//No Tail Found
+					//if (gs_bdebug) app_trace_log(DEBUG_LOW, "Mem Check: NTF\r\n");	//No Tail Found
 					search_state = COMPLETE;
 				}
 				else {
@@ -1049,7 +1049,7 @@ uint16_t hal_log_memory_check( void )
 	
 	//The Tail now points to the LAST "LOG:" or the largest "ROG:" that was discovered...
 	recent.offset = force_word_aligned( recent.offset );	
-	app_trace_log(DEBUG_MED, "[MEM_CHECK] Tail: 0x%04X saved ptr, 0x%04X new ptr\r", log_region.tail_offset+log_region.start, recent.offset+log_region.start);
+	app_trace_log(DEBUG_MED, "[MEM_CHECK] Tail: 0x%04X saved ptr, 0x%04X new ptr\r\n", log_region.tail_offset+log_region.start, recent.offset+log_region.start);
 	log_region.tail_offset = recent.offset;
 		
 	//allow other functions to use pointers

@@ -220,7 +220,7 @@ void ble_nus_on_ble_evt(ble_nus_t * p_nus, ble_evt_t * p_ble_evt)
             break;
 
         case BLE_GAP_EVT_DISCONNECTED:
-			app_trace_log(DEBUG_MED, "ble_nus_on_ble_evt BLE_GAP_EVT_DISCONNECTED\r");
+			app_trace_log(DEBUG_MED, "ble_nus_on_ble_evt BLE_GAP_EVT_DISCONNECTED\r\n");
             on_disconnect(p_nus, p_ble_evt);
             break;
 

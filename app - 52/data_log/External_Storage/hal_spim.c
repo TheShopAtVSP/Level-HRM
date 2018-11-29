@@ -45,7 +45,7 @@ ret_code_t hal_spim_init( bool debug )
 	spim_busy = false;
 	spim_debug = debug;
 	
-	if (spim_debug) app_trace_log(DEBUG_LOW, "hal_spim_init: start\r");	
+	if (spim_debug) app_trace_log(DEBUG_LOW, "hal_spim_init: start\r\n");	
 	
 	ret = app_timer_create( &m_SPIM_timer_id, APP_TIMER_MODE_SINGLE_SHOT, spim_timer_handler );
 	APP_ERROR_CHECK(ret);
@@ -54,10 +54,10 @@ ret_code_t hal_spim_init( bool debug )
 	spim_config.frequency = NRF_DRV_SPI_FREQ_8M;
     ret = nrf_drv_spi_init(&spim, &spim_config, spim_handler);
 	if( ret == NRF_SUCCESS) {		
-		if (spim_debug) app_trace_log(DEBUG_LOW, "hal_spim_init: done\r");
+		if (spim_debug) app_trace_log(DEBUG_LOW, "hal_spim_init: done\r\n");
 	}
 	else {
-		if (spim_debug) app_trace_log(DEBUG_HIGH, "spi_master_init: failed\r");	
+		if (spim_debug) app_trace_log(DEBUG_HIGH, "spi_master_init: failed\r\n");	
 	}	
 	return ret;
 }
@@ -75,7 +75,7 @@ void hal_spim_uninit( void )
 //
 static void spim_timer_start( void )
 {
-	if (spim_debug) app_trace_log(DEBUG_LOW, "   [SPIM] Timer On @%01u\r", getSystemTimeMs());
+	if (spim_debug) app_trace_log(DEBUG_LOW, "   [SPIM] Timer On @%01u\r\n", getSystemTimeMs());
 	ret_code_t res = app_timer_start( m_SPIM_timer_id, SPIM_250MS_TO, NULL );	
 	APP_ERROR_CHECK(res);
 }
@@ -85,7 +85,7 @@ static void spim_timer_start( void )
 //
 void spim_timer_stop( void )
 {
-	if (spim_debug) app_trace_log(DEBUG_LOW, "   [SPIM] Timer Off @%01u\r", getSystemTimeMs());
+	if (spim_debug) app_trace_log(DEBUG_LOW, "   [SPIM] Timer Off @%01u\r\n", getSystemTimeMs());
 	ret_code_t res = app_timer_stop( m_SPIM_timer_id );
 	APP_ERROR_CHECK(res);
 }
@@ -96,7 +96,7 @@ void spim_timer_stop( void )
  */
 void spim_timer_handler(void * p_context)
 {
-    if (spim_debug) app_trace_log(DEBUG_MED, "   [SPIM] Time Out @%01u\r", getSystemTimeMs());
+    if (spim_debug) app_trace_log(DEBUG_MED, "   [SPIM] Time Out @%01u\r\n", getSystemTimeMs());
 	
 	//Release lock on spim module
 	spim_busy = false;
@@ -185,11 +185,11 @@ static ret_code_t spim_xfer( void )
     xfer_desc.tx_length   = tx_len;
     xfer_desc.rx_length   = rx_len;
 	
-	//app_trace_log(DEBUG_LOW, "   [SPIM] TL:0x%01X RL:0x%01X\r", xfer_cpy.tx_len, xfer_cpy.rx_len);
+	//app_trace_log(DEBUG_LOW, "   [SPIM] TL:0x%01X RL:0x%01X\r\n", xfer_cpy.tx_len, xfer_cpy.rx_len);
     res = nrf_drv_spi_xfer(&spim, &xfer_desc, 0);
 	if( res != NRF_SUCCESS )
 	{	//XFER failure!
-		app_trace_log(DEBUG_HIGH, "   [SPIM] SPI Err: 0x%04X\r", res);
+		app_trace_log(DEBUG_HIGH, "   [SPIM] SPI Err: 0x%04X\r\n", res);
 		
 		spim_busy = false;
 		
@@ -222,11 +222,11 @@ ret_code_t hal_spim_xfer( T_HAL_SPIM_XFER * data )
 		res = nrf_drv_spi_repair(&spim, &spim_config, spim_handler);
 		if( res == NRF_SUCCESS )
 		{
-			app_trace_log(DEBUG_MED, " CMPLT\r\r\r");
+			app_trace_log(DEBUG_MED, " CMPLT\r\r\r\n");
 		}
 		else
 		{
-			app_trace_log(DEBUG_HIGH, " Failure %01u\r\r\r", res);
+			app_trace_log(DEBUG_HIGH, " Failure %01u\r\r\r\n", res);
 		}
 		
 		// Stall for testing failures
@@ -238,12 +238,12 @@ ret_code_t hal_spim_xfer( T_HAL_SPIM_XFER * data )
 	{
 	   if( (getSystemTimeMs() - last_used_time_ms) > 1000 )
 		{	//spim has not been used in more than 1 second, it should be free
-			app_trace_log(DEBUG_HIGH, "   [SPIM] Lock Time Out\r");
+			app_trace_log(DEBUG_HIGH, "   [SPIM] Lock Time Out\r\n");
 			spim_busy = false;
 		}
 		else
 		{	//spim is potentially still busy
-			app_trace_log(DEBUG_HIGH, "   [SPIM] Locked\r");
+			app_trace_log(DEBUG_HIGH, "   [SPIM] Locked\r\n");
 			return NRF_ERROR_BUSY;
 		}
 	}

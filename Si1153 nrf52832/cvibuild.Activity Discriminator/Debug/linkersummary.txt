@@ -11,7 +11,7 @@ RT Serial Sensor Aqu.obj
 Si1153 Cntrl.obj
 Sig Graph.obj
 cvi.lib
-cvidemoa.bli
+analysis.lib
 cvistart.lib
 kernel32.lib
 user32.lib

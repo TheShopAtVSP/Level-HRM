@@ -10,6 +10,7 @@
 #include "hal_nvm.h"
 #include "int_flash.h"
 #include "nrf_soc.h"
+#include "timing.h"
 
 //Global
 extern T_CONFIG g_config;
@@ -17,7 +18,7 @@ extern uint32_t fw_rev;
 
 //#define INIT_FLASH
 
-#define STORE_TIMEOUT			500						//All store operations will complete within this time
+#define STORE_TIMEOUT_US			(500*1000UL)			//All store operations will complete within this time
 
 static bool flash_debug = false;
 
@@ -69,12 +70,12 @@ static void config_cb_handler(pstorage_handle_t * handle,uint8_t op_code, uint32
 		case PSTORAGE_STORE_OP_CODE:
 			config_cb[STORE_OP_CODE].wait = false;
 			if (result == NRF_SUCCESS) {
-				if (flash_debug) app_trace_log(DEBUG_LOW, "cfg_cb: stored\r");
+				if (flash_debug) app_trace_log(DEBUG_LOW, "cfg_cb: stored\r\n");
 				config_cb[STORE_OP_CODE].success = true;
 				
 			}
 			else {
-				app_trace_log(DEBUG_MED, "cfg_cb: store failed\r");
+				app_trace_log(DEBUG_MED, "cfg_cb: store failed\r\n");
 				config_cb[STORE_OP_CODE].success = false;
 			}
 			// Source memory can now be reused or freed.
@@ -83,11 +84,11 @@ static void config_cb_handler(pstorage_handle_t * handle,uint8_t op_code, uint32
 		case PSTORAGE_LOAD_OP_CODE:
 			config_cb[LOAD_OP_CODE].wait = false;
 			if (result == NRF_SUCCESS) {
-				if (flash_debug) app_trace_log(DEBUG_LOW, "cfg_cb: loaded\r");
+				if (flash_debug) app_trace_log(DEBUG_LOW, "cfg_cb: loaded\r\n");
 				config_cb[LOAD_OP_CODE].success = true;
 			}
 			else {
-				app_trace_log(DEBUG_MED, "cfg_cb: load failed\r");
+				app_trace_log(DEBUG_MED, "cfg_cb: load failed\r\n");
 				config_cb[LOAD_OP_CODE].success = false;
 			}
 			break;
@@ -95,11 +96,11 @@ static void config_cb_handler(pstorage_handle_t * handle,uint8_t op_code, uint32
 		case PSTORAGE_CLEAR_OP_CODE:
 			config_cb[CLEAR_OP_CODE].wait = false;
 			if (result == NRF_SUCCESS) {
-				if (flash_debug) app_trace_log(DEBUG_LOW, "cfg_cb: cleared\r");
+				if (flash_debug) app_trace_log(DEBUG_LOW, "cfg_cb: cleared\r\n");
 				config_cb[CLEAR_OP_CODE].success = true;
 			}
 			else {
-				app_trace_log(DEBUG_MED, "cfg_cb: clear failed\r");
+				app_trace_log(DEBUG_MED, "cfg_cb: clear failed\r\n");
 				config_cb[CLEAR_OP_CODE].success = false;
 			}
 			break;
@@ -107,19 +108,19 @@ static void config_cb_handler(pstorage_handle_t * handle,uint8_t op_code, uint32
 		case PSTORAGE_UPDATE_OP_CODE:
 			config_cb[UPDATE_OP_CODE].wait = false;
 			if (result == NRF_SUCCESS) {
-				if (flash_debug) app_trace_log(DEBUG_LOW, "cfg_cb: updated\r");
+				if (flash_debug) app_trace_log(DEBUG_LOW, "cfg_cb: updated\r\n");
 				config_cb[UPDATE_OP_CODE].success = true;
 				
 			}
 			else {
-				app_trace_log(DEBUG_MED, "cfg_cb: update failed\r");
+				app_trace_log(DEBUG_MED, "cfg_cb: update failed\r\n");
 				config_cb[UPDATE_OP_CODE].success = false;
 			}
 			// Source memory can now be reused or freed.
 			break;
 		
 		default:
-			app_trace_log(DEBUG_MED, "cfg_cb: ?\r");
+			app_trace_log(DEBUG_MED, "cfg_cb: ?\r\n");
 			config_cb[STORE_OP_CODE].wait = false;
 			config_cb[LOAD_OP_CODE].wait = false;
 			config_cb[CLEAR_OP_CODE].wait = false;
@@ -168,17 +169,17 @@ static ret_code_t init_config_region(void)
 	retval = pstorage_register(&param, &config_handle);
 	if ( retval == NRF_SUCCESS ) 
 	{
-		if( flash_debug ) app_trace_log(DEBUG_LOW, "init_cfg_region: Storage Handle: 0x%05X\r", (uint) config_handle.block_id);
+		if( flash_debug ) app_trace_log(DEBUG_LOW, "init_cfg_region: Storage Handle: 0x%05X\r\n", (uint) config_handle.block_id);
 	}
 	else
 	{
-		app_trace_log(DEBUG_HIGH, "init_cfg_region: Storage Handle Failed %01u\r",retval);
+		app_trace_log(DEBUG_HIGH, "init_cfg_region: Storage Handle Failed %01u\r\n",retval);
 		return retval;
 	}
 	
 	if( retval != NRF_SUCCESS )
 	{
-		app_trace_log(DEBUG_MED, "init_cfg_region: Register Failed\r");
+		app_trace_log(DEBUG_MED, "init_cfg_region: Register Failed\r\n");
 	}
 
 	return retval;	
@@ -187,17 +188,17 @@ static ret_code_t init_config_region(void)
 //check for changes to config memory and if any are found, save them
 ret_code_t update_config_i( void )
 {
-	TTASK_TIMER timeout;
+	expire_timer_t timeout;
 	ret_code_t retval = NRF_ERROR_INVALID_STATE;	
 	uint8_t op_code = UPDATE_OP_CODE;
 	
-	start_task_timer( timeout, STORE_TIMEOUT );
+	get_expire_time( STORE_TIMEOUT_US, &timeout );
 
 	uint32_t count;
 	pstorage_access_status_get( &count );
 	if( count >= PSTORAGE_CMD_QUEUE_SIZE ) {
 		//todo: pStore is busy, how to kick start it?
-		app_trace_puts(DEBUG_HIGH, "update_cfg: PSTORE Busy\r");
+		app_trace_puts(DEBUG_HIGH, "update_cfg: PSTORE Busy\r\n");
 		return NRF_ERROR_BUSY;
 	}
 		
@@ -223,7 +224,7 @@ ret_code_t update_config_i( void )
 				//wait until the call back verfies completion
 				while( config_cb[op_code].wait == true ) {
 					sd_app_evt_wait();
-					if( task_time(timeout) ) {
+					if( check_expiration(&timeout) ) {
 						config_cb[op_code].success = false;
 						retval = NRF_ERROR_TIMEOUT; 
 						break;
@@ -231,23 +232,23 @@ ret_code_t update_config_i( void )
 				}
 				
 				if( config_cb[op_code].success != true ) {
-					app_trace_log(DEBUG_HIGH, "update_cfg: fail %01u\r", retval);
+					app_trace_log(DEBUG_HIGH, "update_cfg: fail %01u\r\n", retval);
 				}
 				else {
-					if(flash_debug) app_trace_log(DEBUG_MED, "update_cfg: complete\r");
+					if(flash_debug) app_trace_log(DEBUG_MED, "update_cfg: complete\r\n");
 				}
 			}
 			else {
-				app_trace_log(DEBUG_MED, "update_cfg: failed %01u\r", retval);
+				app_trace_log(DEBUG_MED, "update_cfg: failed %01u\r\n", retval);
 			}
 		}
 		else {
-			if(flash_debug) app_trace_log(DEBUG_LOW, "update_cfg: nothing to save\r");
+			if(flash_debug) app_trace_log(DEBUG_LOW, "update_cfg: nothing to save\r\n");
 			retval = NRF_SUCCESS;	
 		}
 	}
 	else {
-		app_trace_log(DEBUG_HIGH, "update_cfg: Config Not Initialized\r");
+		app_trace_log(DEBUG_HIGH, "update_cfg: Config Not Initialized\r\n");
 		retval = NRF_ERROR_INVALID_STATE;
 	}
 	
@@ -262,11 +263,11 @@ static void log_cb_handler(pstorage_handle_t * handle,uint8_t op_code, uint32_t 
 		case PSTORAGE_STORE_OP_CODE:
 			log_cb[STORE_OP_CODE].wait = false;
 			if (result == NRF_SUCCESS) {
-				//if (flash_debug) app_trace_log(DEBUG_LOW, "log_cb_handler: log stored\r");
+				//if (flash_debug) app_trace_log(DEBUG_LOW, "log_cb_handler: log stored\r\n");
 				log_cb[STORE_OP_CODE].success = true;
 			}
 			else {
-				app_trace_log(DEBUG_MED, "log_cb_handler: store failed\r");
+				app_trace_log(DEBUG_MED, "log_cb_handler: store failed\r\n");
 				log_cb[STORE_OP_CODE].success = false;
 			}
 			// Source memory can now be reused or freed.
@@ -275,11 +276,11 @@ static void log_cb_handler(pstorage_handle_t * handle,uint8_t op_code, uint32_t 
 		case PSTORAGE_LOAD_OP_CODE:
 			log_cb[LOAD_OP_CODE].wait = false;
 			if (result == NRF_SUCCESS) {
-				//if (flash_debug) app_trace_log(DEBUG_LOW, "log_cb_handler: log loaded\r");
+				//if (flash_debug) app_trace_log(DEBUG_LOW, "log_cb_handler: log loaded\r\n");
 				log_cb[LOAD_OP_CODE].success = true;
 			}
 			else {
-				app_trace_log(DEBUG_MED, "log_cb_handler: load failed\r");
+				app_trace_log(DEBUG_MED, "log_cb_handler: load failed\r\n");
 				log_cb[LOAD_OP_CODE].success = false;
 			}
 			break;
@@ -287,11 +288,11 @@ static void log_cb_handler(pstorage_handle_t * handle,uint8_t op_code, uint32_t 
 		case PSTORAGE_CLEAR_OP_CODE:
 			log_cb[CLEAR_OP_CODE].wait = false;
 			if (result == NRF_SUCCESS) {
-				if (flash_debug) app_trace_log(DEBUG_LOW, "log_cb_handler: log cleared\r");
+				if (flash_debug) app_trace_log(DEBUG_LOW, "log_cb_handler: log cleared\r\n");
 				log_cb[CLEAR_OP_CODE].success = true;
 			}
 			else {
-				app_trace_log(DEBUG_MED, "log_cb_handler: update failed\r");
+				app_trace_log(DEBUG_MED, "log_cb_handler: update failed\r\n");
 				log_cb[CLEAR_OP_CODE].success = false;
 			}
 			break;
@@ -299,19 +300,19 @@ static void log_cb_handler(pstorage_handle_t * handle,uint8_t op_code, uint32_t 
 		case PSTORAGE_UPDATE_OP_CODE:
 			log_cb[UPDATE_OP_CODE].wait = false;
 			if (result == NRF_SUCCESS) {
-				//if (gs_bdebug) app_trace_log(DEBUG_LOW, "log_cb_handler: log updated\r");
+				//if (gs_bdebug) app_trace_log(DEBUG_LOW, "log_cb_handler: log updated\r\n");
 				log_cb[UPDATE_OP_CODE].success = true;
 				
 			}
 			else {
-				app_trace_log(DEBUG_MED, "log_cb_handler: update failed\r");
+				app_trace_log(DEBUG_MED, "log_cb_handler: update failed\r\n");
 				log_cb[UPDATE_OP_CODE].success = false;
 			}
 			// Source memory can now be reused or freed.
 			break;
 		
 		default:
-			app_trace_log(DEBUG_MED, "log_cb_handler: ?\r");
+			app_trace_log(DEBUG_MED, "log_cb_handler: ?\r\n");
 			log_cb[STORE_OP_CODE].wait = false;
 			log_cb[LOAD_OP_CODE].wait = false;
 			log_cb[CLEAR_OP_CODE].wait = false;
@@ -327,7 +328,7 @@ static ret_code_t init_log_region( void )
 	
 	// must reserve sizes in word aligned increments
 	if( force_word_aligned(TOTAL_LOG_LEN) != TOTAL_LOG_LEN ) {
-		app_trace_log(DEBUG_HIGH, "Invalid Log Region Size\r");
+		app_trace_log(DEBUG_HIGH, "Invalid Log Region Size\r\n");
 		return NRF_ERROR_INVALID_ADDR;
 	}
 	
@@ -337,10 +338,10 @@ static ret_code_t init_log_region( void )
 	param.cb          = log_cb_handler;
 	retval = pstorage_register(&param, &log_handle);
 	if ( retval == NRF_SUCCESS ) {
-		if( flash_debug ) app_trace_log(DEBUG_LOW, "init_log_region: Storage Handle: 0x%05X\r", (uint)log_handle.block_id);
+		if( flash_debug ) app_trace_log(DEBUG_LOW, "init_log_region: Storage Handle: 0x%05X\r\n", (uint)log_handle.block_id);
 	}
 	else{
-		app_trace_log(DEBUG_HIGH, "init_log_region: Storage Handle Register Failed %01u\r",retval);
+		app_trace_log(DEBUG_HIGH, "init_log_region: Storage Handle Register Failed %01u\r\n",retval);
 		return retval;
 	}
 	
@@ -374,13 +375,13 @@ ret_code_t copy_log_i( uint8_t * data, uint16_t length, uint32_t offset )
 
 ret_code_t clear_log_page_i( uint32_t block_id_offset ) 
 {
-	TTASK_TIMER timeout;
+	expire_timer_t timeout;
 	uint8_t op_code = CLEAR_OP_CODE;
 	ret_code_t retval;
 	pstorage_handle_t temp_log_handle = log_handle;
 	temp_log_handle.block_id += block_id_offset;	//handle to the memory page block that we want to modify
 	
-	start_task_timer( timeout, STORE_TIMEOUT );
+	get_expire_time( STORE_TIMEOUT_US, &timeout );
 	
 	log_cb[op_code].wait = true;
 	retval = pstorage_clear(&temp_log_handle, PAGE_LEN_BYTES);	
@@ -388,8 +389,8 @@ ret_code_t clear_log_page_i( uint32_t block_id_offset )
 		//wait until the call back verfies completion
 		while( log_cb[op_code].wait == true ) {
 			sd_app_evt_wait();
-			if( task_time(timeout) ) {
-				app_trace_log(DEBUG_MED, "clear_log to: %01u, %01u\r", getSystemTimeMs(), timeout.start_time );
+			if( check_expiration(&timeout) ) {
+				app_trace_log(DEBUG_MED, "clear_log to: %01u\r\n", getSystemTimeMs() );
 				log_cb[op_code].success = false;
 				retval = NRF_ERROR_TIMEOUT; 
 				break;
@@ -403,13 +404,13 @@ ret_code_t clear_log_page_i( uint32_t block_id_offset )
 //save changes to a partial page
 ret_code_t store_log_i( uint8_t * data, uint16_t length, uint32_t offset )
 {
-	TTASK_TIMER timeout;
+	expire_timer_t timeout;
 	ret_code_t retval;	
 	pstorage_handle_t temp_log_handle = log_handle;
 	uint8_t op_code = STORE_OP_CODE;
 	uint16_t page_remainder = get_page_remainder( offset );
 	
-	start_task_timer( timeout, STORE_TIMEOUT );
+	get_expire_time( STORE_TIMEOUT_US, &timeout );
 	
 	uint32_t count;
 	pstorage_access_status_get( &count );
@@ -418,7 +419,7 @@ ret_code_t store_log_i( uint8_t * data, uint16_t length, uint32_t offset )
 		//pstorage_init();
 		//init_record();
 		//init_config();	//pStore module to init last (so it will be placed at the last available memory page)
-		app_trace_puts(DEBUG_MED, "store_log: PSTORE Busy\r");
+		app_trace_puts(DEBUG_MED, "store_log: PSTORE Busy\r\n");
 		return NRF_ERROR_BUSY;
 	}
 	
@@ -435,8 +436,8 @@ ret_code_t store_log_i( uint8_t * data, uint16_t length, uint32_t offset )
 		//wait until the call back verfies completion
 		while( log_cb[op_code].wait == true ) {
 			sd_app_evt_wait();
-			if( task_time(timeout) ) {
-				app_trace_log(DEBUG_MED, "save_log to: %01u, %01u\r", getSystemTimeMs(), timeout.start_time );
+			if( check_expiration(&timeout) ) {
+				app_trace_log(DEBUG_MED, "save_log to: %01u\r\n", getSystemTimeMs() );
 				log_cb[op_code].success = false;
 				retval = NRF_ERROR_TIMEOUT; 
 				break;
@@ -444,11 +445,11 @@ ret_code_t store_log_i( uint8_t * data, uint16_t length, uint32_t offset )
 		}
 		
 		if( log_cb[op_code].success != true ) {
-			app_trace_log(DEBUG_MED, "save_log_cb: failed %01u\r", retval);
+			app_trace_log(DEBUG_MED, "save_log_cb: failed %01u\r\n", retval);
 		}
 	}
 	else {
-		app_trace_log(DEBUG_MED, "save_log: failed %01u\r", retval);
+		app_trace_log(DEBUG_MED, "save_log: failed %01u\r\n", retval);
 	}
 	
 	return retval;
