@@ -14,3 +14,7 @@ Prototype="void Basic_Integrate(const double *x, int n, int dt, double xInit, do
 Class="Function"
 Prototype="void Simpson_Integrate(const double *x, int n, int dt, double xInit, double xFinal, double *y);"
 
+[Phase2ScaleFactor]
+Class="Function"
+Prototype="int Phase2ScaleFactor(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+

@@ -6,3 +6,11 @@ Prototype="int Apply_Raw_Data_Filtering_CB(int panel, int control, int event, vo
 Class="Function"
 Prototype="void Apply_Raw_Data_Filtering();"
 
+[Sqr_A]
+Class="Function"
+Prototype="int Sqr_A(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+
+[Sqr_B]
+Class="Function"
+Prototype="int Sqr_B(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
+

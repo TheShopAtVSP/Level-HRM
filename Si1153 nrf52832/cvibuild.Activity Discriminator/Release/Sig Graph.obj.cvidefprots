@@ -46,7 +46,3 @@ Prototype="int Accel_and_Gyro_Cursor_Update(int panel, int control, int event, v
 Class="Function"
 Prototype="void Update_Cursors();"
 
-[Play_Back_CB]
-Class="Function"
-Prototype="int Play_Back_CB(int panel, int control, int event, void *callbackData, int eventData1, int eventData2);"
-
