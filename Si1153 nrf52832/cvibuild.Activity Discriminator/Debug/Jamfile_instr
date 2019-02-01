@@ -34,6 +34,8 @@ Depends "c:\\Users\\matt\\Documents\\workspace\\theshop-level_HRM\\Si1153 nrf528
 NoCare "C:\\Program Files (x86)\\Windows Kits\\8.1\\Lib\\winv6.3\\um\\x86\\gdi32.lib" ;
 Depends "c:\\Users\\matt\\Documents\\workspace\\theshop-level_HRM\\Si1153 nrf52832\\cvibuild.Activity Discriminator\\Debug\\Activity Discriminator.exe" : "c:\\Program Files (x86)\\National Instruments\\CVI2017\\bin\\msvc\\gpib.lib" ;
 NoCare "c:\\Program Files (x86)\\National Instruments\\CVI2017\\bin\\msvc\\gpib.lib" ;
+Depends "c:\\Users\\matt\\Documents\\workspace\\theshop-level_HRM\\Si1153 nrf52832\\cvibuild.Activity Discriminator\\Debug\\Activity Discriminator.exe" : "c:\\Program Files (x86)\\National Instruments\\CVI2017\\toolslib\\toolbox\\msvc\\inifile.obj" ;
+NoCare "c:\\Program Files (x86)\\National Instruments\\CVI2017\\toolslib\\toolbox\\msvc\\inifile.obj" ;
 Depends "c:\\Users\\matt\\Documents\\workspace\\theshop-level_HRM\\Si1153 nrf52832\\cvibuild.Activity Discriminator\\Debug\\Activity Discriminator.exe" : "C:\\Program Files (x86)\\Windows Kits\\8.1\\Lib\\winv6.3\\um\\x86\\kernel32.lib" ;
 NoCare "C:\\Program Files (x86)\\Windows Kits\\8.1\\Lib\\winv6.3\\um\\x86\\kernel32.lib" ;
 Depends "c:\\Users\\matt\\Documents\\workspace\\theshop-level_HRM\\Si1153 nrf52832\\cvibuild.Activity Discriminator\\Debug\\Activity Discriminator.exe" : "c:\\Program Files (x86)\\National Instruments\\CVI2017\\bin\\msvc\\nivxi.lib" ;

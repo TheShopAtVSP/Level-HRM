@@ -11,7 +11,7 @@ IVI Standard Root Dir = "/C/Program Files (x86)/IVI Foundation/IVI"
 VXIplug&play Framework Dir = "/C/Program Files (x86)/IVI Foundation/VISA/winnt"
 IVI Standard Root 64-bit Dir = "/C/Program Files/IVI Foundation/IVI"
 VXIplug&play Framework 64-bit Dir = "/C/Program Files/IVI Foundation/VISA/win64"
-Number of Files = 23
+Number of Files = 24
 Target Type = "Executable"
 Flags = 16
 Copied From Locked InstrDrv Directory = False
@@ -315,8 +315,21 @@ Folder = "Instrument Files"
 Folder Id = 3
 
 [File 0022]
-File Type = "Library"
+File Type = "Function Panel"
 Res Id = 22
+Path Is Rel = True
+Path Rel To = "CVI"
+Path Rel To Override = "CVI"
+Path Rel Path = "toolslib/toolbox/inifile.fp"
+Path = "/c/Program Files (x86)/National Instruments/CVI2017/toolslib/toolbox/inifile.fp"
+Exclude = False
+Project Flags = 0
+Folder = "Instrument Files"
+Folder Id = 3
+
+[File 0023]
+File Type = "Library"
+Res Id = 23
 Path Is Rel = True
 Path Rel To = "CVI"
 Path Rel Path = "sdk/lib/msvc/GlU32.Lib"
@@ -326,9 +339,9 @@ Project Flags = 0
 Folder = "Library Files"
 Folder Id = 4
 
-[File 0023]
+[File 0024]
 File Type = "Library"
-Res Id = 23
+Res Id = 24
 Path Is Rel = True
 Path Rel To = "CVI"
 Path Rel Path = "sdk/lib/msvc/OpenGL32.Lib"
@@ -406,7 +419,7 @@ File Version = "1.0"
 File Version Ex = "%f1.%f2"
 Internal Name = "Activity Discriminator"
 Internal Name Ex = "%basename"
-Legal Copyright = "Copyright © The Shop @ VSP Global 2018"
+Legal Copyright = "Copyright © The Shop @ VSP Global 2019"
 Legal Copyright Ex = "Copyright © %company %Y"
 Legal Trademarks = ""
 Legal Trademarks Ex = ""
@@ -491,7 +504,7 @@ File Version = "1.0"
 File Version Ex = "%f1.%f2"
 Internal Name = "convolve"
 Internal Name Ex = "%basename"
-Legal Copyright = "Copyright © The Shop @ VSP Global 2018"
+Legal Copyright = "Copyright © The Shop @ VSP Global 2019"
 Legal Copyright Ex = "Copyright © %company %Y"
 Legal Trademarks = ""
 Legal Trademarks Ex = ""
@@ -709,7 +722,7 @@ File Version = "1.0"
 File Version Ex = "%f1.%f2"
 Internal Name = "convolve"
 Internal Name Ex = "%basename"
-Legal Copyright = "Copyright © The Shop @ VSP Global 2018"
+Legal Copyright = "Copyright © The Shop @ VSP Global 2019"
 Legal Copyright Ex = "Copyright © %company %Y"
 Legal Trademarks = ""
 Legal Trademarks Ex = ""

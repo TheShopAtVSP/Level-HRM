@@ -13,8 +13,13 @@ Sig Graph.obj
 cvi.lib
 analysis.lib
 cvistart.lib
+inifile.obj
+advapi32.lib
 kernel32.lib
+toolbox.obj
 user32.lib
+cviauto.lib
+gdi32.lib
 EXE Symbol Module
 Exports Module
 Resource Module

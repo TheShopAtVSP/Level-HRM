@@ -26,7 +26,7 @@ BEGIN
             VALUE "FileDescription", "Activity Discriminator (Debug x86)\0"
             VALUE "FileVersion", "1.0\0"
             VALUE "InternalName", "Activity Discriminator\0"
-            VALUE "LegalCopyright", "Copyright © The Shop @ VSP Global 2018\0"
+            VALUE "LegalCopyright", "Copyright © The Shop @ VSP Global 2019\0"
             VALUE "OriginalFilename", "Activity Discriminator.exe\0"
             VALUE "ProductName", "The Shop @ VSP Global Activity Discriminator\0"
             VALUE "ProductVersion", "1.0\0"

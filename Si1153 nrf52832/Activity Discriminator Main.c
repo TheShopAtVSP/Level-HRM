@@ -15,6 +15,7 @@
 #include <cvirte.h>     
 #include <analysis.h>
 #include <userint.h>
+#include <inifile.h>
 #include "cviogl.h"
 #include "Activity Discriminator.h"
 #include "Activity Discriminator vars.h"
@@ -27,7 +28,8 @@
 
 int main (int argc, char *argv[])
 {
-	int screen_width;
+	int fileError;
+	char com_str[8]; 
 	
     if (InitCVIRTE (0, argv, 0) == 0)    
         return -1;    /* out of memory */
@@ -40,16 +42,31 @@ int main (int argc, char *argv[])
 /*****************************************************************/	
 	
 	CheckListItem (mainpnl, MAINPNL_PD_PLOT, 3, 1);
-	//ser_com_port =6;
-	//OpenComConfig (ser_com_port, "COM6", 115200, 0, 8, 1, 16, 16);
-	//ser_com_port =3;
-	//OpenComConfig (ser_com_port, "COM3", 115200, 0, 8, 1, 16, 16);
-	ser_com_port =5;
-	OpenComConfig (ser_com_port, "COM5", 115200, 0, 8, 1, 16, 16);
-	//ser_com_port =8;
-	//OpenComConfig (ser_com_port, "COM8", 115200, 0, 8, 1, 16, 16);
-//	ComWrtByte (ser_com_port, 0x56);
-//	ComWrtByte (ser_com_port, 0);
+	
+	// create object for holding the value/tag pairs
+	IniText iniText = Ini_New (TRUE);	// TRUE for automatic sorting 
+	// read in the tag/value pairs 
+	fileError = Ini_ReadFromFile (iniText, "./myconfig.ini"); 
+	if( fileError < 0 )
+	{   //File Not read
+		return -1;
+	}
+	// create the in–memory tag/value pairs
+	fileError = Ini_GetInt (iniText, "section 1", "com_port", &ser_com_port); 
+	if( fileError < 0 )
+	{   //Value Not read
+		return -1;
+	}
+	// dispose of the in–memory tag/value pairs
+	Ini_Dispose (iniText);
+	
+	// check that the com port makes sense:
+	if( ser_com_port > 99 || ser_com_port < 0 )
+	{	// Com port out of bounds
+		return -1;	
+	}
+	sprintf( com_str, "COM%01u", ser_com_port );
+	RS232Error = OpenComConfig (ser_com_port, com_str, 115200, 0, 8, 1, 16, 16); 
 	
 	selfsteadyhasrun = 0;
 	self_steady = 0;
@@ -79,6 +96,8 @@ int main (int argc, char *argv[])
 	for(int i = 0; i < 8; i++)
 		last4hrmavg[i] = 71;
 	last4hrmavgidx = 0;
+	
+
 //	GetScreenSize (NULL, &screen_width);
 //	if(screen_width == 1600)
 //		SetPanelSize (mainpnl, 800, 1600);

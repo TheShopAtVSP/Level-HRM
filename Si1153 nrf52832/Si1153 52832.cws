@@ -15,9 +15,9 @@ Active Project = 1
 Project 0001 = "Activity Discriminator.prj"
 Drag Bar Left = 253
 Window Top = 47
-Window Left = 2577
-Window Bottom = 782
-Window Right = 3991
+Window Left = 762
+Window Bottom = 1047
+Window Right = 2251
 Maximized = False
 Maximized Children = True
 Max32 Number Of Errors = 20
@@ -31,7 +31,7 @@ Save Changes Before Compiling = "Always"
 Hide Windows = False
 Break At First Statement = False
 Sort Type = "File Name"
-Number of Opened Files = 11
+Number of Opened Files = 12
 Window Confinement Region Enabled = True
 MainColumnWidth = 236
 FileDateColumnWidth = 70
@@ -60,6 +60,18 @@ Disk Date = 3573619200
 In Projects = "1,"
 
 [File 0003]
+Path Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Activity Dis"
+Path Line0002 = "criminator Main.c"
+File Type = "CSource"
+Disk Date = 3631903453
+In Projects = "1,"
+Window Top = 31
+Window Z-Order = 1
+Source Window State = "1,44,63,63,0,17,17,0,0,146,0,0,0,0,0,53,21,0,59,111,349,715,1,0,"
+Breakpoint 0001 = "137,0,enabled,"
+Tracepoint 0001 = "0,0,106,1,"
+
+[File 0004]
 Path Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Load Store D"
 Path Line0002 = "ata.c"
 File Type = "CSource"
@@ -67,10 +79,10 @@ Disk Date = 3614089175
 In Projects = "1,"
 Window Top = 33
 Window Left = 10
-Window Z-Order = 10
+Window Z-Order = 12
 Source Window State = "1,27,27,27,16,25,25,0,0,76,0,0,0,0,0,25,87,0,99,21,349,683,1,0,"
 
-[File 0004]
+[File 0005]
 Path Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Activity Dis"
 Path Line0002 = "criminator.uir"
 File Type = "User Interface Resource"
@@ -80,9 +92,9 @@ Window Top = 38
 Window Left = 6
 Window Height = 349
 Window Width = 715
-Window Z-Order = 4
+Window Z-Order = 8
 
-[File 0005]
+[File 0006]
 Path Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/RT Serial Se"
 Path Line0002 = "nsor Aqu.c"
 File Type = "CSource"
@@ -90,10 +102,10 @@ Disk Date = 3614087078
 In Projects = "1,"
 Window Top = 110
 Window Left = 48
-Window Z-Order = 1
-Source Window State = "1,375,375,375,48,55,55,0,0,136,0,0,0,0,0,32,317,0,332,4,417,835,1,0,"
+Window Z-Order = 3
+Source Window State = "1,360,360,360,26,38,38,0,0,95,0,0,0,0,0,30,166,0,181,22,417,835,1,0,"
 
-[File 0006]
+[File 0007]
 Path Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Peak Detecto"
 Path Line0002 = "r 3.c"
 File Type = "CSource"
@@ -101,19 +113,7 @@ Disk Date = 3614092304
 In Projects = "1,"
 Window Top = 38
 Window Left = 6
-Window Z-Order = 6
 Source Window State = "1,586,586,586,18,21,21,0,0,81,0,599,0,0,0,31,1045,0,989,38,427,718,1,0,"
-
-[File 0007]
-Path Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Activity Dis"
-Path Line0002 = "criminator Main.c"
-File Type = "CSource"
-Disk Date = 3626212079
-In Projects = "1,"
-Window Top = 40
-Window Left = 11
-Window Z-Order = 9
-Source Window State = "1,47,47,47,37,38,38,0,0,80,0,0,0,0,0,25,35,0,47,4,349,715,1,0,"
 
 [File 0008]
 Path Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Activity Dis"
@@ -123,8 +123,8 @@ Disk Date = 3614087787
 In Projects = "1,"
 Window Top = 230
 Window Left = 111
-Window Z-Order = 11
-Source Window State = "1,80,80,80,60,69,69,0,0,80,0,51,0,0,0,25,54,0,66,27,349,715,1,11,"
+Window Z-Order = 2
+Source Window State = "1,80,80,80,60,69,69,0,0,80,0,51,0,0,0,25,86,0,98,8,349,715,1,11,"
 
 [File 0009]
 Path = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Sig Graph.c"
@@ -133,20 +133,10 @@ Disk Date = 3614087078
 In Projects = "1,"
 Window Top = 230
 Window Left = 111
-Window Z-Order = 3
+Window Z-Order = 10
 Source Window State = "1,352,352,352,4,94,94,0,3,80,0,0,0,0,0,25,338,0,352,4,349,715,1,0,"
 
 [File 0010]
-Path Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Raw Data Fil"
-Path Line0002 = "ters.c"
-File Type = "CSource"
-Disk Date = 3614087078
-In Projects = "1,"
-Window Top = 40
-Window Left = 11
-Source Window State = "1,23,23,23,16,43,43,0,0,80,0,0,0,0,0,25,125,0,30,35,349,715,1,0,"
-
-[File 0011]
 Path Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Si1153 Cntrl"
 Path Line0002 = ".c"
 File Type = "CSource"
@@ -154,10 +144,30 @@ Disk Date = 3626292787
 In Projects = "1,"
 Window Top = 38
 Window Left = 10
-Window Z-Order = 2
-Source Window State = "1,34,34,34,32,48,48,0,0,76,0,0,0,0,0,25,122,0,121,43,349,683,1,0,"
+Window Z-Order = 4
+Source Window State = "1,34,34,34,32,48,48,0,0,76,0,0,0,0,0,25,122,0,122,20,349,683,1,0,"
+
+[File 0011]
+Path Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Activity Dis"
+Path Line0002 = "criminator.h"
+File Type = "Include"
+Disk Date = 3614087077
+In Projects = "1,"
+Window Top = 38
+Source Window State = "1,110,110,110,9,25,25,0,3,66,0,0,0,0,0,28,96,0,110,9,400,600,1,0,"
 
 [File 0012]
+Path Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Peak Detecto"
+Path Line0002 = "r.c"
+File Type = "CSource"
+Disk Date = 3614087077
+In Projects = ""
+Window Top = 126
+Window Left = 58
+Window Z-Order = 11
+Source Window State = "1,150,150,150,37,40,40,0,3,80,0,0,0,0,0,21,140,0,150,37,297,715,1,0,"
+
+[File 0013]
 Path Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Activity_Pro"
 Path Line0002 = "cedural.c"
 File Type = "CSource"
@@ -167,7 +177,7 @@ Window Top = 268
 Window Left = 131
 Source Window State = "1,57,57,57,19,20,20,0,0,0,0,0,0,0,0,0,14,0,57,24,349,715,1,0,"
 
-[File 0013]
+[File 0014]
 Path = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/AX3dPlot.c"
 File Type = "CSource"
 Disk Date = 3614087077
@@ -175,7 +185,7 @@ In Projects = "1,"
 Window Top = 38
 Source Window State = "1,70,70,70,75,78,78,0,0,0,0,0,0,0,0,0,50,0,60,0,400,600,1,0,"
 
-[File 0014]
+[File 0015]
 Path = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Blood Hart.c"
 File Type = "CSource"
 Disk Date = 3614087077
@@ -184,7 +194,7 @@ Window Top = 40
 Window Left = 11
 Source Window State = "1,48,53,48,8,99,8,0,3,0,0,0,0,0,0,0,7,0,53,99,349,715,1,0,"
 
-[File 0015]
+[File 0016]
 Path Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Gravity Vect"
 Path Line0002 = "or OGL.c"
 File Type = "CSource"
@@ -194,7 +204,7 @@ Window Top = 306
 Window Left = 151
 Source Window State = "1,130,130,130,34,35,35,0,0,0,0,0,0,0,0,0,103,0,130,35,349,715,1,0,"
 
-[File 0016]
+[File 0017]
 Path Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Gravity Vect"
 Path Line0002 = "or.c"
 File Type = "CSource"
@@ -204,7 +214,7 @@ Window Top = 116
 Window Left = 51
 Source Window State = "1,62,62,62,16,39,39,0,3,0,0,0,0,0,0,0,43,0,62,16,349,715,1,0,"
 
-[File 0017]
+[File 0018]
 Path = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Histogram.c"
 File Type = "CSource"
 Disk Date = 3614087077
@@ -213,7 +223,7 @@ Window Top = 425
 Window Left = 231
 Source Window State = "1,66,66,66,4,163,4,0,0,0,0,0,0,0,0,0,28,0,36,4,349,715,1,0,"
 
-[File 0018]
+[File 0019]
 Path = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Magnitude.c"
 File Type = "CSource"
 Disk Date = 3614087077
@@ -222,7 +232,7 @@ Window Top = 40
 Window Left = 11
 Source Window State = "1,21,21,21,5,18,5,0,3,0,0,0,0,0,0,0,6,0,21,18,349,715,1,0,"
 
-[File 0019]
+[File 0020]
 Path Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Position Int"
 Path Line0002 = "egrator.c"
 File Type = "CSource"
@@ -232,56 +242,77 @@ Window Top = 192
 Window Left = 91
 Source Window State = "1,256,264,265,0,8160,0,1,0,0,0,0,0,0,0,0,0,0,90,2,349,739,1,0,"
 
-[File 0020]
-Path Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Activity Dis"
-Path Line0002 = "criminator.h"
-File Type = "Include"
-Disk Date = 3614087077
-In Projects = "1,"
-Window Top = 38
-Window Z-Order = 5
-Source Window State = "1,110,110,110,9,25,25,0,3,66,0,0,0,0,0,28,96,0,110,9,400,600,1,0,"
-
 [File 0021]
+Path Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Raw Data Fil"
+Path Line0002 = "ters.c"
+File Type = "CSource"
+Disk Date = 3614087078
+In Projects = "1,"
+Window Top = 40
+Window Left = 11
+Source Window State = "1,23,23,23,16,43,43,0,0,0,0,0,0,0,0,0,125,0,30,35,349,715,1,0,"
+
+[File 0022]
 Path = "/c/Users/matt/Documents/675da3299148/mbed.h"
 File Type = "Include"
 Disk Date = 0
 In Projects = "1,"
 Source Window State = "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"
 
-[File 0022]
+[File 0023]
 Path = "/C/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x86/GlU32.Lib"
 File Type = "Library"
 Disk Date = 3459983618
 In Projects = "1,"
 
-[File 0023]
+[File 0024]
 Path = "/C/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x86/OpenGL32.Lib"
 File Type = "Library"
 Disk Date = 3459979706
 In Projects = "1,"
 
-[File 0024]
-Path Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Peak Detecto"
-Path Line0002 = "r.c"
-File Type = "CSource"
-Disk Date = 3614087077
-In Projects = ""
-Window Top = 126
-Window Left = 58
-Window Z-Order = 8
-Source Window State = "1,150,150,150,37,40,40,0,3,80,0,0,0,0,0,21,140,0,150,37,297,715,1,0,"
-
 [File 0025]
+Path = "/c/Program Files (x86)/National Instruments/CVI2017/include/userint.h"
+File Type = "Include"
+Disk Date = 3573619200
+In Projects = ""
+Window Top = 281
+Window Left = 138
+Window Z-Order = 9
+Source Window State = "1,2318,2318,2318,12,28,28,0,3,80,0,0,0,0,0,25,2306,0,2318,12,349,715,1,0,"
+
+[File 0026]
+Path Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Uno Serial S"
+Path Line0002 = "ensor Aqu ASCII.c"
+File Type = "CSource"
+Disk Date = 3614087078
+In Projects = ""
+Window Top = 250
+Window Left = 122
+Window Z-Order = 5
+Source Window State = "1,0,0,0,0,0,0,0,0,80,0,0,0,0,0,25,24,0,54,14,349,715,1,0,"
+
+[File 0027]
 Path Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Uno Serial S"
 Path Line0002 = "ensor Aqu.c"
 File Type = "CSource"
 Disk Date = 3614087078
 In Projects = ""
-Window Top = 33
-Window Left = 10
+Window Top = 219
+Window Left = 106
+Window Z-Order = 6
+Source Window State = "1,0,0,0,0,0,0,0,0,80,0,0,0,0,0,25,168,0,194,14,349,715,1,0,"
+
+[File 0028]
+Path Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/VCNL4020 Cnt"
+Path Line0002 = "rl.c"
+File Type = "CSource"
+Disk Date = 3614087078
+In Projects = ""
+Window Top = 188
+Window Left = 90
 Window Z-Order = 7
-Source Window State = "1,0,0,0,0,0,0,0,0,80,0,0,0,0,0,21,177,0,189,26,297,715,1,0,"
+Source Window State = "1,0,0,0,0,0,0,0,0,80,0,0,0,0,0,25,36,0,116,28,349,715,1,0,"
 
 [Tab Order]
 Tab 0001 Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Activity Dis"
@@ -294,17 +325,18 @@ Tab 0004 Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 
 Tab 0004 Line0002 = "ata.c"
 Tab 0005 Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Activity Dis"
 Tab 0005 Line0002 = "criminator.uir"
-Tab 0006 Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Peak Detecto"
-Tab 0006 Line0002 = "r 3.c"
-Tab 0007 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Sig Graph.c"
-Tab 0008 Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Si1153 Cntrl"
-Tab 0008 Line0002 = ".c"
-Tab 0009 Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Peak Detecto"
-Tab 0009 Line0002 = "r.c"
-Tab 0010 Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Activity Dis"
-Tab 0010 Line0002 = "criminator.h"
+Tab 0006 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Sig Graph.c"
+Tab 0007 Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Peak Detecto"
+Tab 0007 Line0002 = "r.c"
+Tab 0008 = "/c/Program Files (x86)/National Instruments/CVI2017/include/userint.h"
+Tab 0009 Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/VCNL4020 Cnt"
+Tab 0009 Line0002 = "rl.c"
+Tab 0010 Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Uno Serial S"
+Tab 0010 Line0002 = "ensor Aqu.c"
 Tab 0011 Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Uno Serial S"
-Tab 0011 Line0002 = "ensor Aqu.c"
+Tab 0011 Line0002 = "ensor Aqu ASCII.c"
+Tab 0012 Line0001 = "/c/Users/matt/Documents/workspace/theshop-level_HRM/Si1153 nrf52832/Si1153 Cntrl"
+Tab 0012 Line0002 = ".c"
 
 [Default Build Config 0001 Debug]
 Generate Browse Info = True
