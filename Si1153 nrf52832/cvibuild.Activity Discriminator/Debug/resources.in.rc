@@ -6,7 +6,7 @@
 
 STRINGTABLE DISCARDABLE
 BEGIN
-  65535  "Activity Discriminator"
+  65535  "hrm_demo_debug"
 END
 
 VS_VERSION_INFO VERSIONINFO
@@ -23,12 +23,12 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "CompanyName", "The Shop @ VSP Global\0"
-            VALUE "FileDescription", "Activity Discriminator (Debug x86)\0"
+            VALUE "FileDescription", "hrm_demo_debug (Debug x86)\0"
             VALUE "FileVersion", "1.0\0"
-            VALUE "InternalName", "Activity Discriminator\0"
+            VALUE "InternalName", "hrm_demo_debug\0"
             VALUE "LegalCopyright", "Copyright © The Shop @ VSP Global 2019\0"
-            VALUE "OriginalFilename", "Activity Discriminator.exe\0"
-            VALUE "ProductName", "The Shop @ VSP Global Activity Discriminator\0"
+            VALUE "OriginalFilename", "hrm_demo_debug.exe\0"
+            VALUE "ProductName", "The Shop @ VSP Global hrm_demo_debug\0"
             VALUE "ProductVersion", "1.0\0"
         END
     END

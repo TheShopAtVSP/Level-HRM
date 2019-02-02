@@ -1,5 +1,5 @@
 -nologo
--out:c:\Users\matt\Documents\workspace\theshop-level_HRM\Si1153 nrf52832\cvibuild.Activity Discriminator\Debug\Activity Discriminator.exe
+-out:c:\Users\matt\Documents\workspace\theshop-level_HRM\Si1153 nrf52832\cvibuild.Activity Discriminator\Debug\hrm_demo_debug.exe
 -arch:x86
 -timestamp
 -debug:2
