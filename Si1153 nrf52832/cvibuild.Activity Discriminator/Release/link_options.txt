@@ -1,5 +1,5 @@
 -nologo
--out:c:\Users\matt\Documents\workspace\theshop-level_HRM\Si1153 nrf52832\cvibuild.Activity Discriminator\Release\convolve.exe
+-out:c:\Users\matt\Documents\workspace\theshop-level_HRM\Si1153 nrf52832\cvibuild.Activity Discriminator\Release\hrm_demo.exe
 -arch:x86
 -timestamp
 -loadextmod

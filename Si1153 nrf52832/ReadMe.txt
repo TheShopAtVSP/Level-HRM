@@ -1,0 +1,1 @@
+The com port for the BLE dongle can be define in myconfig.ini

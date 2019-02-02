@@ -1,68 +1,7 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
-	<dependency>
-		<dependentAssembly>
-			<assemblyIdentity type="win32" name="ni.cvi.rte" version="17.0.0.295" processorArchitecture="x86" publicKeyToken="0f735295e7682ad5"/>
-		</dependentAssembly>
-	</dependency>
-	<dependency>
-		<dependentAssembly>
-			<assemblyIdentity type="win32" name="ni.cvi.activex" version="17.0.0.295" processorArchitecture="x86" publicKeyToken="0f735295e7682ad5"/>
-		</dependentAssembly>
-	</dependency>
-	<dependency>
-		<dependentAssembly>
-			<assemblyIdentity type="win32" name="ni.cvi.internet" version="17.0.0.295" processorArchitecture="x86" publicKeyToken="0f735295e7682ad5"/>
-		</dependentAssembly>
-	</dependency>
-	<dependency>
-		<dependentAssembly>
-			<assemblyIdentity type="win32" name="ni.cvi.datasocket" version="17.0.0.295" processorArchitecture="x86" publicKeyToken="0f735295e7682ad5"/>
-		</dependentAssembly>
-	</dependency>
-	<dependency>
-		<dependentAssembly>
-			<assemblyIdentity type="win32" name="ni.cvi.instrsup" version="17.0.0.295" processorArchitecture="x86" publicKeyToken="0f735295e7682ad5"/>
-		</dependentAssembly>
-	</dependency>
-	<dependency>
-		<dependentAssembly>
-			<assemblyIdentity type="win32" name="ni.cvi.dotnet" version="17.0.0.295" processorArchitecture="x86" publicKeyToken="0f735295e7682ad5"/>
-		</dependentAssembly>
-	</dependency>
-	<dependency>
-		<dependentAssembly>
-			<assemblyIdentity type="win32" name="ni.cvi.analysis" version="17.0.0.295" processorArchitecture="x86" publicKeyToken="0f735295e7682ad5"/>
-		</dependentAssembly>
-	</dependency>
-	<dependency>
-		<dependentAssembly>
-			<assemblyIdentity type="win32" name="ni.cvi.netv" version="17.0.0.295" processorArchitecture="x86" publicKeyToken="0f735295e7682ad5"/>
-		</dependentAssembly>
-	</dependency>
-	<dependency>
-		<dependentAssembly>
-			<assemblyIdentity type="win32" name="ni.cvi.cnetstreams" version="17.0.0.295" processorArchitecture="x86" publicKeyToken="0f735295e7682ad5"/>
-		</dependentAssembly>
-	</dependency>
-	<dependency>
-		<dependentAssembly>
-			<assemblyIdentity type="win32" name="ni.cvi.tdms" version="17.0.0.295" processorArchitecture="x86" publicKeyToken="0f735295e7682ad5"/>
-		</dependentAssembly>
-	</dependency>
-	<dependency>
-		<dependentAssembly>
-			<assemblyIdentity type="win32" name="ni.cvi.omp" version="17.0.0.295" processorArchitecture="x86" publicKeyToken="0f735295e7682ad5"/>
-		</dependentAssembly>
-	</dependency>
-	<dependency>
-		<dependentAssembly>
-			<assemblyIdentity type="win32" name="ni.cvi.ogl" version="17.0.0.295" processorArchitecture="x86" publicKeyToken="0f735295e7682ad5"/>
-		</dependentAssembly>
-	</dependency>
-	<asmv3:application xmlns:asmv3="urn:schemas-microsoft-com:asm.v3">
-		<asmv3:windowsSettings xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">
-			<dpiAware>False</dpiAware>
-		</asmv3:windowsSettings>
-	</asmv3:application>
-</assembly>
+﻿<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" >
+  <asmv3:application>
+    <asmv3:windowsSettings xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">
+      <dpiAware>False</dpiAware>
+    </asmv3:windowsSettings>
+  </asmv3:application>
+</assembly> 
