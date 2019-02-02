@@ -43,31 +43,6 @@ int main (int argc, char *argv[])
 	
 	CheckListItem (mainpnl, MAINPNL_PD_PLOT, 3, 1);
 	
-	// create object for holding the value/tag pairs
-	IniText iniText = Ini_New (TRUE);	// TRUE for automatic sorting 
-	// read in the tag/value pairs 
-	fileError = Ini_ReadFromFile (iniText, "./myconfig.ini"); 
-	if( fileError < 0 )
-	{   //File Not read
-		return -1;
-	}
-	// create the in–memory tag/value pairs
-	fileError = Ini_GetInt (iniText, "section 1", "com_port", &ser_com_port); 
-	if( fileError < 0 )
-	{   //Value Not read
-		return -1;
-	}
-	// dispose of the in–memory tag/value pairs
-	Ini_Dispose (iniText);
-	
-	// check that the com port makes sense:
-	if( ser_com_port > 99 || ser_com_port < 0 )
-	{	// Com port out of bounds
-		return -1;	
-	}
-	sprintf( com_str, "COM%01u", ser_com_port );
-	RS232Error = OpenComConfig (ser_com_port, com_str, 115200, 0, 8, 1, 16, 16); 
-	
 	selfsteadyhasrun = 0;
 	self_steady = 0;
 	ssax = ssay = ssaz = 0;
@@ -112,6 +87,36 @@ int main (int argc, char *argv[])
     // For HB Testing
     //if (autoGenerateGraphs) GenerateGraphs();
     DisplayPanel (mainpnl);
+	
+	// create object for holding the value/tag pairs
+	IniText iniText = Ini_New (TRUE);	// TRUE for automatic sorting 
+	// read in the tag/value pairs 
+	fileError = Ini_ReadFromFile (iniText, "./myconfig.ini"); 
+	if( fileError < 0 )
+	{   //File Not read
+	    MessagePopup ("File Not Found", "myconfig.ini failed to open"); 
+	}
+	// create the in–memory tag/value pairs
+	fileError = Ini_GetInt (iniText, "section 1", "com_port", &ser_com_port); 
+	if( fileError < 0 )
+	{   //Value Not read
+		MessagePopup ("Definition Error", "COM Port not defined in myconfig.ini");
+	}
+	// dispose of the in–memory tag/value pairs
+	Ini_Dispose (iniText);
+	
+	// check that the com port makes sense:
+	if( ser_com_port > 99 || ser_com_port < 0 )
+	{	// Com port out of bounds
+		MessagePopup ("COM Port Error", "myconfig.ini define Out of Bounds"); 
+	}
+	sprintf( com_str, "COM%01u", ser_com_port );
+	RS232Error = OpenComConfig (ser_com_port, com_str, 115200, 0, 8, 1, 16, 16); 
+	if( RS232Error < 0 )
+	{
+		MessagePopup ("COM Port Error", "Could not Open Communication to BLE Dongle"); 
+	}
+	
     RunUserInterface ();
     DiscardPanel (mainpnl);
     return 0;
